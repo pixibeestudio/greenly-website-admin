@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greenly - Clean Food Admin Dashboard</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Tailwind Config for Custom Colors -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Quicksand', 'sans-serif'],
+                    },
+                    colors: {
+                        forest: {
+                            50: '#e8f5e9',
+                            100: '#c8e6c9',
+                            500: '#4caf50',
+                            700: '#2e7d32', // Main Forest Green
+                            800: '#1b5e20',
+                            900: '#0d3b10',
+                        },
+                        organic: {
+                            100: '#fff9c4',
+                            400: '#fbc02d',
+                            500: '#f9a825', // Yellow Orange
+                        },
+                        cream: {
+                            50: '#fffde7', // Light Cream
+                            100: '#f5f5f5',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2e7d32; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #1b5e20; 
+        }
+
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* Sidebar transition */
+        #sidebar {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="bg-cream-50 text-gray-800 font-sans antialiased overflow-hidden">
+
+    <div class="flex h-screen relative">
+        
+        <!-- SIDEBAR -->
+        <!-- Logic: Hidden on mobile by default, toggled via JS. Fixed width on desktop. -->
+        <aside id="sidebar" class="absolute z-20 top-0 left-0 h-full w-64 bg-forest-800 text-white transform -translate-x-full md:translate-x-0 flex flex-col shadow-2xl">
+            <!-- Logo Area -->
+            <div class="h-20 flex items-center justify-center border-b border-forest-700 bg-forest-900">
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-forest-700">
+                        <i class="fa-solid fa-leaf text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold tracking-wide">GREENLY</h1>
+                        <p class="text-xs text-forest-100 uppercase tracking-wider">Admin Premium</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Menu (Based on DB Tables) -->
+            <nav class="flex-1 overflow-y-auto py-4">
+                <ul class="space-y-1 px-3">
+                    <!-- Dashboard -->
+                    <li>
+                        <a href="#" onclick="loadPage('dashboard', this)" class="nav-item flex items-center px-4 py-3 rounded-lg bg-forest-700 text-white shadow-md transition-colors">
+                            <i class="fa-solid fa-chart-pie w-6 text-center"></i>
+                            <span class="ml-3 font-medium">Dashboard</span>
+                        </a>
+                    </li>
+
+                    <li class="pt-4 pb-1 px-4 text-xs font-bold text-forest-100 uppercase opacity-70">Quản lý Sản phẩm</li>
+                    
+                    <!-- Products (Table: products) -->
+                    <li>
+                        <a href="#" onclick="loadPage('products', this)" class="nav-item flex items-center px-4 py-3 rounded-lg hover:bg-forest-700 text-forest-100 hover:text-white transition-colors">
+                            <i class="fa-solid fa-carrot w-6 text-center"></i>
+                            <span class="ml-3 font-medium">Sản phẩm</span>
+                        </a>
+                    </li>
+                    
+                    <!-- Categories (Table: categories) -->
+                    <li>
+                        <a href="#" onclick="loadPage('categories', this)" class="nav-item flex items-center px-4 py-3 rounded-lg hover:bg-forest-700 text-forest-100 hover:text-white transition-colors">
+                            <i class="fa-solid fa-tags w-6 text-center"></i>
+                            <span class="ml-3 font-medium">Danh mục</span>
+                        </a>
+                    </li>
+
+                    <li class="pt-4 pb-1 px-4 text-xs font-bold text-forest-100 uppercase opacity-70">Bán hàng & Kho</li>
+
+                    <!-- Orders (Table: orders, order_details) -->
+                    <li>
+                        <a href="#" onclick="loadPage('orders', this)" class="nav-item flex items-center px-4 py-3 rounded-lg hover:bg-forest-700 text-forest-100 hover:text-white transition-colors">
+                            <i class="fa-solid fa-cart-shopping w-6 text-center"></i>
+                            <span class="ml-3 font-medium">Đơn hàng</span>
+                            <span class="ml-auto bg-organic-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">3</span>
+                        </a>
+                    </li>
+
+                    <!-- Batches (Table: batches) -->
+                    <li>
+                        <a href="#" onclick="loadPage('batches', this)" class="nav-item flex items-center px-4 py-3 rounded-lg hover:bg-forest-700 text-forest-100 hover:text-white transition-colors">
+                            <i class="fa-solid fa-boxes-stacked w-6 text-center"></i>
+                            <span class="ml-3 font-medium">Lô hàng nhập</span>
+                        </a>
+                    </li>
+
+                    <!-- Suppliers (Table: suppliers) -->
+                    <li>
+                        <a href="#" onclick="loadPage('suppliers', this)" class="nav-item flex items-center px-4 py-3 rounded-lg hover:bg-forest-700 text-forest-100 hover:text-white transition-colors">
+                            <i class="fa-solid fa-truck-field w-6 text-center"></i>
+                            <span class="ml-3 font-medium">Nhà cung cấp</span>
+                        </a>
+                    </li>
+
+                    <li class="pt-4 pb-1 px-4 text-xs font-bold text-forest-100 uppercase opacity-70">Hệ thống</li>
+
+                    <!-- Users (Table: users) -->
+                    <li>
+                        <a href="#" onclick="loadPage('users', this)" class="nav-item flex items-center px-4 py-3 rounded-lg hover:bg-forest-700 text-forest-100 hover:text-white transition-colors">
+                            <i class="fa-solid fa-users w-6 text-center"></i>
+                            <span class="ml-3 font-medium">Người dùng</span>
+                        </a>
+                    </li>
+
+                    <!-- Reviews (Table: reviews) -->
+                    <li>
+                        <a href="#" onclick="loadPage('reviews', this)" class="nav-item flex items-center px-4 py-3 rounded-lg hover:bg-forest-700 text-forest-100 hover:text-white transition-colors">
+                            <i class="fa-solid fa-star w-6 text-center"></i>
+                            <span class="ml-3 font-medium">Đánh giá</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- User Profile (Bottom Sidebar) -->
+            <div class="p-4 border-t border-forest-700 bg-forest-900">
+                <div class="flex items-center gap-3">
+                    <img src="https://ui-avatars.com/api/?name=Admin+User&background=f9a825&color=fff" alt="Admin" class="w-10 h-10 rounded-full border-2 border-white">
+                    <div class="overflow-hidden">
+                        <h4 class="text-sm font-semibold truncate">Quản trị viên</h4>
+                        <p class="text-xs text-forest-100 truncate">admin@greenly.com</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <div class="flex-1 flex flex-col h-screen w-full md:ml-64 transition-all duration-300 relative">
+            
+            <!-- Header -->
+            <header class="h-20 bg-white/80 backdrop-blur-md shadow-sm flex items-center justify-between px-6 sticky top-0 z-10">
+                <div class="flex items-center gap-4">
+                    <!-- Hamburger Button -->
+                    <button onclick="toggleSidebar()" class="p-2 rounded-lg hover:bg-gray-100 text-forest-800 md:hidden focus:outline-none">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                    <!-- Sidebar Toggle for Desktop (Collapse) -->
+                    <button onclick="toggleSidebarDesktop()" class="hidden md:block p-2 rounded-lg hover:bg-gray-100 text-forest-800 focus:outline-none">
+                         <i class="fa-solid fa-outdent text-xl"></i>
+                    </button>
+
+                    <h2 id="page-title" class="text-2xl font-bold text-forest-800">Dashboard</h2>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <!-- Search -->
+                    <div class="hidden sm:flex items-center bg-cream-100 rounded-full px-4 py-2 border border-transparent focus-within:border-organic-400 focus-within:bg-white transition-all">
+                        <i class="fa-solid fa-search text-gray-400"></i>
+                        <input type="text" placeholder="Tìm kiếm..." class="bg-transparent border-none focus:ring-0 ml-2 text-sm w-48 outline-none text-gray-600">
+                    </div>
+
+                    <!-- Notifications -->
+                    <button class="relative p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
+                        <i class="fa-regular fa-bell text-xl"></i>
+                        <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Main Scrollable Area -->
+            <main id="main-content" class="flex-1 overflow-y-auto p-4 md:p-6 bg-cream-50 scroll-smooth">
+                <!-- CONTENT INJECTED BY JS -->
+            </main>
+        </div>
+
+        <!-- Overlay for Mobile Sidebar -->
+        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-10 hidden md:hidden glass"></div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- Mock Data based on SQL Structure ---
+        const db = {
+            stats: {
+                revenue: 154200000,
+                orders: 1240,
+                customers: 856,
+                products: 45
+            },
+            recentOrders: [
+                { id: '#ORD-7829', user: 'Nguyễn Văn A', date: '2023-10-25', total: '1,250,000đ', status: 'shipping', statusText: 'Đang giao' },
+                { id: '#ORD-7830', user: 'Trần Thị B', date: '2023-10-25', total: '450,000đ', status: 'pending', statusText: 'Chờ xử lý' },
+                { id: '#ORD-7831', user: 'Lê Hoàng C', date: '2023-10-24', total: '3,100,000đ', status: 'completed', statusText: 'Hoàn thành' },
+                { id: '#ORD-7832', user: 'Phạm Minh D', date: '2023-10-24', total: '890,000đ', status: 'cancelled', statusText: 'Đã hủy' },
+            ],
+            products: [
+                { id: 1, name: 'Cà chua Organic Đà Lạt', cat: 'Rau củ', price: '45,000đ', unit: 'Kg', stock: 120, img: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=100&q=80', status: true },
+                { id: 2, name: 'Thịt Ba Chỉ Heo Sạch', cat: 'Thịt tươi', price: '180,000đ', unit: 'Kg', stock: 45, img: 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?auto=format&fit=crop&w=100&q=80', status: true },
+                { id: 3, name: 'Táo Envy Mỹ', cat: 'Trái cây', price: '220,000đ', unit: 'Kg', stock: 0, img: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=100&q=80', status: false },
+                { id: 4, name: 'Cải Kale Hữu Cơ', cat: 'Rau củ', price: '80,000đ', unit: 'Kg', stock: 30, img: 'https://images.unsplash.com/photo-1524179091875-bf99a9a6af57?auto=format&fit=crop&w=100&q=80', status: true },
+            ],
+            batches: [
+                { code: 'L001-TOM', product: 'Cà chua Organic', supplier: 'Nông trại Vineco', importDate: '2023-10-20', expiry: '2023-11-05', qty: 500, current: 120 },
+                { code: 'L002-PORK', product: 'Thịt Ba Chỉ', supplier: 'CP Food', importDate: '2023-10-24', expiry: '2023-10-27', qty: 100, current: 45 },
+            ]
+        };
+
+        // --- Core Functions ---
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+        }
+
+        // Toggle Sidebar Mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        // Toggle Desktop Sidebar (Mini mode logic could be added here, for now just simple toggle)
+        function toggleSidebarDesktop() {
+            const sidebar = document.getElementById('sidebar');
+            const mainDiv = sidebar.nextElementSibling; // The main content div
+            
+            if (sidebar.classList.contains('-translate-x-full')) {
+                // Open
+                sidebar.classList.remove('-translate-x-full');
+                sidebar.classList.remove('md:-translate-x-full'); // Remove the force hide
+                mainDiv.classList.add('md:ml-64');
+                mainDiv.classList.remove('md:ml-0');
+            } else {
+                // Close
+                sidebar.classList.add('-translate-x-full');
+                sidebar.classList.add('md:-translate-x-full'); // Force hide on desktop
+                mainDiv.classList.remove('md:ml-64');
+                mainDiv.classList.add('md:ml-0');
+            }
+        }
+
+        // --- Render Views ---
+
+        function getSkeletonHTML() {
+            return `
+                <div class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="h-32 rounded-xl skeleton"></div>
+                        <div class="h-32 rounded-xl skeleton"></div>
+                        <div class="h-32 rounded-xl skeleton"></div>
+                        <div class="h-32 rounded-xl skeleton"></div>
+                    </div>
+                    <div class="h-96 rounded-xl skeleton mt-6"></div>
+                    <div class="h-64 rounded-xl skeleton mt-6"></div>
+                </div>
+            `;
+        }
+
+        async function loadPage(pageName, element) {
+            // Update Active Menu
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('bg-forest-700', 'text-white', 'shadow-md');
+                el.classList.add('text-forest-100', 'hover:bg-forest-700', 'hover:text-white');
+            });
+            if(element) {
+                element.classList.add('bg-forest-700', 'text-white', 'shadow-md');
+                element.classList.remove('text-forest-100', 'hover:bg-forest-700');
+            }
+
+            // Update Title
+            const titles = {
+                'dashboard': 'Dashboard',
+                'products': 'Quản lý Sản phẩm',
+                'orders': 'Quản lý Đơn hàng',
+                'categories': 'Danh mục Sản phẩm',
+                'batches': 'Quản lý Lô hàng (Kho)',
+                'suppliers': 'Nhà Cung cấp',
+                'users': 'Người dùng hệ thống',
+                'reviews': 'Đánh giá khách hàng'
+            };
+            document.getElementById('page-title').innerText = titles[pageName] || 'Trang chủ';
+
+            // Show Skeleton
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = getSkeletonHTML();
+
+            // Simulate Network Delay for realism
+            await new Promise(r => setTimeout(r, 600));
+
+            // Render Content
+            mainContent.innerHTML = `<div class="fade-in">${getContent(pageName)}</div>`;
+
+            // Init Charts if Dashboard
+            if(pageName === 'dashboard') {
+                initCharts();
+            }
+
+            // Close sidebar on mobile after click
+            if(window.innerWidth < 768) {
+                const sidebar = document.getElementById('sidebar');
+                if(!sidebar.classList.contains('-translate-x-full')){
+                    toggleSidebar();
+                }
+            }
+        }
+
+        function getContent(page) {
+            switch(page) {
+                case 'dashboard':
+                    return renderDashboard();
+                case 'products':
+                    return renderProducts();
+                case 'orders':
+                    return renderOrders();
+                case 'batches':
+                    return renderBatches();
+                default:
+                    return `<div class="flex flex-col items-center justify-center h-96 text-gray-400">
+                                <i class="fa-solid fa-person-digging text-6xl mb-4 text-organic-500"></i>
+                                <h3 class="text-xl font-medium">Chức năng đang phát triển</h3>
+                                <p>Dữ liệu bảng ${page} sẽ được hiển thị tại đây.</p>
+                            </div>`;
+            }
+        }
+
+        // --- View Templates ---
+
+        function renderDashboard() {
+            // Stats Section
+            const statsHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <!-- Revenue -->
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-lg transition-shadow">
+                        <div>
+                            <p class="text-gray-500 text-sm font-medium">Doanh thu tháng</p>
+                            <h3 class="text-2xl font-bold text-forest-800 mt-1">154.2 Tr</h3>
+                            <span class="text-green-500 text-xs font-bold bg-green-50 px-2 py-1 rounded mt-2 inline-block"><i class="fa-solid fa-arrow-trend-up"></i> +12.5%</span>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-organic-100 text-organic-500 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-coins"></i>
+                        </div>
+                    </div>
+
+                    <!-- Orders -->
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-lg transition-shadow">
+                        <div>
+                            <p class="text-gray-500 text-sm font-medium">Đơn hàng mới</p>
+                            <h3 class="text-2xl font-bold text-forest-800 mt-1">1,240</h3>
+                            <span class="text-green-500 text-xs font-bold bg-green-50 px-2 py-1 rounded mt-2 inline-block"><i class="fa-solid fa-arrow-trend-up"></i> +5.2%</span>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-shopping-bag"></i>
+                        </div>
+                    </div>
+
+                     <!-- Products -->
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-lg transition-shadow">
+                        <div>
+                            <p class="text-gray-500 text-sm font-medium">Sản phẩm</p>
+                            <h3 class="text-2xl font-bold text-forest-800 mt-1">45</h3>
+                            <span class="text-gray-400 text-xs font-medium mt-2 inline-block">Đang bán</span>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-forest-50 text-forest-700 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-carrot"></i>
+                        </div>
+                    </div>
+
+                    <!-- Customers -->
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-lg transition-shadow">
+                        <div>
+                            <p class="text-gray-500 text-sm font-medium">Khách hàng</p>
+                            <h3 class="text-2xl font-bold text-forest-800 mt-1">856</h3>
+                            <span class="text-green-500 text-xs font-bold bg-green-50 px-2 py-1 rounded mt-2 inline-block"><i class="fa-solid fa-user-plus"></i> +18</span>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Charts Section
+            const chartsHTML = `
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <!-- Main Chart -->
+                    <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                        <h4 class="text-lg font-bold text-forest-800 mb-4">Biểu đồ doanh thu (2025)</h4>
+                        <div class="h-64">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+                    <!-- Doughnut Chart -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                        <h4 class="text-lg font-bold text-forest-800 mb-4">Tỷ lệ danh mục</h4>
+                        <div class="h-48 flex justify-center">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                        <div class="mt-4 space-y-2">
+                             <div class="flex justify-between text-sm"><span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-forest-500"></span>Rau củ</span> <span class="font-bold">45%</span></div>
+                             <div class="flex justify-between text-sm"><span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-organic-500"></span>Trái cây</span> <span class="font-bold">30%</span></div>
+                             <div class="flex justify-between text-sm"><span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-400"></span>Thịt & Cá</span> <span class="font-bold">25%</span></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Recent Orders Table Section
+            let ordersRows = db.recentOrders.map(order => {
+                let statusColor = '';
+                switch(order.status) {
+                    case 'shipping': statusColor = 'bg-blue-100 text-blue-700'; break;
+                    case 'pending': statusColor = 'bg-yellow-100 text-yellow-700'; break;
+                    case 'completed': statusColor = 'bg-green-100 text-green-700'; break;
+                    case 'cancelled': statusColor = 'bg-red-100 text-red-700'; break;
+                }
+                return `
+                    <tr class="hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-none">
+                        <td class="py-4 px-4 font-medium text-forest-700">${order.id}</td>
+                        <td class="py-4 px-4 text-gray-600">${order.user}</td>
+                        <td class="py-4 px-4 text-gray-500">${order.date}</td>
+                        <td class="py-4 px-4 font-semibold text-gray-700">${order.total}</td>
+                        <td class="py-4 px-4">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold ${statusColor}">${order.statusText}</span>
+                        </td>
+                        <td class="py-4 px-4 text-right">
+                            <button class="text-gray-400 hover:text-forest-600"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            const tableHTML = `
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                        <h4 class="text-lg font-bold text-forest-800">Đơn hàng gần đây</h4>
+                        <button class="text-sm text-organic-500 font-semibold hover:underline">Xem tất cả</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-cream-50 text-gray-500 uppercase text-xs">
+                                <tr>
+                                    <th class="py-3 px-4">Mã đơn</th>
+                                    <th class="py-3 px-4">Khách hàng</th>
+                                    <th class="py-3 px-4">Ngày đặt</th>
+                                    <th class="py-3 px-4">Tổng tiền</th>
+                                    <th class="py-3 px-4">Trạng thái</th>
+                                    <th class="py-3 px-4 text-right">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${ordersRows}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            return statsHTML + chartsHTML + tableHTML;
+        }
+
+        function renderProducts() {
+            let rows = db.products.map(p => `
+                <tr class="hover:bg-gray-50 border-b border-gray-100">
+                    <td class="p-4">
+                        <div class="flex items-center gap-3">
+                            <img src="${p.img}" class="w-12 h-12 rounded-lg object-cover border border-gray-200" alt="${p.name}">
+                            <div>
+                                <div class="font-bold text-gray-800">${p.name}</div>
+                                <div class="text-xs text-gray-500">ID: #${p.id}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-4 text-gray-600">${p.cat}</td>
+                    <td class="p-4 font-semibold text-forest-700">${p.price} <span class="text-xs text-gray-400 font-normal">/${p.unit}</span></td>
+                    <td class="p-4">
+                        <div class="w-full bg-gray-200 rounded-full h-1.5 w-24 mb-1">
+                            <div class="bg-forest-500 h-1.5 rounded-full" style="width: ${Math.min(p.stock, 100)}%"></div>
+                        </div>
+                        <span class="text-xs text-gray-500">${p.stock} tồn kho</span>
+                    </td>
+                    <td class="p-4">
+                        ${p.status 
+                            ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-bold">Đang bán</span>' 
+                            : '<span class="px-2 py-1 bg-gray-100 text-gray-500 rounded text-xs font-bold">Ngừng bán</span>'}
+                    </td>
+                    <td class="p-4 text-right">
+                         <button class="text-blue-500 hover:text-blue-700 mr-2"><i class="fa-solid fa-pen-to-square"></i></button>
+                         <button class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+
+            return `
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                    <div class="flex gap-2">
+                         <div class="bg-white p-2 rounded-lg border border-gray-200 text-forest-800 font-bold shadow-sm">
+                            Tổng: 45
+                         </div>
+                         <div class="bg-white p-2 rounded-lg border border-gray-200 text-red-500 font-bold shadow-sm">
+                            Hết hàng: 1
+                         </div>
+                    </div>
+                    <button class="bg-forest-700 hover:bg-forest-800 text-white px-4 py-2 rounded-lg shadow-lg shadow-forest-500/30 flex items-center gap-2 transition-all">
+                        <i class="fa-solid fa-plus"></i> Thêm sản phẩm
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-cream-100 text-gray-600 uppercase text-xs font-bold">
+                                <tr>
+                                    <th class="p-4">Sản phẩm</th>
+                                    <th class="p-4">Danh mục</th>
+                                    <th class="p-4">Giá bán</th>
+                                    <th class="p-4">Tồn kho</th>
+                                    <th class="p-4">Trạng thái</th>
+                                    <th class="p-4 text-right">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rows}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Pagination Mock -->
+                    <div class="p-4 border-t border-gray-100 flex justify-between items-center">
+                        <span class="text-xs text-gray-500">Hiển thị 1-4 trên 45 sản phẩm</span>
+                        <div class="flex gap-1">
+                            <button class="w-8 h-8 rounded border hover:bg-gray-50 flex items-center justify-center"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                            <button class="w-8 h-8 rounded bg-forest-700 text-white flex items-center justify-center text-xs">1</button>
+                            <button class="w-8 h-8 rounded border hover:bg-gray-50 flex items-center justify-center text-xs">2</button>
+                            <button class="w-8 h-8 rounded border hover:bg-gray-50 flex items-center justify-center"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderOrders() {
+            // Reusing recent orders structure but full page
+             let ordersRows = db.recentOrders.map(order => {
+                let statusColor = '';
+                switch(order.status) {
+                    case 'shipping': statusColor = 'bg-blue-100 text-blue-700'; break;
+                    case 'pending': statusColor = 'bg-yellow-100 text-yellow-700'; break;
+                    case 'completed': statusColor = 'bg-green-100 text-green-700'; break;
+                    case 'cancelled': statusColor = 'bg-red-100 text-red-700'; break;
+                }
+                return `
+                    <tr class="bg-white border-b border-gray-100 hover:bg-gray-50 mb-4 rounded-lg block md:table-row shadow-sm md:shadow-none p-4 md:p-0 relative">
+                         <!-- Mobile View Layout -->
+                        <td class="md:hidden absolute top-4 right-4 text-right">
+                             <span class="px-3 py-1 rounded-full text-xs font-bold ${statusColor}">${order.statusText}</span>
+                        </td>
+                        <td class="py-2 md:py-4 px-1 md:px-4 block md:table-cell">
+                            <span class="text-xs text-gray-400 md:hidden block">Mã:</span>
+                            <span class="font-medium text-forest-700">${order.id}</span>
+                        </td>
+                        <td class="py-2 md:py-4 px-1 md:px-4 block md:table-cell">
+                             <span class="text-xs text-gray-400 md:hidden block">Khách:</span>
+                             ${order.user}
+                        </td>
+                        <td class="py-2 md:py-4 px-1 md:px-4 block md:table-cell text-gray-500">${order.date}</td>
+                        <td class="py-2 md:py-4 px-1 md:px-4 block md:table-cell font-bold text-gray-800">${order.total}</td>
+                        <td class="py-4 px-4 hidden md:table-cell">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold ${statusColor}">${order.statusText}</span>
+                        </td>
+                        <td class="py-4 px-4 text-right hidden md:table-cell">
+                            <button class="bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 px-3 py-1 rounded text-sm">Chi tiết</button>
+                        </td>
+                         <td class="md:hidden mt-2 pt-2 border-t border-gray-100 block">
+                            <button class="w-full bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 px-3 py-2 rounded text-sm">Xem chi tiết</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            return `
+                 <!-- Filter Bar -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6 flex flex-col md:flex-row gap-4 justify-between items-center">
+                    <div class="flex gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0">
+                        <button class="px-4 py-2 rounded-lg bg-forest-700 text-white text-sm font-medium whitespace-nowrap">Tất cả</button>
+                        <button class="px-4 py-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm font-medium whitespace-nowrap">Chờ xử lý</button>
+                        <button class="px-4 py-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm font-medium whitespace-nowrap">Đang giao</button>
+                        <button class="px-4 py-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm font-medium whitespace-nowrap">Hoàn thành</button>
+                    </div>
+                    <div class="flex gap-2 w-full md:w-auto">
+                        <input type="date" class="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none focus:border-forest-500">
+                        <button class="bg-organic-500 text-white px-4 py-2 rounded-lg hover:bg-organic-400 text-sm font-bold shadow-md">Xuất Excel</button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left border-separate border-spacing-y-0 md:border-spacing-y-0">
+                        <thead class="bg-cream-100 text-gray-600 uppercase text-xs font-bold hidden md:table-header-group">
+                            <tr>
+                                <th class="py-3 px-4 rounded-tl-lg">Mã đơn</th>
+                                <th class="py-3 px-4">Khách hàng</th>
+                                <th class="py-3 px-4">Ngày đặt</th>
+                                <th class="py-3 px-4">Tổng tiền</th>
+                                <th class="py-3 px-4">Trạng thái</th>
+                                <th class="py-3 px-4 text-right rounded-tr-lg">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody class="space-y-4 md:space-y-0">
+                            ${ordersRows}
+                             <!-- Duplicate for demo visual -->
+                            ${ordersRows}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
+        function renderBatches() {
+            let rows = db.batches.map(b => `
+                <tr class="hover:bg-gray-50 border-b border-gray-100">
+                    <td class="p-4 font-bold text-gray-700">${b.code}</td>
+                    <td class="p-4 text-forest-700 font-medium">${b.product}</td>
+                    <td class="p-4 text-gray-600">${b.supplier}</td>
+                    <td class="p-4 text-sm">
+                        <div>Nhập: ${b.importDate}</div>
+                        <div class="text-red-500">Hết hạn: ${b.expiry}</div>
+                    </td>
+                    <td class="p-4">
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold">${b.current}</span> / <span class="text-gray-400 text-xs">${b.qty}</span>
+                            <div class="w-16 bg-gray-200 rounded-full h-1.5 ml-2">
+                                <div class="bg-organic-500 h-1.5 rounded-full" style="width: ${(b.current/b.qty)*100}%"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-4 text-right">
+                         <button class="text-gray-500 hover:text-forest-700"><i class="fa-solid fa-eye"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+
+             return `
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-gradient-to-r from-forest-700 to-forest-500 rounded-xl p-6 text-white shadow-lg">
+                        <div class="text-forest-100 text-sm mb-1">Tổng giá trị kho</div>
+                        <div class="text-3xl font-bold">452.5 Tr</div>
+                        <div class="text-xs mt-2 opacity-80"><i class="fa-solid fa-check-circle"></i> Cập nhật: Vừa xong</div>
+                    </div>
+                     <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                        <div class="text-gray-500 text-sm mb-1">Sắp hết hạn (7 ngày)</div>
+                        <div class="text-3xl font-bold text-red-500">3 <span class="text-sm font-normal text-gray-400">Lô hàng</span></div>
+                        <button class="text-xs text-blue-500 mt-2 hover:underline">Xem chi tiết</button>
+                    </div>
+                     <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                        <div class="text-gray-500 text-sm mb-1">Cần nhập thêm</div>
+                        <div class="text-3xl font-bold text-organic-500">12 <span class="text-sm font-normal text-gray-400">Sản phẩm</span></div>
+                        <button class="text-xs text-blue-500 mt-2 hover:underline">Tạo phiếu nhập</button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                     <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                        <h4 class="text-lg font-bold text-forest-800">Danh sách Lô hàng</h4>
+                        <button class="bg-forest-100 text-forest-800 px-4 py-2 rounded-lg text-sm font-bold hover:bg-forest-200">+ Nhập kho</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-cream-100 text-gray-600 uppercase text-xs font-bold">
+                                <tr>
+                                    <th class="p-4">Mã lô</th>
+                                    <th class="p-4">Sản phẩm</th>
+                                    <th class="p-4">Nhà cung cấp</th>
+                                    <th class="p-4">Thời gian</th>
+                                    <th class="p-4">Số lượng (Hiện tại/Gốc)</th>
+                                    <th class="p-4 text-right">Chi tiết</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rows}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function initCharts() {
+            // Revenue Chart
+            const ctxRev = document.getElementById('revenueChart').getContext('2d');
+            new Chart(ctxRev, {
+                type: 'line',
+                data: {
+                    labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
+                    datasets: [{
+                        label: 'Doanh thu (Triệu VNĐ)',
+                        data: [65, 59, 80, 81, 56, 85, 90, 100, 115, 130, 145, 154],
+                        borderColor: '#2e7d32', // Forest 700
+                        backgroundColor: (context) => {
+                            const ctx = context.chart.ctx;
+                            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+                            gradient.addColorStop(0, 'rgba(46, 125, 50, 0.2)');
+                            gradient.addColorStop(1, 'rgba(46, 125, 50, 0)');
+                            return gradient;
+                        },
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { borderDash: [2, 4], color: '#f0f0f0' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // Category Chart
+            const ctxCat = document.getElementById('categoryChart').getContext('2d');
+            new Chart(ctxCat, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Rau củ', 'Trái cây', 'Thịt & Cá'],
+                    datasets: [{
+                        data: [45, 30, 25],
+                        backgroundColor: ['#4caf50', '#f9a825', '#ef5350'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // Init App
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load Dashboard by default but with the loading effect
+            loadPage('dashboard', document.querySelector('.nav-item')); 
+        });
+
+    </script>
+</body>
+</html>
