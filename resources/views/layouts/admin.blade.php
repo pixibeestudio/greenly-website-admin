@@ -25,7 +25,7 @@
         @include('partials.sidebar')
 
         <!-- MAIN CONTENT -->
-        <div class="flex-1 flex flex-col h-screen w-full md:ml-64 transition-all duration-300 relative">
+        <div id="main-wrapper" class="flex-1 flex flex-col h-screen w-full md:ml-64 transition-all duration-300 relative">
 
             <!-- Header -->
             @include('partials.header')
@@ -50,24 +50,10 @@
             overlay.classList.toggle('hidden');
         }
 
-        // Toggle Desktop Sidebar
+        // Toggle Desktop Sidebar (dùng custom CSS class, không dùng Tailwind dynamic)
         function toggleSidebarDesktop() {
-            const sidebar = document.getElementById('sidebar');
-            const mainDiv = sidebar.nextElementSibling; // Phần nội dung chính
-
-            if (sidebar.classList.contains('-translate-x-full')) {
-                // Mở sidebar
-                sidebar.classList.remove('-translate-x-full');
-                sidebar.classList.remove('md:-translate-x-full');
-                mainDiv.classList.add('md:ml-64');
-                mainDiv.classList.remove('md:ml-0');
-            } else {
-                // Đóng sidebar
-                sidebar.classList.add('-translate-x-full');
-                sidebar.classList.add('md:-translate-x-full');
-                mainDiv.classList.remove('md:ml-64');
-                mainDiv.classList.add('md:ml-0');
-            }
+            document.getElementById('sidebar').classList.toggle('sidebar-desktop-hidden');
+            document.getElementById('main-wrapper').classList.toggle('sidebar-desktop-hidden');
         }
     </script>
 

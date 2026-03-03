@@ -1,8 +1,8 @@
 @extends('layouts.admin')
 
-@section('title', 'Dashboard - Greenly Admin')
+@section('title', ($pageTitle ?? 'Dashboard') . ' - Greenly Admin')
 
-@section('page-title', 'Dashboard')
+@section('page-title', $pageTitle ?? 'Dashboard')
 
 @section('content')
 <div class="fade-in">

@@ -10,7 +10,9 @@
             <i class="fa-solid fa-outdent text-xl"></i>
         </button>
 
-        <h2 id="page-title" class="text-2xl font-bold text-forest-800">@yield('page-title', 'Dashboard')</h2>
+        <h2 id="page-title" class="text-2xl font-bold text-forest-800">
+            @yield('page-title', 'Dashboard')
+        </h2>
     </div>
 
     <div class="flex items-center gap-4">
