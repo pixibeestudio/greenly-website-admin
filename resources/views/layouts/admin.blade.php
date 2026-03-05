@@ -57,6 +57,64 @@
         }
     </script>
 
+    <!-- TOAST NOTIFICATION -->
+    <div id="toastNotification" class="fixed top-6 right-6 z-50 transform transition-all duration-300 translate-x-[120%] opacity-0 flex items-start p-4 mb-4 text-gray-200 bg-[#1e232d] rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-gray-700/50 w-[380px]" role="alert">
+        <!-- Icon Success (Xanh lá) -->
+        <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-full border-2 border-emerald-500 text-emerald-500 mr-3 mt-0.5">
+            <i class="fa-solid fa-check text-sm"></i>
+        </div>
+        
+        <!-- Nội dung -->
+        <div class="ml-1 flex-1">
+            <h4 class="text-base font-bold text-white mb-0.5">Thành công!</h4>
+            <div class="text-sm font-normal text-gray-400" id="toastMessage">Thao tác thành công.</div>
+        </div>
+        
+        <!-- Nút đóng (X) -->
+        <button type="button" onclick="hideNotification()" class="ml-auto -mx-1.5 -my-1.5 bg-transparent text-gray-400 hover:text-white rounded-lg p-1.5 inline-flex items-center justify-center h-8 w-8 transition-colors">
+            <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+    </div>
+
+    <!-- Script xử lý Toast Notification -->
+    <script>
+        let notificationTimeout;
+
+        function showNotification(message = 'Thao tác thành công.') {
+            const toast = document.getElementById('toastNotification');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            if (message) {
+                toastMessage.innerText = message;
+            }
+            
+            // Xóa class ẩn, thêm class hiện
+            toast.classList.remove('translate-x-[120%]', 'opacity-0');
+            toast.classList.add('translate-x-0', 'opacity-100');
+
+            // Xóa timeout cũ nếu có
+            clearTimeout(notificationTimeout);
+
+            // Tự động ẩn sau 3 giây
+            notificationTimeout = setTimeout(() => {
+                hideNotification();
+            }, 3000);
+        }
+
+        function hideNotification() {
+            const toast = document.getElementById('toastNotification');
+            toast.classList.remove('translate-x-0', 'opacity-100');
+            toast.classList.add('translate-x-[120%]', 'opacity-0');
+        }
+
+        // Tự động gọi thông báo nếu có session flash success từ Laravel
+        @if(session('success'))
+            document.addEventListener('DOMContentLoaded', function() {
+                showNotification("{{ session('success') }}");
+            });
+        @endif
+    </script>
+
     @stack('scripts')
 </body>
 </html>

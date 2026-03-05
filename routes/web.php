@@ -14,9 +14,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     })->name('dashboard');
 
     // Nhóm Cửa hàng & Sản phẩm
-    Route::get('/categories', function () {
-        return view('admin.dashboard', ['pageTitle' => 'Danh mục Sản phẩm']);
-    })->name('categories.index');
+    Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class)->names('categories');
 
     Route::get('/products', function () {
         return view('admin.dashboard', ['pageTitle' => 'Quản lý Sản phẩm']);

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greenly Categories Management Content for Figma</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Quicksand', 'sans-serif'],
+                    },
+                    colors: {
+                        forest: {
+                            50: '#e8f5e9',
+                            100: '#c8e6c9',
+                            500: '#4caf50',
+                            600: '#43a047',
+                            700: '#2e7d32', 
+                            800: '#1b5e20',
+                            900: '#0d3b10',
+                        },
+                        organic: {
+                            100: '#fff9c4',
+                            400: '#fbc02d',
+                            500: '#f9a825', 
+                        },
+                        cream: {
+                            50: '#fffde7', 
+                            100: '#f5f5f5',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Tùy chỉnh input date để ẩn icon mặc định của trình duyệt và dùng icon fontawesome */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-white font-sans antialiased text-gray-800 p-10">
+
+    <!-- Giả lập Main Content Container -->
+    <div class="max-w-[1200px] mx-auto bg-cream-50 p-6 md:p-8 rounded-2xl border border-dashed border-gray-300 relative min-h-screen">
+        <div class="absolute -top-3 left-6 bg-white px-3 py-0.5 rounded-full text-xs text-gray-400 font-mono shadow-sm">Main Content Area: Categories</div>
+
+        <!-- 1. TOP SECTION: STATS CARD & ACTIONS -->
+        <div class="flex flex-col lg:flex-row justify-between items-end gap-6 mb-8 mt-2">
+            
+            <!-- Card Thống kê Tổng Danh Mục (Sang trọng, Gradient) -->
+            <div class="w-full lg:w-1/3 bg-gradient-to-br from-forest-900 via-forest-800 to-forest-700 p-6 rounded-2xl shadow-xl text-white relative overflow-hidden">
+                <!-- Hiệu ứng lá mờ background -->
+                <div class="absolute -right-4 -bottom-6 opacity-10">
+                    <i class="fa-solid fa-leaf text-9xl"></i>
+                </div>
+                
+                <div class="relative z-10 flex items-center justify-between">
+                    <div>
+                        <p class="text-forest-100 text-sm font-semibold uppercase tracking-wider mb-1">Tổng Danh Mục</p>
+                        <h2 class="text-5xl font-bold tracking-tight text-white drop-shadow-md">08</h2>
+                    </div>
+                    <div class="w-14 h-14 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl flex items-center justify-center text-organic-400 text-2xl shadow-inner">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Thanh công cụ (Bộ lọc & Thêm mới) -->
+            <div class="w-full lg:w-2/3 flex flex-col sm:flex-row justify-end items-center gap-4">
+                
+                <!-- Lọc theo ngày tạo (Date Picker custom) -->
+                <div class="relative group w-full sm:w-auto">
+                    <div class="flex items-center bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-2.5 focus-within:border-forest-500 focus-within:ring-1 focus-within:ring-forest-500 transition-all">
+                        <i class="fa-regular fa-calendar-days text-forest-600 mr-3"></i>
+                        <input type="date" class="bg-transparent text-sm text-gray-600 outline-none w-32 cursor-pointer font-medium relative z-10">
+                    </div>
+                    <!-- Label nhỏ nổi lên khi hover -->
+                    <span class="absolute -top-2 left-4 bg-white px-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Lọc ngày tạo</span>
+                </div>
+
+                <!-- Tìm kiếm -->
+                <div class="relative group w-full sm:w-auto">
+                    <div class="flex items-center bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-2.5 focus-within:border-forest-500 focus-within:ring-1 focus-within:ring-forest-500 transition-all">
+                        <i class="fa-solid fa-search text-gray-400 mr-3 group-focus-within:text-forest-500"></i>
+                        <input type="text" placeholder="Tìm tên danh mục..." class="bg-transparent text-sm text-gray-600 outline-none w-full sm:w-48 placeholder-gray-400">
+                    </div>
+                </div>
+
+                <!-- Nút Thêm Mới -->
+                <button class="w-full sm:w-auto bg-forest-700 hover:bg-forest-800 text-white px-6 py-2.5 rounded-xl shadow-lg shadow-forest-500/30 flex items-center justify-center gap-2 transition-all font-bold">
+                    <i class="fa-solid fa-plus"></i> Thêm Danh Mục
+                </button>
+            </div>
+        </div>
+
+        <!-- 2. BẢNG DỮ LIỆU (SIMPLE IN CARD STYLE) -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left whitespace-nowrap">
+                    <thead class="bg-cream-100/50 text-gray-500 uppercase text-xs font-bold border-b border-gray-100 tracking-wider">
+                        <tr>
+                            <th class="px-6 py-4 w-16 text-center">ID</th>
+                            <th class="px-6 py-4">Hình ảnh</th>
+                            <th class="px-6 py-4">Tên Danh mục</th>
+                            <th class="px-6 py-4 max-w-xs">Mô tả</th>
+                            <th class="px-6 py-4">Ngày tạo <br/><span class="text-[10px] text-gray-400 font-normal normal-case">(created_at)</span></th>
+                            <th class="px-6 py-4">Cập nhật <br/><span class="text-[10px] text-gray-400 font-normal normal-case">(updated_at)</span></th>
+                            <th class="px-6 py-4 text-center">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        
+                        <!-- Dữ liệu mẫu 1 -->
+                        <tr class="hover:bg-forest-50/30 transition-colors group">
+                            <td class="px-6 py-4 text-center font-mono text-gray-500">#1</td>
+                            <td class="px-6 py-4">
+                                <div class="w-12 h-12 rounded-xl border border-gray-200 overflow-hidden bg-white shadow-sm group-hover:shadow-md transition-shadow p-1">
+                                    <img src="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=100&q=80" alt="Rau Củ" class="w-full h-full object-cover rounded-lg">
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="font-bold text-gray-800 text-base group-hover:text-forest-700 transition-colors">Rau Củ Hữu Cơ</span>
+                            </td>
+                            <td class="px-6 py-4 max-w-xs whitespace-normal">
+                                <p class="text-gray-600 line-clamp-2 text-sm">Các loại rau xanh, củ quả sạch đạt chuẩn VietGAP, chứng nhận Organic. Tươi ngon hái mỗi ngày tại vườn.</p>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-gray-700 font-medium">02/03/2026</div>
+                                <div class="text-[11px] text-gray-400">08:15 AM</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-gray-700 font-medium">04/03/2026</div>
+                                <div class="text-[11px] text-gray-400">10:54 AM</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button class="w-8 h-8 rounded-full bg-green-50 text-green-600 hover:bg-green-600 hover:text-white transition-all shadow-sm flex items-center justify-center" title="Xem chi tiết">
+                                        <i class="fa-solid fa-eye text-xs"></i>
+                                    </button>
+                                    <button class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm flex items-center justify-center" title="Chỉnh sửa">
+                                        <i class="fa-solid fa-pen text-xs"></i>
+                                    </button>
+                                    <button class="w-8 h-8 rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-sm flex items-center justify-center" title="Xóa">
+                                        <i class="fa-solid fa-trash-can text-xs"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Dữ liệu mẫu 2 -->
+                        <tr class="hover:bg-forest-50/30 transition-colors group">
+                            <td class="px-6 py-4 text-center font-mono text-gray-500">#2</td>
+                            <td class="px-6 py-4">
+                                <div class="w-12 h-12 rounded-xl border border-gray-200 overflow-hidden bg-white shadow-sm group-hover:shadow-md transition-shadow p-1">
+                                    <img src="https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=100&q=80" alt="Trái Cây" class="w-full h-full object-cover rounded-lg">
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="font-bold text-gray-800 text-base group-hover:text-forest-700 transition-colors">Trái Cây Tươi</span>
+                            </td>
+                            <td class="px-6 py-4 max-w-xs whitespace-normal">
+                                <p class="text-gray-600 line-clamp-2 text-sm">Trái cây nhiệt đới đặc sản theo mùa và trái cây nhập khẩu cao cấp nguyên thùng.</p>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-gray-700 font-medium">02/03/2026</div>
+                                <div class="text-[11px] text-gray-400">08:20 AM</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-gray-400 italic text-sm">-</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button class="w-8 h-8 rounded-full bg-green-50 text-green-600 hover:bg-green-600 hover:text-white transition-all shadow-sm flex items-center justify-center" title="Xem chi tiết">
+                                        <i class="fa-solid fa-eye text-xs"></i>
+                                    </button>
+                                    <button class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm flex items-center justify-center" title="Chỉnh sửa">
+                                        <i class="fa-solid fa-pen text-xs"></i>
+                                    </button>
+                                    <button class="w-8 h-8 rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-sm flex items-center justify-center" title="Xóa">
+                                        <i class="fa-solid fa-trash-can text-xs"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Dữ liệu mẫu 3 -->
+                        <tr class="hover:bg-forest-50/30 transition-colors group">
+                            <td class="px-6 py-4 text-center font-mono text-gray-500">#3</td>
+                            <td class="px-6 py-4">
+                                <div class="w-12 h-12 rounded-xl border border-gray-200 overflow-hidden bg-white shadow-sm group-hover:shadow-md transition-shadow p-1">
+                                    <img src="https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?auto=format&fit=crop&w=100&q=80" alt="Thịt Sạch" class="w-full h-full object-cover rounded-lg">
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="font-bold text-gray-800 text-base group-hover:text-forest-700 transition-colors">Thịt & Hải Sản</span>
+                            </td>
+                            <td class="px-6 py-4 max-w-xs whitespace-normal">
+                                <p class="text-gray-600 line-clamp-2 text-sm">Các loại thịt heo, bò, gà thả vườn và hải sản tươi sống cấp đông đạt chuẩn an toàn vệ sinh thực phẩm.</p>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-gray-700 font-medium">02/03/2026</div>
+                                <div class="text-[11px] text-gray-400">09:00 AM</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-gray-700 font-medium">03/03/2026</div>
+                                <div class="text-[11px] text-gray-400">15:30 PM</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button class="w-8 h-8 rounded-full bg-green-50 text-green-600 hover:bg-green-600 hover:text-white transition-all shadow-sm flex items-center justify-center" title="Xem chi tiết">
+                                        <i class="fa-solid fa-eye text-xs"></i>
+                                    </button>
+                                    <button class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm flex items-center justify-center" title="Chỉnh sửa">
+                                        <i class="fa-solid fa-pen text-xs"></i>
+                                    </button>
+                                    <button class="w-8 h-8 rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-sm flex items-center justify-center" title="Xóa">
+                                        <i class="fa-solid fa-trash-can text-xs"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Dữ liệu mẫu 4 -->
+                        <tr class="hover:bg-forest-50/30 transition-colors group">
+                            <td class="px-6 py-4 text-center font-mono text-gray-500">#4</td>
+                            <td class="px-6 py-4">
+                                <div class="w-12 h-12 rounded-xl border border-gray-200 overflow-hidden bg-white shadow-sm group-hover:shadow-md transition-shadow p-1">
+                                    <img src="https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=100&q=80" alt="Đồ Khô" class="w-full h-full object-cover rounded-lg">
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="font-bold text-gray-800 text-base group-hover:text-forest-700 transition-colors">Đồ Khô & Các Hạt</span>
+                            </td>
+                            <td class="px-6 py-4 max-w-xs whitespace-normal">
+                                <p class="text-gray-600 line-clamp-2 text-sm">Gạo ST25, các loại hạt dinh dưỡng (hạnh nhân, óc chó), nấm khô và đặc sản vùng miền.</p>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-gray-700 font-medium">03/03/2026</div>
+                                <div class="text-[11px] text-gray-400">14:20 PM</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-gray-400 italic text-sm">-</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button class="w-8 h-8 rounded-full bg-green-50 text-green-600 hover:bg-green-600 hover:text-white transition-all shadow-sm flex items-center justify-center" title="Xem chi tiết">
+                                        <i class="fa-solid fa-eye text-xs"></i>
+                                    </button>
+                                    <button class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm flex items-center justify-center" title="Chỉnh sửa">
+                                        <i class="fa-solid fa-pen text-xs"></i>
+                                    </button>
+                                    <button class="w-8 h-8 rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-sm flex items-center justify-center" title="Xóa">
+                                        <i class="fa-solid fa-trash-can text-xs"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Phân trang tĩnh -->
+            <div class="px-6 py-4 border-t border-gray-100 flex justify-between items-center bg-white rounded-b-2xl">
+                <span class="text-sm text-gray-500 font-medium">Hiển thị 1 - 4 trên tổng số 8 danh mục</span>
+                <div class="flex gap-1.5">
+                    <button class="w-8 h-8 rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 flex items-center justify-center disabled:opacity-50 transition-colors" disabled><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                    <button class="w-8 h-8 rounded-lg bg-forest-700 text-white flex items-center justify-center text-sm font-bold shadow-md shadow-forest-500/20">1</button>
+                    <button class="w-8 h-8 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-forest-700 flex items-center justify-center text-sm font-medium transition-colors">2</button>
+                    <button class="w-8 h-8 rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 flex items-center justify-center transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
