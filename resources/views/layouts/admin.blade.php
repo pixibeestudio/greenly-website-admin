@@ -76,6 +76,16 @@
         </button>
     </div>
 
+    <!-- TOAST ERROR NOTIFICATION -->
+    <div id="errorToastNotification" class="fixed bottom-5 right-5 transform translate-x-[120%] opacity-0 transition-all duration-500 z-50 bg-white border-l-4 border-red-500 p-4 rounded-xl shadow-2xl flex items-center gap-4 min-w-[300px] max-w-sm" role="alert">
+        <!-- Icon Error (Đỏ) -->
+        <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-red-500">
+            <i class="fa-solid fa-circle-xmark text-2xl"></i>
+        </div>
+        <!-- Nội dung -->
+        <p id="errorToastMessage" class="text-sm font-bold text-gray-800">Đã xảy ra lỗi.</p>
+    </div>
+
     <!-- Script xử lý Toast Notification -->
     <script>
         let notificationTimeout;
@@ -103,6 +113,32 @@
 
         function hideNotification() {
             const toast = document.getElementById('toastNotification');
+            toast.classList.remove('translate-x-0', 'opacity-100');
+            toast.classList.add('translate-x-[120%]', 'opacity-0');
+        }
+
+        let errorNotificationTimeout;
+
+        function showErrorNotification(message = 'Đã xảy ra lỗi.') {
+            const toast = document.getElementById('errorToastNotification');
+            const toastMessage = document.getElementById('errorToastMessage');
+
+            if (message) {
+                toastMessage.innerText = message;
+            }
+
+            toast.classList.remove('translate-x-[120%]', 'opacity-0');
+            toast.classList.add('translate-x-0', 'opacity-100');
+
+            clearTimeout(errorNotificationTimeout);
+
+            errorNotificationTimeout = setTimeout(() => {
+                hideErrorNotification();
+            }, 3000);
+        }
+
+        function hideErrorNotification() {
+            const toast = document.getElementById('errorToastNotification');
             toast.classList.remove('translate-x-0', 'opacity-100');
             toast.classList.add('translate-x-[120%]', 'opacity-0');
         }

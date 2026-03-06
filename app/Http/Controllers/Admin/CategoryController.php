@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class CategoryController extends Controller
 {
@@ -36,16 +37,17 @@ class CategoryController extends Controller
     {
         // 1. Validate dữ liệu
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:255', Rule::unique('categories')],
             'description' => 'nullable|string|max:500',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ], [
             'name.required' => 'Vui lòng nhập tên danh mục.',
             'name.max' => 'Tên danh mục không được vượt quá 255 ký tự.',
+            'name.unique' => 'Tên danh mục này đã tồn tại trong bảng.',
             'description.max' => 'Mô tả không được vượt quá 500 ký tự.',
             'image.image' => 'Tệp tải lên phải là hình ảnh.',
-            'image.mimes' => 'Hình ảnh phải có định dạng jpeg, png, jpg, hoặc webp.',
-            'image.max' => 'Dung lượng hình ảnh không được vượt quá 2MB.',
+            'image.mimes' => 'Chỉ hỗ trợ ảnh PNG, JPG, WEBP.',
+            'image.max' => 'Kích thước ảnh không được vượt quá 2MB.',
         ]);
 
         // 2. Xử lý upload ảnh
@@ -68,16 +70,17 @@ class CategoryController extends Controller
         $category = Category::findOrFail($id);
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:255', Rule::unique('categories')->ignore($id)],
             'description' => 'nullable|string|max:500',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ], [
             'name.required' => 'Vui lòng nhập tên danh mục.',
             'name.max' => 'Tên danh mục không được vượt quá 255 ký tự.',
+            'name.unique' => 'Tên danh mục này đã tồn tại trong bảng.',
             'description.max' => 'Mô tả không được vượt quá 500 ký tự.',
             'image.image' => 'Tệp tải lên phải là hình ảnh.',
-            'image.mimes' => 'Hình ảnh phải có định dạng jpeg, png, jpg, hoặc webp.',
-            'image.max' => 'Dung lượng hình ảnh không được vượt quá 2MB.',
+            'image.mimes' => 'Chỉ hỗ trợ ảnh PNG, JPG, WEBP.',
+            'image.max' => 'Kích thước ảnh không được vượt quá 2MB.',
         ]);
 
         if ($request->hasFile('image')) {

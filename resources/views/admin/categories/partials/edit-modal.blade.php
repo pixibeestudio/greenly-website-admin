@@ -27,6 +27,7 @@
             enctype="multipart/form-data">
             @csrf
             @method('PUT')
+            <input type="hidden" name="category_id" id="edit_category_id">
 
             <div class="flex flex-col md:flex-row gap-10">
 
@@ -60,12 +61,10 @@
 
                         <!-- Input File ẩn -->
                         <input type="file" id="editImageUpload" name="image" class="hidden"
-                            accept="image/png, image/jpeg, image/jpg, image/webp" onchange="previewEditImage(this)">
+                            accept="image/png, image/jpeg, image/jpg, image/webp" onchange="if(!validateImage(this, 'edit_image_error')) return; previewEditImage(this)">
                     </label>
 
-                    @error('image')
-                        <p class="text-red-500 text-xs mt-2 font-medium">{{ $message }}</p>
-                    @enderror
+                    <p id="edit_image_error" class="text-red-500 text-xs mt-1.5 hidden"></p>
 
                     <!-- Text hướng dẫn -->
                     <p class="text-xs text-gray-400 mt-4 font-medium">PNG, JPG, WEBP. Tối đa 2MB</p>
@@ -89,11 +88,9 @@
                                 <label for="edit_name" class="block text-sm font-bold text-gray-700 mb-2">Tên danh mục
                                     <span class="text-red-500">*</span></label>
                                 <input type="text" id="edit_name" name="name" required
-                                    class="w-full bg-white border border-gray-300 text-gray-800 text-base rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-forest-500 block px-4 py-3 outline-none transition-all shadow-sm @error('name') border-red-500 focus:ring-red-500 focus:border-red-500 @enderror"
+                                    class="w-full bg-white border border-gray-300 text-gray-800 text-base rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-forest-500 block px-4 py-3 outline-none transition-all shadow-sm"
                                     placeholder="Nhập tên danh mục...">
-                                @error('name')
-                                    <p class="text-red-500 text-xs mt-1.5 font-medium">{{ $message }}</p>
-                                @enderror
+                                <p id="edit_name_error" class="text-red-500 text-xs mt-1.5 hidden"></p>
                             </div>
                         </div>
 
@@ -149,7 +146,7 @@
 
         // Bước 2: Dùng setTimeout (Nghỉ 10ms) để trình duyệt kịp vẽ (Render) UI mới ra màn hình
         // Rồi mới khóa nút để tránh double-click chặn việc gửi form
-        setTimeout(() => {
+        window._updateBtnTimeout = setTimeout(() => {
             updateBtn.disabled = true;
         }, 10);
     });

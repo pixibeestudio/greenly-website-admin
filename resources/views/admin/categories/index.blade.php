@@ -190,6 +190,7 @@
         
         // Điền thông tin vào form
         document.getElementById('edit_id').value = category.id;
+        document.getElementById('edit_category_id').value = category.id;
         document.getElementById('edit_name').value = category.name;
         
         const descInput = document.getElementById('edit_description');
@@ -243,6 +244,12 @@
         setTimeout(() => {
             modal.classList.add('hidden');
         }, 300);
+
+        // Reset thẻ báo lỗi form Sửa
+        const editNameErr = document.getElementById('edit_name_error');
+        const editImageErr = document.getElementById('edit_image_error');
+        editNameErr.innerText = ''; editNameErr.classList.add('hidden');
+        editImageErr.innerText = ''; editImageErr.classList.add('hidden');
     }
 
     // Hàm mở modal xác nhận xóa
@@ -276,5 +283,155 @@
             modal.classList.add('hidden');
         }, 300);
     }
+
+    // Hàm validate ảnh dùng chung cho cả 2 form
+    function validateImage(fileInput, errorId) {
+        const file = fileInput.files[0];
+        const errorEl = document.getElementById(errorId);
+
+        if (!file) return true;
+
+        if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
+            errorEl.innerText = 'Chỉ cho phép tải hình ảnh PNG, JPG, WEBP';
+            errorEl.classList.remove('hidden');
+            fileInput.value = '';
+            return false;
+        }
+
+        if (file.size > 2097152) {
+            errorEl.innerText = 'Chỉ cho phép hình ảnh có kích thước dưới 2MB';
+            errorEl.classList.remove('hidden');
+            fileInput.value = '';
+            return false;
+        }
+
+        errorEl.innerText = '';
+        errorEl.classList.add('hidden');
+        return true;
+    }
+
+    // Hàm reset toàn bộ form Thêm khi đóng modal
+    const _originalCloseModal = closeModal;
+    closeModal = function() {
+        _originalCloseModal();
+
+        // Reset thẻ báo lỗi
+        const addNameErr = document.getElementById('add_name_error');
+        const addImageErr = document.getElementById('add_image_error');
+        addNameErr.innerText = ''; addNameErr.classList.add('hidden');
+        addImageErr.innerText = ''; addImageErr.classList.add('hidden');
+
+        // Reset input tên + xóa viền đỏ
+        const nameInput = document.getElementById('categoryName');
+        nameInput.value = '';
+        nameInput.classList.remove('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+
+        // Reset textarea mô tả + bộ đếm ký tự
+        document.getElementById('categoryDesc').value = '';
+        const charCount = document.getElementById('charCount');
+        charCount.innerText = '0';
+        charCount.classList.remove('text-organic-500');
+
+        // Reset ảnh preview về mặc định
+        document.getElementById('imageUpload').value = '';
+        document.getElementById('imagePreview').src = '#';
+        document.getElementById('imagePreview').classList.add('hidden');
+        document.getElementById('uploadPlaceholder').classList.remove('hidden');
+        document.getElementById('changeImageOverlay').classList.add('hidden');
+
+        // Reset nút submit
+        clearTimeout(window._submitBtnTimeout);
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.innerHTML = '<i class="fa-solid fa-save"></i> Lưu danh mục';
+        submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+        submitBtn.disabled = false;
+    };
+
+    // Validate tên chống toàn số khi submit Form Thêm
+    document.getElementById('addCategoryForm').addEventListener('submit', function (e) {
+        const nameValue = document.getElementById('categoryName').value;
+        const nameErr = document.getElementById('add_name_error');
+
+        if (/^\d+$/.test(nameValue.trim())) {
+            e.preventDefault();
+            clearTimeout(window._submitBtnTimeout);
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerHTML = '<i class="fa-solid fa-save"></i> Lưu danh mục';
+            submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+            submitBtn.disabled = false;
+            nameErr.innerText = 'Không cho phép đặt tên bằng số';
+            nameErr.classList.remove('hidden');
+            showErrorNotification('Dữ liệu không hợp lệ');
+            return;
+        }
+
+        nameErr.innerText = '';
+        nameErr.classList.add('hidden');
+    });
+
+    // Validate tên chống toàn số khi submit Form Sửa
+    document.getElementById('editCategoryForm').addEventListener('submit', function (e) {
+        const nameValue = document.getElementById('edit_name').value;
+        const nameErr = document.getElementById('edit_name_error');
+
+        if (/^\d+$/.test(nameValue.trim())) {
+            e.preventDefault();
+            clearTimeout(window._updateBtnTimeout);
+            const updateBtn = document.getElementById('updateBtn');
+            updateBtn.innerHTML = '<i class="fa-solid fa-save"></i> Cập nhật danh mục';
+            updateBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+            updateBtn.disabled = false;
+            nameErr.innerText = 'Không cho phép đặt tên bằng số';
+            nameErr.classList.remove('hidden');
+            showErrorNotification('Dữ liệu không hợp lệ');
+            return;
+        }
+
+        nameErr.innerText = '';
+        nameErr.classList.add('hidden');
+    });
+
+    @if($errors->any())
+        document.addEventListener('DOMContentLoaded', () => {
+            showErrorNotification("{{ $errors->first() }}");
+
+            @if(old('_method') == 'PUT')
+                // Mở lại Form Sửa nếu lỗi từ thao tác Cập nhật (PUT)
+                const editCatId = "{{ old('category_id') }}";
+                // Tìm nút Sửa trong bảng để lấy dữ liệu category gốc (bao gồm ảnh)
+                const allEditBtns = document.querySelectorAll('[onclick^="openEditModal"]');
+                let targetBtn = null;
+                allEditBtns.forEach(btn => {
+                    try {
+                        const cat = JSON.parse(btn.getAttribute('data-category'));
+                        if (String(cat.id) === String(editCatId)) targetBtn = btn;
+                    } catch(e) {}
+                });
+                if (targetBtn) {
+                    openEditModal(targetBtn);
+                    // Ghi đè lại giá trị name/description bằng old() (giá trị user đã nhập)
+                    document.getElementById('edit_name').value = "{{ old('name') }}";
+                    document.getElementById('edit_description').value = "{{ old('description') }}";
+                    if (typeof updateEditCharCount === 'function') {
+                        updateEditCharCount(document.getElementById('edit_description'));
+                    }
+                }
+                // Hiện lỗi name nếu có
+                @if($errors->has('name'))
+                    let editNameErr = document.getElementById('edit_name_error');
+                    editNameErr.innerText = "{{ $errors->first('name') }}";
+                    editNameErr.classList.remove('hidden');
+                @endif
+            @else
+                // Mở lại Form Thêm nếu lỗi từ thao tác Thêm mới (POST)
+                openModal();
+                @if($errors->has('name'))
+                    let addNameErr = document.getElementById('add_name_error');
+                    addNameErr.innerText = "{{ $errors->first('name') }}";
+                    addNameErr.classList.remove('hidden');
+                @endif
+            @endif
+        });
+    @endif
 </script>
 @endpush

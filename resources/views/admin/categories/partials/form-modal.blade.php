@@ -59,12 +59,10 @@
 
                         <!-- Input File ẩn -->
                         <input type="file" id="imageUpload" name="image" class="hidden"
-                            accept="image/png, image/jpeg, image/jpg, image/webp" onchange="previewImage(this)">
+                            accept="image/png, image/jpeg, image/jpg, image/webp" onchange="if(!validateImage(this, 'add_image_error')) return; previewImage(this)">
                     </label>
 
-                    @error('image')
-                        <p class="text-red-500 text-xs mt-2 font-medium">{{ $message }}</p>
-                    @enderror
+                    <p id="add_image_error" class="text-red-500 text-xs mt-1.5 hidden"></p>
 
                     <!-- Text hướng dẫn -->
                     <p class="text-xs text-gray-400 mt-4 font-medium">PNG, JPG, WEBP. Tối đa 2MB</p>
@@ -81,9 +79,7 @@
                             <input type="text" id="categoryName" name="name" value="{{ old('name') }}" required
                                 class="w-full bg-white border border-gray-300 text-gray-800 text-base rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-forest-500 block px-4 py-3 outline-none transition-all shadow-sm @error('name') border-red-500 focus:ring-red-500 focus:border-red-500 @enderror"
                                 placeholder="Nhập tên danh mục...">
-                            @error('name')
-                                <p class="text-red-500 text-xs mt-1.5 font-medium">{{ $message }}</p>
-                            @enderror
+                            <p id="add_name_error" class="text-red-500 text-xs mt-1.5 hidden"></p>
                         </div>
 
                         <!-- Textarea: Mô tả -->
@@ -138,7 +134,7 @@
 
         // Bước 2: Dùng setTimeout (Nghỉ 10ms) để trình duyệt kịp vẽ (Render) UI mới ra màn hình
         // Rồi mới khóa nút để tránh double-click chặn việc gửi form
-        setTimeout(() => {
+        window._submitBtnTimeout = setTimeout(() => {
             submitBtn.disabled = true;
         }, 10);
     });
