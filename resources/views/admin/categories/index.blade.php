@@ -141,6 +141,7 @@
 @include('admin.categories.partials.form-modal')
 @include('admin.categories.partials.show-modal')
 @include('admin.categories.partials.edit-modal')
+@include('admin.categories.partials.delete-modal')
 
 @endsection
 
@@ -235,6 +236,38 @@
     function closeEditModal() {
         const modal = document.getElementById('editCategoryModal');
         const modalContent = document.getElementById('editModalContent');
+        
+        modal.classList.add('opacity-0');
+        modalContent.classList.add('scale-95');
+        
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    }
+
+    // Hàm mở modal xác nhận xóa
+    function openDeleteModal(id, name) {
+        // Điền tên danh mục
+        document.getElementById('delete_category_name').innerText = name;
+        
+        // Cập nhật action của form
+        document.getElementById('deleteCategoryForm').action = '/admin/categories/' + id;
+        
+        // Hiển thị modal
+        const modal = document.getElementById('deleteCategoryModal');
+        const modalContent = document.getElementById('deleteModalContent');
+        
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            modalContent.classList.remove('scale-95');
+        }, 10);
+    }
+
+    // Hàm đóng modal xác nhận xóa
+    function closeDeleteModal() {
+        const modal = document.getElementById('deleteCategoryModal');
+        const modalContent = document.getElementById('deleteModalContent');
         
         modal.classList.add('opacity-0');
         modalContent.classList.add('scale-95');

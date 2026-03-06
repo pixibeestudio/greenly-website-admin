@@ -96,4 +96,19 @@ class CategoryController extends Controller
 
         return redirect()->route('admin.categories.index')->with('success', 'Cập nhật danh mục thành công!');
     }
+
+    public function destroy(string $id)
+    {
+        $category = Category::findOrFail($id);
+
+        // Xóa ảnh cũ nếu có
+        if ($category->image && str_starts_with($category->image, 'storage/')) {
+            $oldImagePath = str_replace('storage/', '', $category->image);
+            Storage::disk('public')->delete($oldImagePath);
+        }
+
+        $category->delete();
+
+        return redirect()->route('admin.categories.index')->with('success', 'Đã xóa danh mục thành công!');
+    }
 }
