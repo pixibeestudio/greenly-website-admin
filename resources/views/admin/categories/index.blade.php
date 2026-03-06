@@ -277,4 +277,24 @@
         }, 300);
     }
 </script>
+
+@if($errors->has('name'))
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Tự động mở lại modal Thêm Danh mục để người dùng thấy lỗi
+        openModal();
+        const nameError = document.getElementById('name_error');
+        if (nameError) {
+            nameError.innerText = '{{ $errors->first("name") }}';
+            nameError.classList.remove('hidden');
+        }
+        
+        const nameInput = document.getElementById('categoryName');
+        if (nameInput) {
+            nameInput.classList.add('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+        }
+    });
+</script>
+@endif
+
 @endpush

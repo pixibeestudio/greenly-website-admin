@@ -63,6 +63,8 @@
                             accept="image/png, image/jpeg, image/jpg, image/webp" onchange="previewEditImage(this)">
                     </label>
 
+                    <p id="edit_image_error" class="text-red-500 text-xs mt-2 font-medium hidden"></p>
+
                     @error('image')
                         <p class="text-red-500 text-xs mt-2 font-medium">{{ $message }}</p>
                     @enderror
@@ -91,6 +93,9 @@
                                 <input type="text" id="edit_name" name="name" required
                                     class="w-full bg-white border border-gray-300 text-gray-800 text-base rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-forest-500 block px-4 py-3 outline-none transition-all shadow-sm @error('name') border-red-500 focus:ring-red-500 focus:border-red-500 @enderror"
                                     placeholder="Nhập tên danh mục...">
+                                
+                                <p id="edit_name_error" class="text-red-500 text-xs mt-1.5 font-medium hidden"></p>
+
                                 @error('name')
                                     <p class="text-red-500 text-xs mt-1.5 font-medium">{{ $message }}</p>
                                 @enderror
@@ -139,8 +144,29 @@
 </div>
 
 <script>
-    // Xử lý sự kiện submit form (Loading state)
+    // Xử lý sự kiện submit form (Loading state & Validate Name)
     document.getElementById('editCategoryForm').addEventListener('submit', function (e) {
+        const nameInput = document.getElementById('edit_name');
+        const nameValue = nameInput.value;
+        const nameError = document.getElementById('edit_name_error');
+
+        // JS Validate: Tránh nhập toàn số
+        if (/^\d+$/.test(nameValue.trim())) {
+            e.preventDefault(); // Chặn submit
+            nameError.innerText = 'Không cho phép đặt tên bằng số.';
+            nameError.classList.remove('hidden');
+            nameInput.classList.add('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+            
+            // Gọi hàm showErrorNotification nếu có (từ layout)
+            if (typeof showErrorNotification === 'function') {
+                showErrorNotification('Tên danh mục không hợp lệ.');
+            }
+            return;
+        } else {
+            nameError.classList.add('hidden');
+            nameInput.classList.remove('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+        }
+
         const updateBtn = document.getElementById('updateBtn');
 
         // Bước 1: Thay đổi giao diện ngay lập tức thành vòng quay
@@ -175,13 +201,39 @@
         }
     }
 
-    // Hàm Preview ảnh
+    // Hàm Preview ảnh & Validate
     function previewEditImage(input) {
         const preview = document.getElementById('editImagePreview');
         const placeholder = document.getElementById('editUploadPlaceholder');
         const changeOverlay = document.getElementById('editChangeImageOverlay');
+        const imageError = document.getElementById('edit_image_error');
+        const labelUpload = document.querySelector('label[for="editImageUpload"]');
 
         if (input.files && input.files[0]) {
+            const file = input.files[0];
+
+            // Validate loại file
+            if (!['image/png', 'image/jpeg', 'image/webp', 'image/jpg'].includes(file.type)) {
+                imageError.innerText = 'Chỉ cho phép tải hình ảnh PNG, JPG, WEBP.';
+                imageError.classList.remove('hidden');
+                labelUpload.classList.add('border-red-500', 'bg-red-50');
+                input.value = ''; // Xóa file không hợp lệ
+                return;
+            }
+
+            // Validate dung lượng (2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                imageError.innerText = 'Chỉ cho phép hình ảnh có kích thước dưới 2MB.';
+                imageError.classList.remove('hidden');
+                labelUpload.classList.add('border-red-500', 'bg-red-50');
+                input.value = ''; // Xóa file không hợp lệ
+                return;
+            }
+
+            // Xóa lỗi nếu ảnh hợp lệ
+            imageError.classList.add('hidden');
+            labelUpload.classList.remove('border-red-500', 'bg-red-50');
+
             const reader = new FileReader();
 
             reader.onload = function (e) {
@@ -191,7 +243,7 @@
                 changeOverlay.classList.remove('hidden'); // Kích hoạt hover thay ảnh
             }
 
-            reader.readAsDataURL(input.files[0]);
+            reader.readAsDataURL(file);
         }
     }
 </script>
