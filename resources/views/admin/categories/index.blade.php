@@ -30,23 +30,34 @@
         <!-- Thanh công cụ (Bộ lọc & Thêm mới) -->
         <div class="w-full lg:w-2/3 flex flex-col sm:flex-row justify-end items-center gap-4">
             
-            <!-- Lọc theo ngày tạo (Date Picker custom) -->
-            <div class="relative group w-full sm:w-auto">
-                <div class="flex items-center bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-2.5 focus-within:border-forest-500 focus-within:ring-1 focus-within:ring-forest-500 transition-all">
-                    <i class="fa-regular fa-calendar-days text-forest-600 mr-3"></i>
-                    <input type="date" class="bg-transparent text-sm text-gray-600 outline-none w-32 cursor-pointer font-medium relative z-10">
-                </div>
-                <!-- Label nhỏ nổi lên khi hover -->
-                <span class="absolute -top-2 left-4 bg-white px-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Lọc ngày tạo</span>
-            </div>
+            <form method="GET" action="{{ route('admin.categories.index') }}" class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                <!-- Combobox chọn số lượng hiển thị -->
+                <select name="per_page" onchange="this.form.submit()" class="bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-600 outline-none focus:border-forest-500 transition-all shadow-sm">
+                    <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10 mục</option>
+                    <option value="20" {{ request('per_page') == 20 ? 'selected' : '' }}>20 mục</option>
+                    <option value="30" {{ request('per_page') == 30 ? 'selected' : '' }}>30 mục</option>
+                    <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50 mục</option>
+                    <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100 mục</option>
+                </select>
 
-            <!-- Tìm kiếm -->
-            <div class="relative group w-full sm:w-auto">
-                <div class="flex items-center bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-2.5 focus-within:border-forest-500 focus-within:ring-1 focus-within:ring-forest-500 transition-all">
-                    <i class="fa-solid fa-search text-gray-400 mr-3 group-focus-within:text-forest-500"></i>
-                    <input type="text" placeholder="Tìm tên danh mục..." class="bg-transparent text-sm text-gray-600 outline-none w-full sm:w-48 placeholder-gray-400">
+                <!-- Lọc theo ngày tạo (Date Picker custom) -->
+                <div class="relative group w-full sm:w-auto hidden"> <!-- Tạm ẩn tính năng lọc ngày chưa làm -->
+                    <div class="flex items-center bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-2.5 focus-within:border-forest-500 focus-within:ring-1 focus-within:ring-forest-500 transition-all">
+                        <i class="fa-regular fa-calendar-days text-forest-600 mr-3"></i>
+                        <input type="date" class="bg-transparent text-sm text-gray-600 outline-none w-32 cursor-pointer font-medium relative z-10">
+                    </div>
+                    <!-- Label nhỏ nổi lên khi hover -->
+                    <span class="absolute -top-2 left-4 bg-white px-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Lọc ngày tạo</span>
                 </div>
-            </div>
+
+                <!-- Tìm kiếm -->
+                <div class="relative group w-full sm:w-auto">
+                    <div class="flex items-center bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-2.5 focus-within:border-forest-500 focus-within:ring-1 focus-within:ring-forest-500 transition-all">
+                        <i class="fa-solid fa-search text-gray-400 mr-3 group-focus-within:text-forest-500"></i>
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Tìm tên danh mục..." class="bg-transparent text-sm text-gray-600 outline-none w-full sm:w-48 placeholder-gray-400">
+                    </div>
+                </div>
+            </form>
 
             <!-- Nút Thêm Mới -->
             <button onclick="openModal()" class="w-full sm:w-auto bg-forest-700 hover:bg-forest-800 text-white px-6 py-2.5 rounded-xl shadow-lg shadow-forest-500/30 flex items-center justify-center gap-2 transition-all font-bold">
@@ -118,8 +129,11 @@
         </div>
 
         <!-- Phân trang -->
-        <div class="px-6 py-4 border-t border-gray-100 bg-white rounded-b-2xl">
-            {{ $categories->links() }}
+        <div class="px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4 bg-white rounded-b-2xl">
+            <span class="text-sm text-gray-500 font-medium">Hiển thị {{ $categories->firstItem() ?? 0 }} - {{ $categories->lastItem() ?? 0 }} trên tổng số {{ $categories->total() }} danh mục</span>
+            <div class="w-full sm:w-auto">
+                {{ $categories->links() }}
+            </div>
         </div>
     </div>
 </div>
