@@ -41,10 +41,10 @@
                 </select>
 
                 <!-- Lọc theo ngày tạo (Date Picker custom) -->
-                <div class="relative group w-full sm:w-auto hidden"> <!-- Tạm ẩn tính năng lọc ngày chưa làm -->
+                <div class="relative group w-full sm:w-auto">
                     <div class="flex items-center bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-2.5 focus-within:border-forest-500 focus-within:ring-1 focus-within:ring-forest-500 transition-all">
                         <i class="fa-regular fa-calendar-days text-forest-600 mr-3"></i>
-                        <input type="date" class="bg-transparent text-sm text-gray-600 outline-none w-32 cursor-pointer font-medium relative z-10">
+                        <input type="date" name="date" value="{{ request('date') }}" onchange="this.form.submit()" class="bg-transparent text-sm text-gray-600 outline-none w-32 cursor-pointer font-medium relative z-10">
                     </div>
                     <!-- Label nhỏ nổi lên khi hover -->
                     <span class="absolute -top-2 left-4 bg-white px-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Lọc ngày tạo</span>
@@ -132,12 +132,54 @@
         <div class="px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4 bg-white rounded-b-2xl">
             <span class="text-sm text-gray-500 font-medium">Hiển thị {{ $categories->firstItem() ?? 0 }} - {{ $categories->lastItem() ?? 0 }} trên tổng số {{ $categories->total() }} danh mục</span>
             <div class="w-full sm:w-auto">
-                {{ $categories->links() }}
+                {{ $categories->links('vendor.pagination.greenly') }}
             </div>
         </div>
     </div>
 </div>
 
 @include('admin.categories.partials.form-modal')
+@include('admin.categories.partials.show-modal')
 
 @endsection
+
+@push('scripts')
+<script>
+    // Hàm mở modal xem chi tiết
+    function openShowModal(button) {
+        // Lấy dữ liệu JSON từ nút bấm
+        const categoryData = JSON.parse(button.getAttribute('data-category'));
+        
+        // Cập nhật thông tin vào các trường trong modal
+        document.getElementById('show_id').innerText = '#' + categoryData.id;
+        document.getElementById('show_name').innerText = categoryData.name;
+        document.getElementById('show_image').src = categoryData.image;
+        document.getElementById('show_description').innerText = categoryData.description;
+        document.getElementById('show_created_at').innerText = categoryData.created_at;
+        document.getElementById('show_updated_at').innerText = categoryData.updated_at;
+
+        // Xử lý hiệu ứng hiển thị modal
+        const modal = document.getElementById('showCategoryModal');
+        const modalContent = document.getElementById('showModalContent');
+        
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            modalContent.classList.remove('scale-95');
+        }, 10);
+    }
+
+    // Hàm đóng modal xem chi tiết
+    function closeShowModal() {
+        const modal = document.getElementById('showCategoryModal');
+        const modalContent = document.getElementById('showModalContent');
+        
+        modal.classList.add('opacity-0');
+        modalContent.classList.add('scale-95');
+        
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    }
+</script>
+@endpush

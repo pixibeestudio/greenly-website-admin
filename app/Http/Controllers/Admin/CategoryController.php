@@ -12,6 +12,7 @@ class CategoryController extends Controller
     {
         $search = $request->input('search');
         $perPage = $request->input('per_page', 10);
+        $date = $request->input('date');
         
         $totalCategories = Category::count();
 
@@ -19,6 +20,10 @@ class CategoryController extends Controller
         
         if ($search) { 
             $query->where('name', 'like', "%{$search}%"); 
+        }
+
+        if ($date) {
+            $query->whereDate('created_at', $date);
         }
 
         $categories = $query->latest()->paginate($perPage)->appends($request->query());
