@@ -140,6 +140,7 @@
 
 @include('admin.categories.partials.form-modal')
 @include('admin.categories.partials.show-modal')
+@include('admin.categories.partials.edit-modal')
 
 @endsection
 
@@ -173,6 +174,67 @@
     function closeShowModal() {
         const modal = document.getElementById('showCategoryModal');
         const modalContent = document.getElementById('showModalContent');
+        
+        modal.classList.add('opacity-0');
+        modalContent.classList.add('scale-95');
+        
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    }
+
+    // Hàm mở modal cập nhật
+    function openEditModal(button) {
+        const category = JSON.parse(button.getAttribute('data-category'));
+        
+        // Điền thông tin vào form
+        document.getElementById('edit_id').value = category.id;
+        document.getElementById('edit_name').value = category.name;
+        
+        const descInput = document.getElementById('edit_description');
+        descInput.value = category.description || '';
+        if (typeof updateEditCharCount === 'function') {
+            updateEditCharCount(descInput);
+        }
+
+        // Xử lý hiển thị ảnh
+        const preview = document.getElementById('editImagePreview');
+        const placeholder = document.getElementById('editUploadPlaceholder');
+        const changeOverlay = document.getElementById('editChangeImageOverlay');
+        
+        if (category.image) {
+            // Chú ý: Ở đây category.image lấy từ JSON ban đầu không chứa hàm asset, nên phải xử lý cẩn thận.
+            // Tuy nhiên, data-category của edit mình dùng json_encode($category) nguyên gốc từ model
+            // Đường dẫn trong DB là 'storage/categories/...'
+            preview.src = '/' + category.image; 
+            preview.classList.remove('hidden');
+            placeholder.classList.add('hidden');
+            changeOverlay.classList.remove('hidden');
+        } else {
+            preview.src = '#';
+            preview.classList.add('hidden');
+            placeholder.classList.remove('hidden');
+            changeOverlay.classList.add('hidden');
+        }
+
+        // Cập nhật action của form
+        document.getElementById('editCategoryForm').action = '/admin/categories/' + category.id;
+
+        // Hiển thị modal
+        const modal = document.getElementById('editCategoryModal');
+        const modalContent = document.getElementById('editModalContent');
+        
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            modalContent.classList.remove('scale-95');
+        }, 10);
+    }
+
+    // Hàm đóng modal cập nhật
+    function closeEditModal() {
+        const modal = document.getElementById('editCategoryModal');
+        const modalContent = document.getElementById('editModalContent');
         
         modal.classList.add('opacity-0');
         modalContent.classList.add('scale-95');
