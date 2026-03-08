@@ -16,9 +16,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Nhóm Cửa hàng & Sản phẩm
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class)->names('categories');
 
-    Route::get('/products', function () {
-        return view('admin.dashboard', ['pageTitle' => 'Quản lý Sản phẩm']);
-    })->name('products.index');
+    Route::resource('products', \App\Http\Controllers\Admin\ProductController::class)->names('products');
 
     Route::get('/reviews', function () {
         return view('admin.dashboard', ['pageTitle' => 'Đánh giá Khách hàng']);
