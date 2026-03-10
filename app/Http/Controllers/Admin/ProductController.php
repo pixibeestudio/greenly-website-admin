@@ -14,16 +14,22 @@ class ProductController extends Controller
         // 1. Truy vấn danh sách sản phẩm, sử dụng Eager Loading
         $query = Product::with(['category', 'images']);
 
-        // 2. Phân trang cơ bản
-        $products = $query->latest()->paginate(10);
+        // 2. Tìm kiếm theo tên sản phẩm
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
 
-        // 3. Đếm tổng số sản phẩm hiện có
+        // 3. Phân trang với số lượng tùy chỉnh
+        $perPage = $request->input('per_page', 10);
+        $products = $query->latest()->paginate($perPage)->appends($request->query());
+
+        // 4. Đếm tổng số sản phẩm hiện có
         $totalProducts = Product::count();
 
-        // 4. Lấy danh sách Category
+        // 5. Lấy danh sách Category
         $categories = Category::all();
 
-        // 5. Trả về view
+        // 6. Trả về view
         return view('admin.products.index', compact('products', 'totalProducts', 'categories'));
     }
 }
