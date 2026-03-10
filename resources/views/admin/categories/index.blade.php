@@ -76,8 +76,8 @@
                         <th class="px-6 py-4">Hình ảnh</th>
                         <th class="px-6 py-4">Tên Danh mục</th>
                         <th class="px-6 py-4 max-w-xs">Mô tả</th>
-                        <th class="px-6 py-4">Ngày tạo <br/><span class="text-[10px] text-gray-400 font-normal normal-case">(created_at)</span></th>
-                        <th class="px-6 py-4">Cập nhật <br/><span class="text-[10px] text-gray-400 font-normal normal-case">(updated_at)</span></th>
+                        <th class="px-6 py-4">Ngày tạo</th>
+                        <th class="px-6 py-4">Cập nhật</th>
                         <th class="px-6 py-4 text-center">Hành động</th>
                     </tr>
                 </thead>

@@ -6,9 +6,10 @@
 
 @push('styles')
 <style>
-    /* Custom scrollbar cho filter dropdown nếu nội dung dài */
+    /* Custom scrollbar cho filter dropdown và card thống kê */
     .custom-scrollbar::-webkit-scrollbar {
         width: 4px;
+        height: 6px;
     }
     .custom-scrollbar::-webkit-scrollbar-track {
         background: #f1f1f1;
@@ -27,101 +28,98 @@
 @section('content')
 <div class="fade-in bg-cream-50 rounded-2xl relative min-h-[80vh]">
 
-    <!-- 1. TOP SECTION: STATS CARDS & TOOLBAR -->
-    <div class="flex flex-col lg:flex-row justify-between items-end gap-6 mb-8">
+    <!-- 1. 4 CARD THỐNG KÊ -->
+    <div class="flex flex-nowrap lg:grid lg:grid-cols-4 gap-6 mb-8 overflow-x-auto pb-4 custom-scrollbar">
+         <!-- Thẻ 1: Tổng sản phẩm -->
+         <div class="min-w-[250px] bg-gradient-to-br from-forest-900 via-forest-800 to-forest-700 p-5 rounded-2xl shadow-lg text-white relative overflow-hidden group hover:shadow-xl transition-all">
+            <div class="absolute -right-4 -bottom-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
+                <i class="fa-solid fa-boxes-stacked text-8xl"></i>
+            </div>
+            <div class="relative z-10 flex items-center justify-between">
+                <div>
+                    <p class="text-forest-100 text-[11px] font-bold uppercase tracking-wider mb-1">Tổng sản phẩm</p>
+                    <h3 class="text-3xl font-bold text-white drop-shadow-md">{{ $totalProducts ?? 0 }}</h3>
+                </div>
+                <div class="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center text-organic-400 text-xl shadow-inner">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                </div>
+            </div>
+         </div>
 
-        <!-- 4 Card Thống kê -->
-        <div class="w-full lg:w-1/2 grid grid-cols-2 gap-4">
-             <!-- Thẻ 1: Tổng sản phẩm -->
-             <div class="bg-gradient-to-br from-forest-900 via-forest-800 to-forest-700 p-5 rounded-2xl shadow-lg text-white relative overflow-hidden group hover:shadow-xl transition-all">
-                <div class="absolute -right-4 -bottom-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                    <i class="fa-solid fa-boxes-stacked text-8xl"></i>
-                </div>
-                <div class="relative z-10 flex items-center justify-between">
-                    <div>
-                        <p class="text-forest-100 text-[11px] font-bold uppercase tracking-wider mb-1">Tổng sản phẩm</p>
-                        <h3 class="text-3xl font-bold text-white drop-shadow-md">{{ $totalProducts ?? 0 }}</h3>
-                    </div>
-                    <div class="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center text-organic-400 text-xl shadow-inner">
-                        <i class="fa-solid fa-boxes-stacked"></i>
-                    </div>
-                </div>
-             </div>
-
-             <!-- Thẻ 2: Hết hàng -->
-             <div class="bg-gradient-to-br from-red-700 via-red-600 to-red-500 p-5 rounded-2xl shadow-lg text-white relative overflow-hidden group hover:shadow-xl transition-all">
-                <div class="absolute -right-4 -bottom-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                    <i class="fa-solid fa-triangle-exclamation text-8xl"></i>
-                </div>
-                <div class="relative z-10 flex items-center justify-between">
-                    <div>
-                        <p class="text-red-100 text-[11px] font-bold uppercase tracking-wider mb-1">Đang hết hàng</p>
-                        <div class="flex items-baseline gap-2">
-                            <h3 class="text-3xl font-bold text-white drop-shadow-md">0</h3>
-                            <span class="text-[9px] text-red-100 font-bold uppercase bg-red-900/40 px-1.5 py-0.5 rounded shadow-sm animate-pulse border border-red-400/50">Cần nhập!</span>
-                        </div>
-                    </div>
-                    <div class="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center text-yellow-300 text-xl shadow-inner">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
-                    </div>
-                </div>
-             </div>
-
-             <!-- Thẻ 3: Đang bán -->
-             <div class="bg-gradient-to-br from-emerald-700 via-emerald-600 to-emerald-500 p-5 rounded-2xl shadow-lg text-white relative overflow-hidden group hover:shadow-xl transition-all">
-                <div class="absolute -right-4 -bottom-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                    <i class="fa-solid fa-store text-8xl"></i>
-                </div>
-                <div class="relative z-10 flex items-center justify-between">
-                    <div>
-                        <p class="text-emerald-100 text-[11px] font-bold uppercase tracking-wider mb-1">Đang mở bán</p>
+         <!-- Thẻ 2: Hết hàng -->
+         <div class="min-w-[250px] bg-gradient-to-br from-red-700 via-red-600 to-red-500 p-5 rounded-2xl shadow-lg text-white relative overflow-hidden group hover:shadow-xl transition-all">
+            <div class="absolute -right-4 -bottom-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
+                <i class="fa-solid fa-triangle-exclamation text-8xl"></i>
+            </div>
+            <div class="relative z-10 flex items-center justify-between">
+                <div>
+                    <p class="text-red-100 text-[11px] font-bold uppercase tracking-wider mb-1">Đang hết hàng</p>
+                    <div class="flex items-baseline gap-2">
                         <h3 class="text-3xl font-bold text-white drop-shadow-md">0</h3>
-                    </div>
-                    <div class="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center text-white text-xl shadow-inner">
-                        <i class="fa-solid fa-store"></i>
+                        <span class="text-[9px] text-red-100 font-bold uppercase bg-red-900/40 px-1.5 py-0.5 rounded shadow-sm animate-pulse border border-red-400/50">Cần nhập!</span>
                     </div>
                 </div>
-             </div>
-
-             <!-- Thẻ 4: Ngừng kinh doanh -->
-             <div class="bg-gradient-to-br from-slate-700 via-slate-600 to-slate-500 p-5 rounded-2xl shadow-lg text-white relative overflow-hidden group hover:shadow-xl transition-all">
-                <div class="absolute -right-4 -bottom-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                    <i class="fa-solid fa-ban text-8xl"></i>
+                <div class="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center text-yellow-300 text-xl shadow-inner">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
                 </div>
-                <div class="relative z-10 flex items-center justify-between">
-                    <div>
-                        <p class="text-slate-200 text-[11px] font-bold uppercase tracking-wider mb-1">Ngừng kinh doanh</p>
-                        <h3 class="text-3xl font-bold text-white drop-shadow-md">0</h3>
-                    </div>
-                    <div class="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center text-slate-100 text-xl shadow-inner">
-                        <i class="fa-solid fa-ban"></i>
-                    </div>
+            </div>
+         </div>
+
+         <!-- Thẻ 3: Đang bán -->
+         <div class="min-w-[250px] bg-gradient-to-br from-emerald-700 via-emerald-600 to-emerald-500 p-5 rounded-2xl shadow-lg text-white relative overflow-hidden group hover:shadow-xl transition-all">
+            <div class="absolute -right-4 -bottom-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
+                <i class="fa-solid fa-store text-8xl"></i>
+            </div>
+            <div class="relative z-10 flex items-center justify-between">
+                <div>
+                    <p class="text-emerald-100 text-[11px] font-bold uppercase tracking-wider mb-1">Đang mở bán</p>
+                    <h3 class="text-3xl font-bold text-white drop-shadow-md">0</h3>
                 </div>
-             </div>
-        </div>
-
-        <!-- Thanh công cụ (Bộ lọc & Thêm mới) -->
-        <div class="w-full lg:w-1/2 flex flex-col sm:flex-row justify-end items-center gap-4">
-
-            <form method="GET" action="{{ route('admin.products.index') }}" class="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                <!-- Combobox chọn số lượng hiển thị -->
-                <select name="per_page" onchange="this.form.submit()" class="bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-600 outline-none focus:border-forest-500 transition-all shadow-sm">
-                    <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10 mục</option>
-                    <option value="20" {{ request('per_page') == 20 ? 'selected' : '' }}>20 mục</option>
-                    <option value="30" {{ request('per_page') == 30 ? 'selected' : '' }}>30 mục</option>
-                    <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50 mục</option>
-                    <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100 mục</option>
-                </select>
-
-                <!-- Tìm kiếm -->
-                <div class="relative group w-full sm:w-auto">
-                    <div class="flex items-center bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-2.5 focus-within:border-forest-500 focus-within:ring-1 focus-within:ring-forest-500 transition-all">
-                        <i class="fa-solid fa-search text-gray-400 mr-3 group-focus-within:text-forest-500"></i>
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Tìm tên sản phẩm..." class="bg-transparent text-sm text-gray-600 outline-none w-full sm:w-48 placeholder-gray-400">
-                    </div>
+                <div class="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center text-white text-xl shadow-inner">
+                    <i class="fa-solid fa-store"></i>
                 </div>
-            </form>
+            </div>
+         </div>
 
+         <!-- Thẻ 4: Ngừng kinh doanh -->
+         <div class="min-w-[250px] bg-gradient-to-br from-slate-700 via-slate-600 to-slate-500 p-5 rounded-2xl shadow-lg text-white relative overflow-hidden group hover:shadow-xl transition-all">
+            <div class="absolute -right-4 -bottom-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
+                <i class="fa-solid fa-ban text-8xl"></i>
+            </div>
+            <div class="relative z-10 flex items-center justify-between">
+                <div>
+                    <p class="text-slate-200 text-[11px] font-bold uppercase tracking-wider mb-1">Ngừng kinh doanh</p>
+                    <h3 class="text-3xl font-bold text-white drop-shadow-md">0</h3>
+                </div>
+                <div class="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center text-slate-100 text-xl shadow-inner">
+                    <i class="fa-solid fa-ban"></i>
+                </div>
+            </div>
+         </div>
+    </div>
+
+    <!-- 2. TOOLBAR: TÌM KIẾM, LỌC & THÊM MỚI -->
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+        <form method="GET" action="{{ route('admin.products.index') }}" class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            <!-- Combobox chọn số lượng hiển thị -->
+            <select name="per_page" onchange="this.form.submit()" class="bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-600 outline-none focus:border-forest-500 transition-all shadow-sm">
+                <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10 mục</option>
+                <option value="20" {{ request('per_page') == 20 ? 'selected' : '' }}>20 mục</option>
+                <option value="30" {{ request('per_page') == 30 ? 'selected' : '' }}>30 mục</option>
+                <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50 mục</option>
+                <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100 mục</option>
+            </select>
+
+            <!-- Tìm kiếm -->
+            <div class="relative group w-full sm:w-auto">
+                <div class="flex items-center bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-2.5 focus-within:border-forest-500 focus-within:ring-1 focus-within:ring-forest-500 transition-all">
+                    <i class="fa-solid fa-search text-gray-400 mr-3 group-focus-within:text-forest-500"></i>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Tìm tên sản phẩm..." class="bg-transparent text-sm text-gray-600 outline-none w-full sm:w-48 placeholder-gray-400">
+                </div>
+            </div>
+        </form>
+
+        <div class="flex items-center gap-3">
             <!-- Nút & Dropdown Filter -->
             <div class="relative">
                 <button id="filterBtn" onclick="toggleFilter()" class="bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-xl shadow-sm hover:bg-gray-50 hover:text-forest-700 transition-all font-bold text-sm flex items-center gap-2">
@@ -219,80 +217,87 @@
         </div>
     </div>
 
-    <!-- 2. BẢNG DỮ LIỆU SẢN PHẨM -->
+    <!-- 3. BẢNG DỮ LIỆU SẢN PHẨM -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left whitespace-nowrap">
+        <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-sm text-left whitespace-nowrap min-w-[1000px]">
                 <thead class="bg-cream-100/50 text-gray-500 uppercase text-xs font-bold border-b border-gray-100 tracking-wider">
                     <tr>
-                        <th class="px-6 py-4 w-16 text-center">ID</th>
-                        <th class="px-6 py-4">Hình ảnh</th>
-                        <th class="px-6 py-4">Thông tin <br/><span class="text-[10px] text-gray-400 font-normal normal-case">(name, unit, slug)</span></th>
-                        <th class="px-6 py-4">Danh mục <br/><span class="text-[10px] text-gray-400 font-normal normal-case">(category_id)</span></th>
-                        <th class="px-6 py-4">Giá <br/><span class="text-[10px] text-gray-400 font-normal normal-case">(price, discount_price)</span></th>
-                        <th class="px-6 py-4">Trạng thái <br/><span class="text-[10px] text-gray-400 font-normal normal-case">(is_active)</span></th>
-                        <th class="px-6 py-4 max-w-xs">Mô tả & Xuất xứ <br/><span class="text-[10px] text-gray-400 font-normal normal-case">(description, origin)</span></th>
-                        <th class="px-6 py-4">Ngày tạo <br/><span class="text-[10px] text-gray-400 font-normal normal-case">(created_at)</span></th>
-                        <th class="px-6 py-4 text-center">Hành động</th>
+                        <th class="px-6 py-4 w-20 text-center">Mã & Ảnh</th>
+                        <th class="px-6 py-4 w-64">Sản phẩm & Danh mục</th>
+                        <th class="px-6 py-4 w-64">Đặc tính (Mô tả & Xuất xứ)</th>
+                        <th class="px-6 py-4">Giá bán & Đơn vị</th>
+                        <th class="px-6 py-4 text-center">Tồn kho</th>
+                        <th class="px-6 py-4 text-center">Trạng thái & Thời gian</th>
+                        <th class="px-6 py-4 text-center sticky right-0 bg-cream-100/50 shadow-[-4px_0_10px_rgba(0,0,0,0.02)] z-10">Hành động</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
 
                     @forelse ($products as $product)
                     <tr class="hover:bg-forest-50/30 transition-colors group {{ !$product->is_active ? 'bg-gray-50/50 opacity-70' : '' }}">
-                        <td class="px-6 py-4 text-center font-mono text-gray-500">#{{ $product->id }}</td>
-                        <td class="px-6 py-4">
-                            <div class="w-12 h-12 rounded-xl border border-gray-200 overflow-hidden bg-white shadow-sm group-hover:shadow-md transition-shadow p-1 relative">
-                                <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover rounded-lg {{ !$product->is_active ? 'grayscale' : '' }}" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($product->name) }}&background=c8e6c9&color=2e7d32'">
-                                @if($product->discount_price > 0 && $product->is_active)
-                                    <div class="absolute -top-1 -right-1 bg-organic-500 text-white text-[8px] font-bold px-1 rounded-sm z-10">SALE</div>
-                                @endif
+                        <!-- Cột 1: Mã & Ảnh -->
+                        <td class="px-6 py-4 text-center">
+                            <div class="flex flex-col items-center gap-2">
+                                <span class="font-mono text-gray-500 text-xs">#{{ $product->id }}</span>
+                                <div class="w-12 h-12 rounded-xl border border-gray-200 overflow-hidden bg-white shadow-sm group-hover:shadow-md transition-shadow p-1 relative">
+                                    <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover rounded-lg {{ !$product->is_active ? 'grayscale' : '' }}" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($product->name) }}&background=c8e6c9&color=2e7d32'">
+                                    @if($product->discount_price > 0 && $product->is_active)
+                                        <div class="absolute -top-1 -right-1 bg-organic-500 text-white text-[8px] font-bold px-1 rounded-sm z-10">SALE</div>
+                                    @endif
+                                </div>
                             </div>
                         </td>
+                        <!-- Cột 2: Sản phẩm & Danh mục -->
                         <td class="px-6 py-4">
-                            <span class="font-bold text-gray-800 text-base group-hover:text-forest-700 transition-colors {{ !$product->is_active ? 'line-through text-gray-500' : '' }}">{{ $product->name }}</span>
-                            <div class="text-[11px] text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full inline-block mt-1">ĐVT: {{ $product->unit }}</div>
-                            <div class="text-[11px] text-gray-400 font-mono mt-0.5">/{{ $product->slug }}</div>
+                            <div class="flex flex-col">
+                                <span class="font-bold text-gray-800 text-base group-hover:text-forest-700 transition-colors {{ !$product->is_active ? 'line-through text-gray-500' : '' }}">{{ $product->name }}</span>
+                                <span class="text-sm text-gray-500">Danh mục: <span class="font-medium text-forest-600">{{ $product->category->name ?? 'Không có' }}</span></span>
+                            </div>
                         </td>
-                        <td class="px-6 py-4">
-                            <span class="font-medium text-gray-800">{{ $product->category->name ?? 'Không có' }}</span>
+                        <!-- Cột 3: Đặc tính (Mô tả & Xuất xứ) -->
+                        <td class="px-6 py-4 max-w-xs whitespace-normal">
+                            <p class="text-gray-600 line-clamp-2 text-sm">{{ $product->description ?? 'Chưa có mô tả' }}</p>
+                            <span class="text-xs text-gray-400 mt-1 inline-block"><i class="fa-solid fa-location-dot mr-1"></i>{{ $product->origin ?? 'Chưa cập nhật' }}</span>
                         </td>
+                        <!-- Cột 4: Giá bán & Đơn vị -->
                         <td class="px-6 py-4">
                             @if($product->discount_price > 0)
-                                <div class="text-xs text-gray-400 line-through">{{ number_format($product->price, 0, ',', '.') }}đ</div>
-                                <div class="font-bold text-organic-600 text-base">{{ number_format($product->discount_price, 0, ',', '.') }}đ</div>
+                                <div class="text-xs text-gray-400 line-through">{{ number_format($product->price, 0, ',', '.') }}đ / {{ $product->unit }}</div>
+                                <div class="font-bold text-organic-600 text-base">{{ number_format($product->discount_price, 0, ',', '.') }}đ / {{ $product->unit }}</div>
                             @else
-                                <div class="font-bold text-forest-700 text-base">{{ number_format($product->price, 0, ',', '.') }}đ</div>
+                                <div class="font-bold text-forest-700 text-base">{{ number_format($product->price, 0, ',', '.') }}đ / {{ $product->unit }}</div>
                             @endif
                         </td>
-                        <td class="px-6 py-4">
-                            @if($product->is_active)
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-green-50 text-green-700 border border-green-100">
-                                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span> Đang bán
-                                </span>
-                            @else
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-gray-200 text-gray-600 border border-gray-300">
-                                    <i class="fa-solid fa-ban mr-1.5 text-[10px]"></i> Ngừng bán
-                                </span>
-                            @endif
+                        <!-- Cột 5: Tồn kho -->
+                        <td class="px-6 py-4 text-center">
+                            <span class="font-bold text-gray-700">0</span>
+                            <span class="text-xs text-gray-400 block">Sản phẩm</span>
                         </td>
-                        <td class="px-6 py-4 max-w-xs whitespace-normal">
-                            <p class="text-gray-600 line-clamp-2 text-sm">{{ $product->description ?? 'Không có mô tả' }}</p>
-                            @if($product->origin)
-                                <div class="text-[11px] text-gray-400 mt-1"><i class="fa-solid fa-location-dot mr-1"></i>{{ $product->origin }}</div>
-                            @endif
+                        <!-- Cột 6: Trạng thái & Thời gian -->
+                        <td class="px-6 py-4 text-center">
+                            <div class="flex flex-col items-center">
+                                @if($product->is_active)
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-green-50 text-green-700 border border-green-100 mb-1">
+                                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span> Đang bán
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-gray-200 text-gray-600 border border-gray-300 mb-1">
+                                        <i class="fa-solid fa-ban mr-1.5 text-[10px]"></i> Ngừng bán
+                                    </span>
+                                @endif
+                                <div class="text-[11px] text-gray-400">Tạo: {{ $product->created_at->format('d/m/Y') }}</div>
+                                <div class="text-[11px] text-gray-400">Sửa: {{ $product->updated_at->format('d/m/Y') }}</div>
+                            </div>
                         </td>
-                        <td class="px-6 py-4">
-                            <div class="text-gray-700 font-medium">{{ $product->created_at->format('d/m/Y') }}</div>
-                            <div class="text-[11px] text-gray-400">{{ $product->created_at->format('H:i A') }}</div>
-                        </td>
-                        <td class="px-6 py-4">
+                        <!-- Cột 7: Hành động (sticky) -->
+                        <td class="px-6 py-4 sticky right-0 bg-white shadow-[-4px_0_10px_rgba(0,0,0,0.02)] z-10">
                             @include('admin.products.partials.action-buttons', ['product' => $product])
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="9" class="px-6 py-10 text-center text-gray-500">
+                        <td colspan="7" class="px-6 py-10 text-center text-gray-500">
                             <div class="flex flex-col items-center justify-center">
                                 <i class="fa-solid fa-inbox text-4xl text-gray-300 mb-3"></i>
                                 <p>Chưa có sản phẩm nào.</p>
