@@ -131,7 +131,8 @@
                                         <div class="relative">
                                             <input type="text" id="add_product_price" name="price" required
                                                 class="currency-input w-full bg-white border border-gray-300 text-gray-800 text-base rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-forest-500 block pl-4 pr-12 py-3 outline-none transition-all shadow-sm font-mono text-right"
-                                                placeholder="0">
+                                                placeholder="0" autocomplete="off" inputmode="numeric"
+                                                oninput="formatCurrencyInput(this)" onkeydown="return filterCurrencyKeydown(event)">
                                             <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold text-sm pointer-events-none">₫</span>
                                         </div>
                                     </div>
@@ -142,7 +143,8 @@
                                         <div class="relative">
                                             <input type="text" id="add_product_discount_price" name="discount_price"
                                                 class="currency-input w-full bg-white border border-gray-300 text-gray-800 text-base rounded-xl focus:ring-2 focus:ring-organic-500 focus:border-organic-500 block pl-4 pr-12 py-3 outline-none transition-all shadow-sm font-mono text-right text-organic-600"
-                                                placeholder="0">
+                                                placeholder="0" autocomplete="off" inputmode="numeric"
+                                                oninput="formatCurrencyInput(this)" onkeydown="return filterCurrencyKeydown(event)">
                                             <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold text-sm pointer-events-none">₫</span>
                                         </div>
                                     </div>

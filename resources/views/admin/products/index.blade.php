@@ -604,20 +604,28 @@
     }
 
     // ============================================
-    // FORMAT TIỀN TỆ (Tự động thêm dấu chấm)
+    // FORMAT TIỀN TỆ (Inline handler - không dùng addEventListener)
+    // Được gọi từ oninput="formatCurrencyInput(this)" trên input HTML
     // ============================================
-    document.querySelectorAll('.currency-input').forEach(input => {
-        input.addEventListener('input', function() {
-            // Xóa tất cả ký tự không phải số
-            let raw = this.value.replace(/\D/g, '');
-            // Format thêm dấu chấm ngàn
-            if (raw) {
-                this.value = Number(raw).toLocaleString('vi-VN');
-            } else {
-                this.value = '';
-            }
-        });
-    });
+    function formatCurrencyInput(el) {
+        let raw = el.value.replace(/\D/g, '');
+        if (raw.length > 1) raw = raw.replace(/^0+/, '') || '0';
+        let formatted = raw !== '' ? raw.replace(/\B(?=(\d{3})+(?!\d))/g, '.') : '';
+        if (el.value !== formatted) {
+            el.value = formatted;
+        }
+    }
+
+    // Chặn ký tự không phải số - gọi từ onkeydown="return filterCurrencyKeydown(event)"
+    function filterCurrencyKeydown(e) {
+        // Cho phép: Backspace, Delete, Tab, Escape, Enter, Home, End, Arrows
+        if (['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'Home', 'End',
+            'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return true;
+        // Cho phép Ctrl/Cmd + A, C, V, X
+        if ((e.ctrlKey || e.metaKey) && ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase())) return true;
+        // Chỉ cho phép số 0-9
+        return /^\d$/.test(e.key);
+    }
 
     // ============================================
     // SUBMIT FORM: VALIDATE + XÓA DẤU CHẤM + LOADING
@@ -637,9 +645,10 @@
         }
 
         // 2. Xóa dấu chấm trong các ô giá trước khi gửi lên Backend
-        document.querySelectorAll('.currency-input').forEach(input => {
-            input.value = input.value.replace(/\./g, '');
-        });
+        let priceInput = document.querySelector('input[name="price"]');
+        let discountInput = document.querySelector('input[name="discount_price"]');
+        if (priceInput) priceInput.value = priceInput.value.replace(/\./g, '');
+        if (discountInput) discountInput.value = discountInput.value.replace(/\./g, '');
 
         // 3. Đồng bộ gallery files
         updateGalleryFileInput();
