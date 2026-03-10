@@ -29,11 +29,19 @@ class ProductController extends Controller
         // 4. Đếm tổng số sản phẩm hiện có
         $totalProducts = Product::count();
 
-        // 5. Lấy danh sách Category
+        // 5. Thống kê cho các Card
+        $outOfStockProducts = 0; // Tạm thời để 0, chờ module Batches
+        $discountedProducts = Product::where('discount_price', '>', 0)->count();
+        $inactiveProducts = Product::where('is_active', 0)->count();
+
+        // 6. Lấy danh sách Category
         $categories = Category::all();
 
-        // 6. Trả về view
-        return view('admin.products.index', compact('products', 'totalProducts', 'categories'));
+        // 7. Trả về view
+        return view('admin.products.index', compact(
+            'products', 'totalProducts', 'categories',
+            'outOfStockProducts', 'discountedProducts', 'inactiveProducts'
+        ));
     }
 
     public function store(Request $request)

@@ -63,7 +63,7 @@
                                         accept="image/png, image/jpeg, image/jpg, image/webp"
                                         onchange="previewAddProductImage(this)">
                                 </label>
-                                <p id="add_product_image_error" class="text-red-500 text-xs mt-1.5 hidden"></p>
+                                <p id="add_product_image_error" class="text-red-500 text-xs mt-1.5 hidden mb-3"></p>
                             </div>
 
                             <hr class="border-gray-100 mb-6">
@@ -89,6 +89,7 @@
                                 <input type="file" name="gallery[]" id="add_product_gallery" multiple class="hidden"
                                     accept="image/png, image/jpeg, image/jpg, image/webp"
                                     onchange="previewAddProductGallery(this)">
+                                <p id="add_product_gallery_error" class="text-red-500 text-xs mt-1.5 hidden mb-3"></p>
                             </div>
 
                         </div>
@@ -128,8 +129,8 @@
                                     <div>
                                         <label for="add_product_price" class="block text-sm font-bold text-gray-700 mb-2">Giá gốc (Price) <span class="text-red-500">*</span></label>
                                         <div class="relative">
-                                            <input type="number" id="add_product_price" name="price" required min="0" step="1000"
-                                                class="w-full bg-white border border-gray-300 text-gray-800 text-base rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-forest-500 block pl-4 pr-12 py-3 outline-none transition-all shadow-sm font-mono text-right"
+                                            <input type="text" id="add_product_price" name="price" required
+                                                class="currency-input w-full bg-white border border-gray-300 text-gray-800 text-base rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-forest-500 block pl-4 pr-12 py-3 outline-none transition-all shadow-sm font-mono text-right"
                                                 placeholder="0">
                                             <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold text-sm pointer-events-none">₫</span>
                                         </div>
@@ -139,8 +140,8 @@
                                     <div>
                                         <label for="add_product_discount_price" class="block text-sm font-bold text-gray-700 mb-2">Giá Khuyến mãi (Tùy chọn)</label>
                                         <div class="relative">
-                                            <input type="number" id="add_product_discount_price" name="discount_price" min="0" step="1000"
-                                                class="w-full bg-white border border-gray-300 text-gray-800 text-base rounded-xl focus:ring-2 focus:ring-organic-500 focus:border-organic-500 block pl-4 pr-12 py-3 outline-none transition-all shadow-sm font-mono text-right text-organic-600"
+                                            <input type="text" id="add_product_discount_price" name="discount_price"
+                                                class="currency-input w-full bg-white border border-gray-300 text-gray-800 text-base rounded-xl focus:ring-2 focus:ring-organic-500 focus:border-organic-500 block pl-4 pr-12 py-3 outline-none transition-all shadow-sm font-mono text-right text-organic-600"
                                                 placeholder="0">
                                             <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold text-sm pointer-events-none">₫</span>
                                         </div>

@@ -55,7 +55,7 @@
                 <div>
                     <p class="text-red-100 text-[11px] font-bold uppercase tracking-wider mb-1">Đang hết hàng</p>
                     <div class="flex items-baseline gap-2">
-                        <h3 class="text-3xl font-bold text-white drop-shadow-md">0</h3>
+                        <h3 class="text-3xl font-bold text-white drop-shadow-md">{{ $outOfStockProducts ?? 0 }}</h3>
                         <span class="text-[9px] text-red-100 font-bold uppercase bg-red-900/40 px-1.5 py-0.5 rounded shadow-sm animate-pulse border border-red-400/50">Cần nhập!</span>
                     </div>
                 </div>
@@ -73,7 +73,7 @@
             <div class="relative z-10 flex items-center justify-between">
                 <div>
                     <p class="text-emerald-100 text-[11px] font-bold uppercase tracking-wider mb-1">Đang mở bán</p>
-                    <h3 class="text-3xl font-bold text-white drop-shadow-md">0</h3>
+                    <h3 class="text-3xl font-bold text-white drop-shadow-md">{{ $discountedProducts ?? 0 }}</h3>
                 </div>
                 <div class="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center text-white text-xl shadow-inner">
                     <i class="fa-solid fa-store"></i>
@@ -89,7 +89,7 @@
             <div class="relative z-10 flex items-center justify-between">
                 <div>
                     <p class="text-slate-200 text-[11px] font-bold uppercase tracking-wider mb-1">Ngừng kinh doanh</p>
-                    <h3 class="text-3xl font-bold text-white drop-shadow-md">0</h3>
+                    <h3 class="text-3xl font-bold text-white drop-shadow-md">{{ $inactiveProducts ?? 0 }}</h3>
                 </div>
                 <div class="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center text-slate-100 text-xl shadow-inner">
                     <i class="fa-solid fa-ban"></i>
@@ -241,7 +241,7 @@
                             <div class="flex flex-col items-center gap-2">
                                 <span class="font-mono text-gray-500 text-xs">#{{ $product->id }}</span>
                                 <div class="w-12 h-12 rounded-xl border border-gray-200 overflow-hidden bg-white shadow-sm group-hover:shadow-md transition-shadow p-1 relative">
-                                    <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover rounded-lg {{ !$product->is_active ? 'grayscale' : '' }}" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($product->name) }}&background=c8e6c9&color=2e7d32'">
+                                    <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('images/no-image.png') }}" alt="{{ $product->name }}" class="w-full h-full object-cover rounded-lg {{ !$product->is_active ? 'grayscale' : '' }}" onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($product->name) }}&background=c8e6c9&color=2e7d32'">
                                     @if($product->discount_price > 0 && $product->is_active)
                                         <div class="absolute -top-1 -right-1 bg-organic-500 text-white text-[8px] font-bold px-1 rounded-sm z-10">SALE</div>
                                     @endif
@@ -277,7 +277,12 @@
                         <!-- Cột 6: Trạng thái & Thời gian -->
                         <td class="px-6 py-4 text-center">
                             <div class="flex flex-col items-center">
-                                @if($product->is_active)
+                                @php $stock = 0; @endphp
+                                @if($stock <= 0)
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-red-100 text-red-700 border border-red-200 mb-1">
+                                        <i class="fa-solid fa-circle-xmark mr-1.5 text-[10px]"></i> Hết hàng
+                                    </span>
+                                @elseif($product->is_active)
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-green-50 text-green-700 border border-green-100 mb-1">
                                         <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span> Đang bán
                                     </span>
@@ -420,6 +425,11 @@
             resetAddProductGallery();
             // Reset đếm ký tự
             document.getElementById('add_product_char_count').innerText = '0';
+            // Reset các thẻ báo lỗi
+            ['add_product_name_error', 'add_product_image_error', 'add_product_gallery_error'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.classList.add('hidden'); el.innerText = ''; }
+            });
         }, 300);
     }
 
@@ -458,12 +468,28 @@
         }
     }
 
-    // Preview ảnh đại diện sản phẩm
+    // Preview ảnh đại diện sản phẩm (có validate file)
     function previewAddProductImage(input) {
+        const errorEl = document.getElementById('add_product_image_error');
         const preview = document.getElementById('add_product_image_preview');
         const placeholder = document.getElementById('add_product_image_placeholder');
         const overlay = document.getElementById('add_product_image_overlay');
+        errorEl.classList.add('hidden'); errorEl.innerText = '';
+
         if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+            // Validate kích thước và định dạng
+            if (file.size > 2 * 1024 * 1024) {
+                errorEl.innerText = 'Ảnh đại diện không được quá 2MB.';
+                errorEl.classList.remove('hidden');
+                input.value = ''; return;
+            }
+            if (!allowedTypes.includes(file.type)) {
+                errorEl.innerText = 'Chỉ chấp nhận định dạng: PNG, JPG, WEBP.';
+                errorEl.classList.remove('hidden');
+                input.value = ''; return;
+            }
             const reader = new FileReader();
             reader.onload = function(e) {
                 preview.src = e.target.result;
@@ -471,7 +497,7 @@
                 placeholder.classList.add('hidden');
                 overlay.classList.remove('hidden');
             };
-            reader.readAsDataURL(input.files[0]);
+            reader.readAsDataURL(file);
         }
     }
 
@@ -482,7 +508,26 @@
     let addProductGalleryFiles = [];
 
     function previewAddProductGallery(input) {
+        const errorEl = document.getElementById('add_product_gallery_error');
+        errorEl.classList.add('hidden'); errorEl.innerText = '';
+
         const files = Array.from(input.files);
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+
+        // Validate từng file trước
+        for (const file of files) {
+            if (file.size > 2 * 1024 * 1024) {
+                errorEl.innerText = 'Mỗi ảnh chi tiết không được quá 2MB. File "' + file.name + '" quá lớn.';
+                errorEl.classList.remove('hidden');
+                input.value = ''; return;
+            }
+            if (!allowedTypes.includes(file.type)) {
+                errorEl.innerText = 'Chỉ chấp nhận định dạng: PNG, JPG, WEBP. File "' + file.name + '" không hợp lệ.';
+                errorEl.classList.remove('hidden');
+                input.value = ''; return;
+            }
+        }
+
         const remaining = ADD_PRODUCT_MAX_GALLERY - addProductGalleryFiles.length;
         const toAdd = files.slice(0, remaining);
 
@@ -558,13 +603,51 @@
         if (addBtn) addBtn.classList.remove('hidden');
     }
 
-    // Submit form loading state
+    // ============================================
+    // FORMAT TIỀN TỆ (Tự động thêm dấu chấm)
+    // ============================================
+    document.querySelectorAll('.currency-input').forEach(input => {
+        input.addEventListener('input', function() {
+            // Xóa tất cả ký tự không phải số
+            let raw = this.value.replace(/\D/g, '');
+            // Format thêm dấu chấm ngàn
+            if (raw) {
+                this.value = Number(raw).toLocaleString('vi-VN');
+            } else {
+                this.value = '';
+            }
+        });
+    });
+
+    // ============================================
+    // SUBMIT FORM: VALIDATE + XÓA DẤU CHẤM + LOADING
+    // ============================================
     document.getElementById('addProductForm').addEventListener('submit', function(e) {
+        // 1. Validate tên sản phẩm (chống nhập chỉ số)
+        const nameInput = document.getElementById('add_product_name');
+        const nameError = document.getElementById('add_product_name_error');
+        if (/^\d+$/.test(nameInput.value.trim())) {
+            e.preventDefault();
+            nameError.innerText = 'Tên sản phẩm không được chỉ là số.';
+            nameError.classList.remove('hidden');
+            nameInput.focus();
+            return;
+        } else {
+            nameError.classList.add('hidden'); nameError.innerText = '';
+        }
+
+        // 2. Xóa dấu chấm trong các ô giá trước khi gửi lên Backend
+        document.querySelectorAll('.currency-input').forEach(input => {
+            input.value = input.value.replace(/\./g, '');
+        });
+
+        // 3. Đồng bộ gallery files
+        updateGalleryFileInput();
+
+        // 4. Loading state
         const btn = document.getElementById('add_product_submit_btn');
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý...';
         btn.classList.add('opacity-70', 'cursor-not-allowed');
-        // Đồng bộ gallery files trước khi submit
-        updateGalleryFileInput();
         setTimeout(() => { btn.disabled = true; }, 10);
     });
 </script>
