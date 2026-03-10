@@ -320,6 +320,9 @@
     </div>
 </div>
 
+<!-- Modal Thêm Sản Phẩm -->
+@include('admin.products.partials.add-modal')
+
 @endsection
 
 @push('scripts')
@@ -378,9 +381,191 @@
         }
     }
 
-    // Placeholder cho các hàm modal sản phẩm (sẽ implement khi tạo modal)
+    // ============================================
+    // MODAL THÊM SẢN PHẨM
+    // ============================================
+
+    // Mở Modal Thêm Sản Phẩm
     function openAddProductModal() {
-        console.log('openAddProductModal() - chưa implement');
+        const modal = document.getElementById('addProductModal');
+        const content = document.getElementById('addProductContent');
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            content.classList.remove('scale-95');
+        }, 10);
     }
+
+    // Đóng Modal Thêm Sản Phẩm
+    function closeAddProductModal() {
+        const modal = document.getElementById('addProductModal');
+        const content = document.getElementById('addProductContent');
+        modal.classList.add('opacity-0');
+        content.classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            // Reset form và các trạng thái UI
+            document.getElementById('addProductForm').reset();
+            // Ẩn ô nhập đơn vị tùy chỉnh
+            const unitCustom = document.getElementById('add_product_unit_custom');
+            unitCustom.classList.add('hidden');
+            unitCustom.removeAttribute('required');
+            unitCustom.value = '';
+            // Reset preview ảnh đại diện
+            document.getElementById('add_product_image_preview').classList.add('hidden');
+            document.getElementById('add_product_image_preview').src = '#';
+            document.getElementById('add_product_image_placeholder').classList.remove('hidden');
+            document.getElementById('add_product_image_overlay').classList.add('hidden');
+            // Reset gallery
+            resetAddProductGallery();
+            // Reset đếm ký tự
+            document.getElementById('add_product_char_count').innerText = '0';
+        }, 300);
+    }
+
+    // Toggle hiển thị ô nhập đơn vị tùy chỉnh
+    function toggleAddProductCustomUnit() {
+        const select = document.getElementById('add_product_unit_select');
+        const customInput = document.getElementById('add_product_unit_custom');
+        if (select.value === 'custom') {
+            customInput.classList.remove('hidden');
+            customInput.setAttribute('required', 'required');
+            customInput.focus();
+        } else {
+            customInput.classList.add('hidden');
+            customInput.removeAttribute('required');
+            customInput.value = '';
+        }
+    }
+
+    // Đếm ký tự mô tả sản phẩm
+    function updateAddProductCharCount(element) {
+        const maxLength = 2000;
+        const currentLength = element.value.length;
+        const countEl = document.getElementById('add_product_char_count');
+        if (currentLength > maxLength) {
+            element.value = element.value.substring(0, maxLength);
+            countEl.innerText = maxLength;
+        } else {
+            countEl.innerText = currentLength;
+        }
+        if (currentLength >= 1900) {
+            countEl.classList.add('text-organic-500');
+            countEl.classList.remove('text-gray-400');
+        } else {
+            countEl.classList.remove('text-organic-500');
+            countEl.classList.add('text-gray-400');
+        }
+    }
+
+    // Preview ảnh đại diện sản phẩm
+    function previewAddProductImage(input) {
+        const preview = document.getElementById('add_product_image_preview');
+        const placeholder = document.getElementById('add_product_image_placeholder');
+        const overlay = document.getElementById('add_product_image_overlay');
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+                overlay.classList.remove('hidden');
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // ============================================
+    // GALLERY ẢNH PHỤ (Multiple Image Preview)
+    // ============================================
+    const ADD_PRODUCT_MAX_GALLERY = 10;
+    let addProductGalleryFiles = [];
+
+    function previewAddProductGallery(input) {
+        const files = Array.from(input.files);
+        const remaining = ADD_PRODUCT_MAX_GALLERY - addProductGalleryFiles.length;
+        const toAdd = files.slice(0, remaining);
+
+        toAdd.forEach(file => {
+            addProductGalleryFiles.push(file);
+        });
+
+        renderAddProductGallery();
+        // Reset input để có thể chọn lại cùng file
+        input.value = '';
+    }
+
+    function renderAddProductGallery() {
+        const grid = document.getElementById('add_product_gallery_grid');
+        const countEl = document.getElementById('add_product_gallery_count');
+
+        // Xóa tất cả ảnh preview cũ (giữ lại nút +)
+        grid.querySelectorAll('.gallery-preview-item').forEach(el => el.remove());
+
+        // Cập nhật số lượng
+        countEl.innerText = addProductGalleryFiles.length + '/' + ADD_PRODUCT_MAX_GALLERY;
+
+        // Render từng ảnh
+        addProductGalleryFiles.forEach((file, index) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'gallery-preview-item aspect-square rounded-xl border border-gray-200 relative group overflow-hidden bg-white shadow-sm';
+
+            const img = document.createElement('img');
+            img.className = 'w-full h-full object-cover';
+            img.alt = 'Gallery ' + (index + 1);
+            img.src = URL.createObjectURL(file);
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'absolute top-1 right-1 w-5 h-5 bg-white/90 hover:bg-red-500 hover:text-white text-gray-600 rounded-full flex items-center justify-center text-[10px] backdrop-blur-sm transition-colors shadow-sm opacity-0 group-hover:opacity-100';
+            removeBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+            removeBtn.onclick = function() {
+                addProductGalleryFiles.splice(index, 1);
+                updateGalleryFileInput();
+                renderAddProductGallery();
+            };
+
+            wrapper.appendChild(img);
+            wrapper.appendChild(removeBtn);
+            grid.appendChild(wrapper);
+        });
+
+        // Ẩn/hiện nút + nếu đã đạt tối đa
+        const addBtn = grid.querySelector('label[for="add_product_gallery"]');
+        if (addProductGalleryFiles.length >= ADD_PRODUCT_MAX_GALLERY) {
+            addBtn.classList.add('hidden');
+        } else {
+            addBtn.classList.remove('hidden');
+        }
+    }
+
+    // Đồng bộ lại DataTransfer vào input file để form submit đúng
+    function updateGalleryFileInput() {
+        const input = document.getElementById('add_product_gallery');
+        const dt = new DataTransfer();
+        addProductGalleryFiles.forEach(file => dt.items.add(file));
+        input.files = dt.files;
+    }
+
+    function resetAddProductGallery() {
+        addProductGalleryFiles = [];
+        const grid = document.getElementById('add_product_gallery_grid');
+        grid.querySelectorAll('.gallery-preview-item').forEach(el => el.remove());
+        document.getElementById('add_product_gallery_count').innerText = '0/' + ADD_PRODUCT_MAX_GALLERY;
+        document.getElementById('add_product_gallery').value = '';
+        // Đảm bảo nút + hiển thị lại
+        const addBtn = grid.querySelector('label[for="add_product_gallery"]');
+        if (addBtn) addBtn.classList.remove('hidden');
+    }
+
+    // Submit form loading state
+    document.getElementById('addProductForm').addEventListener('submit', function(e) {
+        const btn = document.getElementById('add_product_submit_btn');
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý...';
+        btn.classList.add('opacity-70', 'cursor-not-allowed');
+        // Đồng bộ gallery files trước khi submit
+        updateGalleryFileInput();
+        setTimeout(() => { btn.disabled = true; }, 10);
+    });
 </script>
 @endpush
