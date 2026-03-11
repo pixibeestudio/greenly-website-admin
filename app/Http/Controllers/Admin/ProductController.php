@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\ProductImage;
@@ -117,5 +118,60 @@ class ProductController extends Controller
 
         // 6. Redirect về trang danh sách với thông báo thành công
         return redirect()->route('admin.products.index')->with('success', 'Thêm sản phẩm thành công!');
+    }
+
+    public function update(Request $request, string $id)
+    {
+        // 1. Tìm sản phẩm theo ID
+        $product = Product::findOrFail($id);
+
+        // 2. Validate dữ liệu đầu vào
+        $request->validate([
+            'name' => ['required', 'string', 'max:255', Rule::unique('products')->ignore($product->id)],
+            'category_id' => 'required|exists:categories,id',
+            'price' => 'required|numeric|min:0',
+            'discount_price' => 'nullable|numeric|min:0|lt:price',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'gallery.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'unit_select' => 'required|string',
+            'unit_custom' => 'nullable|string|max:50',
+        ], [
+            'name.unique' => 'Tên sản phẩm đã tồn tại.',
+            'discount_price.lt' => 'Giá khuyến mãi phải nhỏ hơn giá gốc.',
+        ]);
+
+        // 3. Xử lý logic Đơn vị tính (Unit)
+        $unit = $request->unit_select === 'custom' ? $request->unit_custom : $request->unit_select;
+
+        // 4. Chuẩn bị dữ liệu cập nhật
+        $data = $request->only(['name', 'category_id', 'price', 'discount_price', 'description', 'origin', 'is_active']);
+        $data['slug'] = Str::slug($request->name);
+        $data['unit'] = $unit;
+
+        // 5. Xử lý ảnh chính (Xóa ảnh cũ nếu upload ảnh mới)
+        if ($request->hasFile('image')) {
+            if ($product->image) {
+                Storage::disk('public')->delete($product->image);
+            }
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        // 6. Cập nhật sản phẩm
+        $product->update($data);
+
+        // 7. Xử lý thêm ảnh phụ (Nối thêm vào gallery cũ)
+        if ($request->hasFile('gallery')) {
+            $maxOrder = $product->images()->max('sort_order') ?? 0;
+            foreach ($request->file('gallery') as $index => $file) {
+                $path = $file->store('products/gallery', 'public');
+                $product->images()->create([
+                    'image_path' => $path,
+                    'sort_order' => $maxOrder + $index + 1,
+                ]);
+            }
+        }
+
+        // 8. Redirect về trang danh sách với thông báo thành công
+        return redirect()->route('admin.products.index')->with('success', 'Cập nhật sản phẩm thành công!');
     }
 }
