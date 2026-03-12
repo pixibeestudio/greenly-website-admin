@@ -7,12 +7,14 @@
         class="bg-gray-50 w-full max-w-5xl mx-4 max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl transform scale-95 transition-transform duration-300">
 
         <!-- Header Sticky -->
-        <div class="sticky top-0 z-20 bg-white border-b border-gray-100 px-8 py-5 rounded-t-2xl flex justify-between items-center">
+        <div
+            class="sticky top-0 z-20 bg-white border-b border-gray-100 px-8 py-5 rounded-t-2xl flex justify-between items-center">
             <div>
                 <h2 class="text-xl font-bold text-forest-800 flex items-center gap-2">
                     <i class="fa-solid fa-pen-to-square text-blue-600"></i> Cập Nhật Sản Phẩm
                 </h2>
-                <p class="text-gray-500 text-sm mt-0.5">Chỉnh sửa thông tin chi tiết, hình ảnh và phân loại sản phẩm.</p>
+                <p class="text-gray-500 text-sm mt-0.5">Chỉnh sửa thông tin chi tiết, hình ảnh và phân loại sản phẩm.
+                </p>
             </div>
             <button type="button" onclick="closeEditProductModal()"
                 class="w-9 h-9 rounded-full bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-500 flex items-center justify-center transition-colors border border-gray-200 hover:border-red-200">
@@ -24,6 +26,8 @@
         <form id="editProductForm" action="" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
+            <!-- Container chứa hidden inputs cho ID ảnh gallery cũ bị xóa -->
+            <div id="edit_product_removed_gallery_container"></div>
 
             <div class="p-8 md:p-10">
                 <div class="bg-white rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 p-8 md:p-10">
@@ -35,7 +39,8 @@
                             <!-- 1. Ảnh đại diện chính (Main Thumbnail) -->
                             <div class="mb-6">
                                 <div class="w-full flex justify-between items-end mb-2">
-                                    <label class="block text-sm font-bold text-gray-700">Ảnh đại diện <span class="text-red-500">*</span></label>
+                                    <label class="block text-sm font-bold text-gray-700">Ảnh đại diện <span
+                                            class="text-red-500">*</span></label>
                                 </div>
                                 <label for="edit_product_image"
                                     class="w-full aspect-square bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center relative overflow-hidden group cursor-pointer hover:border-forest-500 hover:bg-forest-50 transition-colors">
@@ -73,7 +78,8 @@
                             <div>
                                 <div class="w-full flex justify-between items-end mb-2">
                                     <label class="block text-sm font-bold text-gray-700">Hình ảnh chi tiết</label>
-                                    <span id="edit_product_gallery_count" class="text-xs text-gray-400 font-medium">0/10</span>
+                                    <span id="edit_product_gallery_count"
+                                        class="text-xs text-gray-400 font-medium">0/10</span>
                                 </div>
                                 <p class="text-[11px] text-gray-400 mb-3">PNG, JPG, WEBP. Tối đa 2MB/ảnh.</p>
 
@@ -104,13 +110,16 @@
                                 <div class="flex gap-4">
                                     <!-- Mã SP (ID) - readonly -->
                                     <div class="w-24">
-                                        <label for="edit_product_id" class="block text-sm font-bold text-gray-700 mb-2">ID</label>
+                                        <label for="edit_product_id"
+                                            class="block text-sm font-bold text-gray-700 mb-2">ID</label>
                                         <input type="text" id="edit_product_id" readonly
                                             class="w-full bg-gray-100 border border-gray-300 text-gray-500 text-base font-mono rounded-xl block px-4 py-3 outline-none cursor-not-allowed">
                                     </div>
                                     <!-- Tên sản phẩm -->
                                     <div class="flex-1">
-                                        <label for="edit_product_name" class="block text-sm font-bold text-gray-700 mb-2">Tên sản phẩm <span class="text-red-500">*</span></label>
+                                        <label for="edit_product_name"
+                                            class="block text-sm font-bold text-gray-700 mb-2">Tên sản phẩm <span
+                                                class="text-red-500">*</span></label>
                                         <input type="text" id="edit_product_name" name="name" required
                                             class="w-full bg-white border border-gray-300 text-gray-800 text-base rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-forest-500 block px-4 py-3 outline-none transition-all shadow-sm"
                                             placeholder="VD: Cà chua Organic Đà Lạt...">
@@ -120,7 +129,9 @@
 
                                 <!-- Dòng 2: Danh mục -->
                                 <div>
-                                    <label for="edit_product_category" class="block text-sm font-bold text-gray-700 mb-2">Danh mục <span class="text-red-500">*</span></label>
+                                    <label for="edit_product_category"
+                                        class="block text-sm font-bold text-gray-700 mb-2">Danh mục <span
+                                            class="text-red-500">*</span></label>
                                     <div class="relative">
                                         <select id="edit_product_category" name="category_id" required
                                             class="w-full bg-white border border-gray-300 text-gray-800 text-base rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-forest-500 block px-4 py-3 outline-none transition-all shadow-sm appearance-none cursor-pointer">
@@ -129,7 +140,8 @@
                                                 <option value="{{ $category->id }}">{{ $category->name }}</option>
                                             @endforeach
                                         </select>
-                                        <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none text-sm"></i>
+                                        <i
+                                            class="fa-solid fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none text-sm"></i>
                                     </div>
                                 </div>
 
@@ -137,25 +149,33 @@
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <!-- Giá gốc -->
                                     <div>
-                                        <label for="edit_product_price" class="block text-sm font-bold text-gray-700 mb-2">Giá gốc (Price) <span class="text-red-500">*</span></label>
+                                        <label for="edit_product_price"
+                                            class="block text-sm font-bold text-gray-700 mb-2">Giá gốc (Price) <span
+                                                class="text-red-500">*</span></label>
                                         <div class="relative">
                                             <input type="text" id="edit_product_price" name="price" required
                                                 class="currency-input w-full bg-white border border-gray-300 text-gray-800 text-base rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-forest-500 block pl-4 pr-12 py-3 outline-none transition-all shadow-sm font-mono text-right"
                                                 placeholder="0" autocomplete="off" inputmode="numeric"
-                                                oninput="formatCurrencyInput(this)" onkeydown="return filterCurrencyKeydown(event)">
-                                            <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold text-sm pointer-events-none">₫</span>
+                                                oninput="formatCurrencyInput(this)"
+                                                onkeydown="return filterCurrencyKeydown(event)">
+                                            <span
+                                                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold text-sm pointer-events-none">₫</span>
                                         </div>
                                     </div>
 
                                     <!-- Giá Khuyến mãi -->
                                     <div>
-                                        <label for="edit_product_discount_price" class="block text-sm font-bold text-gray-700 mb-2">Giá Khuyến mãi (Tùy chọn)</label>
+                                        <label for="edit_product_discount_price"
+                                            class="block text-sm font-bold text-gray-700 mb-2">Giá Khuyến mãi (Tùy
+                                            chọn)</label>
                                         <div class="relative">
                                             <input type="text" id="edit_product_discount_price" name="discount_price"
                                                 class="currency-input w-full bg-white border border-gray-300 text-gray-800 text-base rounded-xl focus:ring-2 focus:ring-organic-500 focus:border-organic-500 block pl-4 pr-12 py-3 outline-none transition-all shadow-sm font-mono text-right text-organic-600"
                                                 placeholder="0" autocomplete="off" inputmode="numeric"
-                                                oninput="formatCurrencyInput(this)" onkeydown="return filterCurrencyKeydown(event)">
-                                            <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold text-sm pointer-events-none">₫</span>
+                                                oninput="formatCurrencyInput(this)"
+                                                onkeydown="return filterCurrencyKeydown(event)">
+                                            <span
+                                                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold text-sm pointer-events-none">₫</span>
                                         </div>
                                     </div>
                                 </div>
@@ -164,7 +184,9 @@
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <!-- Unit -->
                                     <div>
-                                        <label for="edit_product_unit_select" class="block text-sm font-bold text-gray-700 mb-2">Đơn vị tính (Unit) <span class="text-red-500">*</span></label>
+                                        <label for="edit_product_unit_select"
+                                            class="block text-sm font-bold text-gray-700 mb-2">Đơn vị tính (Unit) <span
+                                                class="text-red-500">*</span></label>
                                         <div class="relative">
                                             <select id="edit_product_unit_select" name="unit_select" required
                                                 onchange="toggleEditProductCustomUnit()"
@@ -176,7 +198,8 @@
                                                 <option value="Bó">Bó / Lốc</option>
                                                 <option value="custom">Khác (Nhập tay)...</option>
                                             </select>
-                                            <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none text-sm"></i>
+                                            <i
+                                                class="fa-solid fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none text-sm"></i>
                                         </div>
                                         <!-- Input nhập tay đơn vị khác (ẩn mặc định) -->
                                         <input type="text" name="unit_custom" id="edit_product_unit_custom"
@@ -186,9 +209,11 @@
 
                                     <!-- Origin -->
                                     <div>
-                                        <label for="edit_product_origin" class="block text-sm font-bold text-gray-700 mb-2">Xuất xứ (Origin)</label>
+                                        <label for="edit_product_origin"
+                                            class="block text-sm font-bold text-gray-700 mb-2">Xuất xứ (Origin)</label>
                                         <div class="relative">
-                                            <i class="fa-solid fa-location-dot absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
+                                            <i
+                                                class="fa-solid fa-location-dot absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
                                             <input type="text" id="edit_product_origin" name="origin"
                                                 class="w-full bg-white border border-gray-300 text-gray-800 text-base rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-forest-500 block pl-10 pr-4 py-3 outline-none transition-all shadow-sm"
                                                 placeholder="VD: Đà Lạt, Nhật Bản...">
@@ -199,7 +224,8 @@
                                 <!-- Dòng 5: Mô tả -->
                                 <div>
                                     <div class="flex justify-between items-end mb-2">
-                                        <label for="edit_product_description" class="block text-sm font-bold text-gray-700">Mô tả sản phẩm</label>
+                                        <label for="edit_product_description"
+                                            class="block text-sm font-bold text-gray-700">Mô tả sản phẩm</label>
                                     </div>
                                     <div class="relative">
                                         <textarea id="edit_product_description" name="description" rows="4"
@@ -207,7 +233,8 @@
                                             placeholder="Nhập mô tả chi tiết về sản phẩm, công dụng, cách bảo quản..."
                                             oninput="updateEditProductCharCount(this)"></textarea>
                                         <!-- Character Count -->
-                                        <div class="absolute bottom-2 right-4 text-xs font-medium text-gray-400 bg-white px-1">
+                                        <div
+                                            class="absolute bottom-2 right-4 text-xs font-medium text-gray-400 bg-white px-1">
                                             <span id="edit_product_char_count">0</span>/2000
                                         </div>
                                     </div>
@@ -215,7 +242,8 @@
 
                                 <!-- Dòng 6: Trạng thái -->
                                 <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-3">Trạng thái sản phẩm</label>
+                                    <label class="block text-sm font-bold text-gray-700 mb-3">Trạng thái sản
+                                        phẩm</label>
                                     <div class="flex items-center gap-6">
                                         <label class="flex items-center gap-2 cursor-pointer group">
                                             <input type="radio" name="is_active" value="1" id="edit_product_active_1"

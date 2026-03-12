@@ -723,8 +723,14 @@
             document.getElementById('edit_product_image_overlay').classList.remove('hidden');
         }
 
-        // Reset gallery mới (form sửa chỉ thêm ảnh mới, không hiển thị ảnh cũ)
+        // Reset và render gallery (ảnh cũ từ DB + ảnh mới)
         resetEditProductGallery();
+        if (product.images && product.images.length > 0) {
+            product.images.forEach(img => {
+                editProductExistingImages.push({ id: img.id, path: img.image_path });
+            });
+        }
+        renderEditProductGallery();
 
         // Hiện Modal
         const modal = document.getElementById('editProductModal');
@@ -840,6 +846,8 @@
     // ============================================
     const EDIT_PRODUCT_MAX_GALLERY = 10;
     let editProductGalleryFiles = [];
+    let editProductExistingImages = []; // Ảnh cũ từ DB: [{id, path}]
+    let editProductRemovedIds = []; // ID ảnh cũ bị xóa
 
     function previewEditProductGallery(input) {
         const errorEl = document.getElementById('edit_product_gallery_error');
@@ -861,7 +869,8 @@
             }
         }
 
-        const remaining = EDIT_PRODUCT_MAX_GALLERY - editProductGalleryFiles.length;
+        const totalCurrent = editProductExistingImages.length + editProductGalleryFiles.length;
+        const remaining = EDIT_PRODUCT_MAX_GALLERY - totalCurrent;
         const toAdd = files.slice(0, remaining);
         toAdd.forEach(file => { editProductGalleryFiles.push(file); });
 
@@ -872,17 +881,57 @@
     function renderEditProductGallery() {
         const grid = document.getElementById('edit_product_gallery_grid');
         const countEl = document.getElementById('edit_product_gallery_count');
+        const removedContainer = document.getElementById('edit_product_removed_gallery_container');
 
+        // Xóa tất cả preview cũ
         grid.querySelectorAll('.gallery-preview-item').forEach(el => el.remove());
-        countEl.innerText = editProductGalleryFiles.length + '/' + EDIT_PRODUCT_MAX_GALLERY;
 
-        editProductGalleryFiles.forEach((file, index) => {
+        // Cập nhật hidden inputs cho ảnh bị xóa
+        removedContainer.innerHTML = '';
+        editProductRemovedIds.forEach(id => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'removed_gallery_ids[]';
+            input.value = id;
+            removedContainer.appendChild(input);
+        });
+
+        const totalCount = editProductExistingImages.length + editProductGalleryFiles.length;
+        countEl.innerText = totalCount + '/' + EDIT_PRODUCT_MAX_GALLERY;
+
+        // Render ảnh cũ từ DB
+        editProductExistingImages.forEach((imgData, index) => {
             const wrapper = document.createElement('div');
             wrapper.className = 'gallery-preview-item aspect-square rounded-xl border border-gray-200 relative group overflow-hidden bg-white shadow-sm';
 
             const img = document.createElement('img');
             img.className = 'w-full h-full object-cover';
             img.alt = 'Gallery ' + (index + 1);
+            img.src = '/storage/' + imgData.path;
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'absolute top-1 right-1 w-5 h-5 bg-white/90 hover:bg-red-500 hover:text-white text-gray-600 rounded-full flex items-center justify-center text-[10px] backdrop-blur-sm transition-colors shadow-sm opacity-0 group-hover:opacity-100';
+            removeBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+            removeBtn.onclick = function() {
+                editProductRemovedIds.push(imgData.id);
+                editProductExistingImages.splice(index, 1);
+                renderEditProductGallery();
+            };
+
+            wrapper.appendChild(img);
+            wrapper.appendChild(removeBtn);
+            grid.appendChild(wrapper);
+        });
+
+        // Render ảnh mới (vừa chọn từ máy)
+        editProductGalleryFiles.forEach((file, index) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'gallery-preview-item aspect-square rounded-xl border border-gray-200 relative group overflow-hidden bg-white shadow-sm';
+
+            const img = document.createElement('img');
+            img.className = 'w-full h-full object-cover';
+            img.alt = 'New ' + (index + 1);
             img.src = URL.createObjectURL(file);
 
             const removeBtn = document.createElement('button');
@@ -900,8 +949,9 @@
             grid.appendChild(wrapper);
         });
 
+        // Ẩn/hiện nút + nếu đã đạt tối đa
         const addBtn = grid.querySelector('label[for="edit_product_gallery"]');
-        if (editProductGalleryFiles.length >= EDIT_PRODUCT_MAX_GALLERY) {
+        if (totalCount >= EDIT_PRODUCT_MAX_GALLERY) {
             addBtn.classList.add('hidden');
         } else {
             addBtn.classList.remove('hidden');
@@ -917,10 +967,13 @@
 
     function resetEditProductGallery() {
         editProductGalleryFiles = [];
+        editProductExistingImages = [];
+        editProductRemovedIds = [];
         const grid = document.getElementById('edit_product_gallery_grid');
         grid.querySelectorAll('.gallery-preview-item').forEach(el => el.remove());
         document.getElementById('edit_product_gallery_count').innerText = '0/' + EDIT_PRODUCT_MAX_GALLERY;
         document.getElementById('edit_product_gallery').value = '';
+        document.getElementById('edit_product_removed_gallery_container').innerHTML = '';
         const addBtn = grid.querySelector('label[for="edit_product_gallery"]');
         if (addBtn) addBtn.classList.remove('hidden');
     }

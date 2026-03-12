@@ -147,6 +147,7 @@ class ProductController extends Controller
         $data = $request->only(['name', 'category_id', 'price', 'discount_price', 'description', 'origin', 'is_active']);
         $data['slug'] = Str::slug($request->name);
         $data['unit'] = $unit;
+        $data['discount_price'] = $request->discount_price ?? 0;
 
         // 5. Xử lý ảnh chính (Xóa ảnh cũ nếu upload ảnh mới)
         if ($request->hasFile('image')) {
@@ -159,7 +160,18 @@ class ProductController extends Controller
         // 6. Cập nhật sản phẩm
         $product->update($data);
 
-        // 7. Xử lý thêm ảnh phụ (Nối thêm vào gallery cũ)
+        // 7. Xử lý xóa ảnh gallery cũ (nếu user đã xóa trên form)
+        if ($request->has('removed_gallery_ids')) {
+            $removedImages = ProductImage::whereIn('id', $request->removed_gallery_ids)
+                ->where('product_id', $product->id)
+                ->get();
+            foreach ($removedImages as $img) {
+                Storage::disk('public')->delete($img->image_path);
+                $img->delete();
+            }
+        }
+
+        // 8. Xử lý thêm ảnh phụ (Nối thêm vào gallery cũ)
         if ($request->hasFile('gallery')) {
             $maxOrder = $product->images()->max('sort_order') ?? 0;
             foreach ($request->file('gallery') as $index => $file) {
