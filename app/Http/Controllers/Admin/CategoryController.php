@@ -15,13 +15,13 @@ class CategoryController extends Controller
         $search = $request->input('search');
         $perPage = $request->input('per_page', 10);
         $date = $request->input('date');
-        
+
         $totalCategories = Category::count();
 
         $query = Category::query();
-        
-        if ($search) { 
-            $query->where('name', 'like', "%{$search}%"); 
+
+        if ($search) {
+            $query->where('name', 'like', "%{$search}%");
         }
 
         if ($date) {
@@ -100,18 +100,18 @@ class CategoryController extends Controller
         return redirect()->route('admin.categories.index')->with('success', 'Cập nhật danh mục thành công!');
     }
 
-    public function destroy(string $id)
+    public function destroy($id)
     {
         $category = Category::findOrFail($id);
 
-        // Xóa ảnh cũ nếu có
-        if ($category->image && str_starts_with($category->image, 'storage/')) {
-            $oldImagePath = str_replace('storage/', '', $category->image);
-            Storage::disk('public')->delete($oldImagePath);
+        // KIỂM TRA: Nếu danh mục có chứa sản phẩm thì chặn lại không cho xóa
+        if ($category->products()->count() > 0) {
+            return redirect()->back()->with('error', 'Không thể xóa! Danh mục này đang chứa sản phẩm. Vui lòng chuyển các sản phẩm sang danh mục khác hoặc xóa chúng trước.');
         }
 
+        // Nếu không có sản phẩm nào, tiến hành xóa bình thường
         $category->delete();
 
-        return redirect()->route('admin.categories.index')->with('success', 'Đã xóa danh mục thành công!');
+        return redirect()->back()->with('success', 'Đã xóa danh mục thành công!');
     }
 }

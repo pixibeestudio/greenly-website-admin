@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,6 +18,7 @@
 
     @stack('styles')
 </head>
+
 <body class="bg-cream-50 text-gray-800 font-sans antialiased overflow-hidden">
 
     <div class="flex h-screen relative">
@@ -25,7 +27,8 @@
         @include('partials.sidebar')
 
         <!-- MAIN CONTENT -->
-        <div id="main-wrapper" class="flex-1 flex flex-col h-screen w-full md:ml-64 transition-all duration-300 relative">
+        <div id="main-wrapper"
+            class="flex-1 flex flex-col h-screen w-full md:ml-64 transition-all duration-300 relative">
 
             <!-- Header -->
             @include('partials.header')
@@ -37,7 +40,8 @@
         </div>
 
         <!-- Overlay cho Sidebar trên Mobile -->
-        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-10 hidden md:hidden"></div>
+        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-10 hidden md:hidden">
+        </div>
     </div>
 
     <!-- JavaScript xử lý Sidebar -->
@@ -58,26 +62,32 @@
     </script>
 
     <!-- TOAST NOTIFICATION -->
-    <div id="toastNotification" class="fixed top-6 right-6 z-50 transform transition-all duration-300 translate-x-[120%] opacity-0 flex items-start p-4 mb-4 text-gray-200 bg-[#1e232d] rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-gray-700/50 w-[380px]" role="alert">
+    <div id="toastNotification"
+        class="fixed top-6 right-6 z-50 transform transition-all duration-300 translate-x-[120%] opacity-0 flex items-start p-4 mb-4 text-gray-200 bg-[#1e232d] rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-gray-700/50 w-[380px]"
+        role="alert">
         <!-- Icon Success (Xanh lá) -->
-        <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-full border-2 border-emerald-500 text-emerald-500 mr-3 mt-0.5">
+        <div
+            class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-full border-2 border-emerald-500 text-emerald-500 mr-3 mt-0.5">
             <i class="fa-solid fa-check text-sm"></i>
         </div>
-        
+
         <!-- Nội dung -->
         <div class="ml-1 flex-1">
             <h4 class="text-base font-bold text-white mb-0.5">Thành công!</h4>
             <div class="text-sm font-normal text-gray-400" id="toastMessage">Thao tác thành công.</div>
         </div>
-        
+
         <!-- Nút đóng (X) -->
-        <button type="button" onclick="hideNotification()" class="ml-auto -mx-1.5 -my-1.5 bg-transparent text-gray-400 hover:text-white rounded-lg p-1.5 inline-flex items-center justify-center h-8 w-8 transition-colors">
+        <button type="button" onclick="hideNotification()"
+            class="ml-auto -mx-1.5 -my-1.5 bg-transparent text-gray-400 hover:text-white rounded-lg p-1.5 inline-flex items-center justify-center h-8 w-8 transition-colors">
             <i class="fa-solid fa-xmark text-lg"></i>
         </button>
     </div>
 
     <!-- TOAST ERROR NOTIFICATION -->
-    <div id="errorToastNotification" class="fixed bottom-5 right-5 transform translate-x-[120%] opacity-0 transition-all duration-500 z-50 bg-white border-l-4 border-red-500 p-4 rounded-xl shadow-2xl flex items-center gap-4 min-w-[300px] max-w-sm" role="alert">
+    <div id="errorToastNotification"
+        class="fixed bottom-5 right-5 transform translate-x-[120%] opacity-0 transition-all duration-500 z-50 bg-white border-l-4 border-red-500 p-4 rounded-xl shadow-2xl flex items-center gap-4 min-w-[300px] max-w-sm"
+        role="alert">
         <!-- Icon Error (Đỏ) -->
         <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-red-500">
             <i class="fa-solid fa-circle-xmark text-2xl"></i>
@@ -93,11 +103,11 @@
         function showNotification(message = 'Thao tác thành công.') {
             const toast = document.getElementById('toastNotification');
             const toastMessage = document.getElementById('toastMessage');
-            
+
             if (message) {
                 toastMessage.innerText = message;
             }
-            
+
             // Xóa class ẩn, thêm class hiện
             toast.classList.remove('translate-x-[120%]', 'opacity-0');
             toast.classList.add('translate-x-0', 'opacity-100');
@@ -145,8 +155,22 @@
 
         // Tự động gọi thông báo nếu có session flash success từ Laravel
         @if(session('success'))
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 showNotification("{{ session('success') }}");
+            });
+        @endif
+        
+        // Tự động gọi thông báo lỗi nếu có session flash error từ Laravel
+        @if(session('error'))
+            document.addEventListener('DOMContentLoaded', function () {
+                showErrorNotification("{!! session('error') !!}");
+            });
+        @endif
+
+        // Tự động gọi thông báo lỗi nếu có Validation errors từ Laravel
+        @if($errors->any())
+            document.addEventListener('DOMContentLoaded', function () {
+                showErrorNotification("Vui lòng kiểm tra lại thông tin nhập liệu: {!! $errors->first() !!}");
             });
         @endif
     </script>

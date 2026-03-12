@@ -99,10 +99,10 @@
     </div>
 
     <!-- 2. TOOLBAR: TÌM KIẾM, LỌC & THÊM MỚI -->
-    <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-        <form method="GET" action="{{ route('admin.products.index') }}" class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+    <form method="GET" id="filterForm" action="{{ route('admin.products.index') }}" class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
             <!-- Combobox chọn số lượng hiển thị -->
-            <select name="per_page" onchange="this.form.submit()" class="bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-600 outline-none focus:border-forest-500 transition-all shadow-sm">
+            <select name="per_page" onchange="document.getElementById('filterForm').submit();" class="bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-600 outline-none focus:border-forest-500 transition-all shadow-sm">
                 <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10 mục</option>
                 <option value="20" {{ request('per_page') == 20 ? 'selected' : '' }}>20 mục</option>
                 <option value="30" {{ request('per_page') == 30 ? 'selected' : '' }}>30 mục</option>
@@ -117,12 +117,27 @@
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Tìm tên sản phẩm..." class="bg-transparent text-sm text-gray-600 outline-none w-full sm:w-48 placeholder-gray-400">
                 </div>
             </div>
-        </form>
+
+            <!-- Lọc theo Danh mục -->
+            <select name="category_id" onchange="document.getElementById('filterForm').submit();" class="bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-600 outline-none focus:border-forest-500 transition-all shadow-sm">
+                <option value="">Tất cả danh mục</option>
+                @foreach($categories as $category)
+                    <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                @endforeach
+            </select>
+
+            <!-- Lọc theo Trạng thái -->
+            <select name="is_active" onchange="document.getElementById('filterForm').submit();" class="bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-600 outline-none focus:border-forest-500 transition-all shadow-sm">
+                <option value="">Tất cả trạng thái</option>
+                <option value="1" {{ request('is_active') === '1' ? 'selected' : '' }}>Đang bán</option>
+                <option value="0" {{ request('is_active') === '0' ? 'selected' : '' }}>Ngừng bán</option>
+            </select>
+        </div>
 
         <div class="flex items-center gap-3">
-            <!-- Nút & Dropdown Filter -->
+            <!-- Nút & Dropdown Filter Nâng Cao -->
             <div class="relative">
-                <button id="filterBtn" onclick="toggleFilter()" class="bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-xl shadow-sm hover:bg-gray-50 hover:text-forest-700 transition-all font-bold text-sm flex items-center gap-2">
+                <button type="button" id="filterBtn" onclick="toggleFilter()" class="bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-xl shadow-sm hover:bg-gray-50 hover:text-forest-700 transition-all font-bold text-sm flex items-center gap-2">
                     <i class="fa-solid fa-filter"></i> Bộ Lọc <span id="filterCount" class="hidden bg-forest-600 text-white text-[10px] px-1.5 py-0.5 rounded-full ml-1">0</span>
                 </button>
 
@@ -130,19 +145,19 @@
                 <div id="filterMenu" class="hidden absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden origin-top-right transition-all">
                     
                     <div class="p-5 max-h-[400px] overflow-y-auto custom-scrollbar">
-                        <!-- Nhóm 1: Giá sản phẩm -->
+                        <!-- Nhóm 1: Sắp xếp Giá -->
                         <div class="mb-5">
                             <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Sắp xếp Giá</h4>
                             <div class="space-y-2">
                                 <label class="flex items-center p-2 rounded-lg hover:bg-forest-50 cursor-pointer group transition-colors">
-                                    <input type="radio" name="priceFilter" class="peer hidden" value="expensive">
+                                    <input type="radio" name="sort_price" class="peer hidden" value="expensive" {{ request('sort_price') === 'expensive' ? 'checked' : '' }}>
                                     <div class="w-4 h-4 rounded-full border-2 border-gray-300 peer-checked:border-forest-600 peer-checked:bg-forest-600 flex items-center justify-center mr-3 transition-colors">
                                         <div class="w-1.5 h-1.5 bg-white rounded-full opacity-0 peer-checked:opacity-100"></div>
                                     </div>
                                     <span class="text-sm font-medium text-gray-700 group-hover:text-forest-700">Giá cao nhất</span>
                                 </label>
                                 <label class="flex items-center p-2 rounded-lg hover:bg-forest-50 cursor-pointer group transition-colors">
-                                    <input type="radio" name="priceFilter" class="peer hidden" value="cheap">
+                                    <input type="radio" name="sort_price" class="peer hidden" value="cheap" {{ request('sort_price') === 'cheap' ? 'checked' : '' }}>
                                     <div class="w-4 h-4 rounded-full border-2 border-gray-300 peer-checked:border-forest-600 peer-checked:bg-forest-600 flex items-center justify-center mr-3 transition-colors">
                                         <div class="w-1.5 h-1.5 bg-white rounded-full opacity-0 peer-checked:opacity-100"></div>
                                     </div>
@@ -153,46 +168,16 @@
 
                         <hr class="border-gray-100 mb-5">
 
-                        <!-- Nhóm 2: Trạng thái sản phẩm -->
-                        <div class="mb-5">
-                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Trạng thái (is_active / Tồn kho)</h4>
-                            <div class="space-y-2">
-                                <label class="flex items-center p-2 rounded-lg hover:bg-green-50 cursor-pointer group transition-colors">
-                                    <input type="radio" name="statusFilter" class="peer hidden" value="active">
-                                    <div class="w-4 h-4 rounded-full border-2 border-gray-300 peer-checked:border-green-600 peer-checked:bg-green-600 flex items-center justify-center mr-3 transition-colors">
-                                        <div class="w-1.5 h-1.5 bg-white rounded-full opacity-0 peer-checked:opacity-100"></div>
-                                    </div>
-                                    <span class="text-sm font-medium text-gray-700 group-hover:text-green-700">Đang bán</span>
-                                </label>
-                                <label class="flex items-center p-2 rounded-lg hover:bg-gray-100 cursor-pointer group transition-colors">
-                                    <input type="radio" name="statusFilter" class="peer hidden" value="inactive">
-                                    <div class="w-4 h-4 rounded-full border-2 border-gray-300 peer-checked:border-gray-600 peer-checked:bg-gray-600 flex items-center justify-center mr-3 transition-colors">
-                                        <div class="w-1.5 h-1.5 bg-white rounded-full opacity-0 peer-checked:opacity-100"></div>
-                                    </div>
-                                    <span class="text-sm font-medium text-gray-700 group-hover:text-gray-800">Ngừng bán</span>
-                                </label>
-                                <label class="flex items-center p-2 rounded-lg hover:bg-red-50 cursor-pointer group transition-colors">
-                                    <input type="radio" name="statusFilter" class="peer hidden" value="outofstock">
-                                    <div class="w-4 h-4 rounded-full border-2 border-gray-300 peer-checked:border-red-600 peer-checked:bg-red-600 flex items-center justify-center mr-3 transition-colors">
-                                        <div class="w-1.5 h-1.5 bg-white rounded-full opacity-0 peer-checked:opacity-100"></div>
-                                    </div>
-                                    <span class="text-sm font-medium text-gray-700 group-hover:text-red-700">Hết hàng</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <hr class="border-gray-100 mb-5">
-
-                        <!-- Nhóm 3: Khuyến mãi -->
+                        <!-- Nhóm 2: Khuyến mãi -->
                         <div class="mb-2">
                             <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Khuyến mãi (discount_price)</h4>
                             <div class="grid grid-cols-2 gap-2">
-                                <label class="flex items-center justify-center p-2 rounded-lg border border-gray-200 cursor-pointer group transition-all peer-checked:bg-organic-50 hover:bg-gray-50 has-[:checked]:border-organic-500 has-[:checked]:bg-organic-50 has-[:checked]:text-organic-700 text-gray-600">
-                                    <input type="radio" name="discountFilter" class="peer hidden" value="has_discount">
+                                <label class="flex items-center justify-center p-2 rounded-lg border border-gray-200 cursor-pointer group transition-all hover:bg-gray-50 has-[:checked]:border-organic-500 has-[:checked]:bg-organic-50 has-[:checked]:text-organic-700 text-gray-600">
+                                    <input type="radio" name="discount" class="peer hidden" value="has_discount" {{ request('discount') === 'has_discount' ? 'checked' : '' }}>
                                     <span class="text-xs font-bold text-center"><i class="fa-solid fa-tag mr-1"></i> Có sale</span>
                                 </label>
                                 <label class="flex items-center justify-center p-2 rounded-lg border border-gray-200 cursor-pointer group transition-all hover:bg-gray-50 has-[:checked]:border-forest-500 has-[:checked]:bg-forest-50 has-[:checked]:text-forest-700 text-gray-600">
-                                    <input type="radio" name="discountFilter" class="peer hidden" value="no_discount">
+                                    <input type="radio" name="discount" class="peer hidden" value="no_discount" {{ request('discount') === 'no_discount' ? 'checked' : '' }}>
                                     <span class="text-xs font-bold text-center">Không sale</span>
                                 </label>
                             </div>
@@ -201,21 +186,21 @@
 
                     <!-- Các nút Action của Dropdown -->
                     <div class="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between gap-2">
-                        <button onclick="toggleFilter()" class="px-4 py-2 text-sm font-bold text-gray-500 hover:text-gray-700 transition-colors">Hủy</button>
+                        <button type="button" onclick="toggleFilter()" class="px-4 py-2 text-sm font-bold text-gray-500 hover:text-gray-700 transition-colors">Hủy</button>
                         <div class="flex gap-2">
-                            <button onclick="resetFilter()" class="px-4 py-2 text-sm font-bold text-forest-700 bg-forest-100 hover:bg-forest-200 rounded-lg transition-colors">Làm lại</button>
-                            <button onclick="applyFilter()" class="px-5 py-2 text-sm font-bold text-white bg-forest-700 hover:bg-forest-800 rounded-lg shadow-md shadow-forest-500/20 transition-all">Áp dụng</button>
+                            <button type="button" onclick="resetFilter()" class="px-4 py-2 text-sm font-bold text-forest-700 bg-forest-100 hover:bg-forest-200 rounded-lg transition-colors">Làm lại</button>
+                            <button type="button" onclick="applyFilter()" class="px-5 py-2 text-sm font-bold text-white bg-forest-700 hover:bg-forest-800 rounded-lg shadow-md shadow-forest-500/20 transition-all">Áp dụng</button>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Nút Thêm Sản Phẩm -->
-            <button onclick="openAddProductModal()" class="w-full sm:w-auto bg-forest-700 hover:bg-forest-800 text-white px-6 py-2.5 rounded-xl shadow-lg shadow-forest-500/30 flex items-center justify-center gap-2 transition-all font-bold">
+            <button type="button" onclick="openAddProductModal()" class="w-full sm:w-auto bg-forest-700 hover:bg-forest-800 text-white px-6 py-2.5 rounded-xl shadow-lg shadow-forest-500/30 flex items-center justify-center gap-2 transition-all font-bold">
                 <i class="fa-solid fa-plus"></i> Thêm Sản Phẩm
             </button>
         </div>
-    </div>
+    </form>
 
     <!-- 3. BẢNG DỮ LIỆU SẢN PHẨM -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -363,26 +348,19 @@
         }
     });
 
-    // Hàm Làm Lại (Reset Filter)
+    // Hàm Làm Lại (Reset tất cả bộ lọc, redirect về trang gốc)
     function resetFilter() {
-        const radios = document.querySelectorAll('#filterMenu input[type="radio"]');
-        radios.forEach(radio => radio.checked = false);
-        updateFilterCount();
+        window.location.href = "{{ route('admin.products.index') }}";
     }
 
-    // Hàm Áp dụng (Apply Filter - Demo)
+    // Hàm Áp dụng (Submit form filter)
     function applyFilter() {
         updateFilterCount();
         toggleFilter();
-        
-        const price = document.querySelector('input[name="priceFilter"]:checked')?.value;
-        const status = document.querySelector('input[name="statusFilter"]:checked')?.value;
-        const discount = document.querySelector('input[name="discountFilter"]:checked')?.value;
-        
-        console.log("Applied Filters:", { price, status, discount });
+        document.getElementById('filterForm').submit();
     }
 
-    // Hàm cập nhật số lượng bộ lọc đang chọn
+    // Hàm cập nhật số lượng bộ lọc đang chọn (chỉ đếm radio trong dropdown)
     function updateFilterCount() {
         const checkedRadios = document.querySelectorAll('#filterMenu input[type="radio"]:checked');
         const count = checkedRadios.length;
@@ -394,6 +372,9 @@
             filterCountBadge.classList.add('hidden');
         }
     }
+
+    // Gọi updateFilterCount khi trang load (để giữ badge nếu có filter đang active)
+    updateFilterCount();
 
     // ============================================
     // MODAL THÊM SẢN PHẨM
@@ -677,8 +658,9 @@
     function openEditProductModal(button) {
         let product = JSON.parse(button.getAttribute('data-product'));
 
-        // Set action form
+        // Set action form + hidden product_id
         document.getElementById('editProductForm').action = '/admin/products/' + product.id;
+        document.getElementById('edit_product_hidden_id').value = product.id;
 
         // Điền dữ liệu text
         document.getElementById('edit_product_id').value = product.id;

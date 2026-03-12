@@ -24,9 +24,37 @@ class ProductController extends Controller
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
-        // 3. Phân trang với số lượng tùy chỉnh
+        // 3. Lọc theo danh mục
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        // 4. Lọc theo trạng thái (is_active)
+        if ($request->filled('is_active')) {
+            $query->where('is_active', $request->is_active);
+        }
+
+        // 5. Lọc theo khuyến mãi
+        if ($request->filled('discount')) {
+            if ($request->discount === 'has_discount') {
+                $query->where('discount_price', '>', 0);
+            } else {
+                $query->where(function ($q) {
+                    $q->where('discount_price', 0)->orWhereNull('discount_price');
+                });
+            }
+        }
+
+        // 6. Sắp xếp theo giá (nếu có) hoặc mặc định mới nhất
+        if ($request->filled('sort_price')) {
+            $query->orderBy('price', $request->sort_price === 'expensive' ? 'desc' : 'asc');
+        } else {
+            $query->latest();
+        }
+
+        // 7. Phân trang với số lượng tùy chỉnh
         $perPage = $request->input('per_page', 10);
-        $products = $query->latest()->paginate($perPage)->appends($request->query());
+        $products = $query->paginate($perPage)->appends($request->query());
 
         // 4. Đếm tổng số sản phẩm hiện có
         $totalProducts = Product::count();

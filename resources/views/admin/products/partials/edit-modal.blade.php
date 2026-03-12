@@ -26,6 +26,8 @@
         <form id="editProductForm" action="" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
+            <input type="hidden" name="form_type" value="edit_product">
+            <input type="hidden" name="product_id" id="edit_product_hidden_id" value="{{ old('product_id') }}">
             <!-- Container chứa hidden inputs cho ID ảnh gallery cũ bị xóa -->
             <div id="edit_product_removed_gallery_container"></div>
 
@@ -123,7 +125,7 @@
                                         <input type="text" id="edit_product_name" name="name" required
                                             class="w-full bg-white border border-gray-300 text-gray-800 text-base rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-forest-500 block px-4 py-3 outline-none transition-all shadow-sm"
                                             placeholder="VD: Cà chua Organic Đà Lạt...">
-                                        <p id="edit_product_name_error" class="text-red-500 text-xs mt-1.5 hidden"></p>
+                                        <p id="edit_product_name_error" class="text-red-500 text-xs mt-1.5 {{ old('form_type') == 'edit_product' && $errors->has('name') ? '' : 'hidden' }}">{{ old('form_type') == 'edit_product' ? $errors->first('name') : '' }}</p>
                                     </div>
                                 </div>
 
@@ -284,3 +286,64 @@
 
     </div>
 </div>
+
+@if(old('form_type') == 'edit_product' && $errors->any())
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tự động mở lại modal Sửa sản phẩm khi có lỗi validation
+        const productId = "{{ old('product_id') }}";
+        document.getElementById('editProductForm').action = '/admin/products/' + productId;
+        document.getElementById('edit_product_id').value = productId;
+        document.getElementById('edit_product_hidden_id').value = productId;
+
+        // Khôi phục giá trị cũ
+        document.getElementById('edit_product_name').value = "{{ old('name') }}";
+        document.getElementById('edit_product_origin').value = "{{ old('origin') }}";
+        document.getElementById('edit_product_description').value = `{!! old('description') !!}`;
+
+        // Khôi phục danh mục
+        const catId = "{{ old('category_id') }}";
+        if (catId) document.getElementById('edit_product_category').value = catId;
+
+        // Khôi phục giá (format lại dấu chấm ngàn)
+        const price = "{{ old('price') }}";
+        if (price) {
+            const priceNum = parseInt(price) || 0;
+            document.getElementById('edit_product_price').value = priceNum > 0 ? priceNum.toLocaleString('vi-VN') : '';
+        }
+        const discount = "{{ old('discount_price') }}";
+        if (discount) {
+            const discountNum = parseInt(discount) || 0;
+            document.getElementById('edit_product_discount_price').value = discountNum > 0 ? discountNum.toLocaleString('vi-VN') : '';
+        }
+
+        // Khôi phục đơn vị tính
+        const unitSelect = "{{ old('unit_select') }}";
+        if (unitSelect) {
+            document.getElementById('edit_product_unit_select').value = unitSelect;
+            if (unitSelect === 'custom') {
+                document.getElementById('edit_product_unit_custom').classList.remove('hidden');
+                document.getElementById('edit_product_unit_custom').value = "{{ old('unit_custom') }}";
+            }
+        }
+
+        // Khôi phục trạng thái radio
+        const isActive = "{{ old('is_active', '1') }}";
+        const radioEl = document.querySelector('#editProductForm input[name="is_active"][value="' + isActive + '"]');
+        if (radioEl) radioEl.checked = true;
+
+        // Cập nhật đếm ký tự mô tả
+        const descEl = document.getElementById('edit_product_description');
+        document.getElementById('edit_product_char_count').innerText = descEl.value.length;
+
+        // Mở modal
+        const modal = document.getElementById('editProductModal');
+        const content = document.getElementById('editProductContent');
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            content.classList.remove('scale-95');
+        }, 10);
+    });
+</script>
+@endif

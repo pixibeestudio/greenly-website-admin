@@ -23,6 +23,7 @@
         <!-- Form -->
         <form id="addProductForm" action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
+            <input type="hidden" name="form_type" value="add_product">
 
             <div class="p-8 md:p-10">
                 <div class="bg-white rounded-3xl shadow-lg shadow-gray-200/50 border border-gray-100 p-8 md:p-10">
@@ -104,8 +105,8 @@
                                     <label for="add_product_name" class="block text-sm font-bold text-gray-700 mb-2">Tên sản phẩm <span class="text-red-500">*</span></label>
                                     <input type="text" id="add_product_name" name="name" required
                                         class="w-full bg-white border border-gray-300 text-gray-800 text-base rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-forest-500 block px-4 py-3 outline-none transition-all shadow-sm"
-                                        placeholder="VD: Cà chua Organic Đà Lạt...">
-                                    <p id="add_product_name_error" class="text-red-500 text-xs mt-1.5 hidden"></p>
+                                        placeholder="VD: Cà chua Organic Đà Lạt..." value="{{ old('form_type') == 'add_product' ? old('name') : '' }}">
+                                    <p id="add_product_name_error" class="text-red-500 text-xs mt-1.5 {{ old('form_type') == 'add_product' && $errors->has('name') ? '' : 'hidden' }}">{{ old('form_type') == 'add_product' ? $errors->first('name') : '' }}</p>
                                 </div>
 
                                 <!-- Dòng 2: Danh mục -->
@@ -114,9 +115,9 @@
                                     <div class="relative">
                                         <select id="add_product_category" name="category_id" required
                                             class="w-full bg-white border border-gray-300 text-gray-800 text-base rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-forest-500 block px-4 py-3 outline-none transition-all shadow-sm appearance-none cursor-pointer">
-                                            <option value="" disabled selected>-- Chọn danh mục --</option>
+                                            <option value="" disabled {{ old('form_type') == 'add_product' && old('category_id') ? '' : 'selected' }}>-- Chọn danh mục --</option>
                                             @foreach($categories as $category)
-                                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                                <option value="{{ $category->id }}" {{ old('form_type') == 'add_product' && old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                                             @endforeach
                                         </select>
                                         <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none text-sm"></i>
@@ -195,7 +196,7 @@
                                         <textarea id="add_product_description" name="description" rows="4"
                                             class="w-full bg-white border border-gray-300 text-gray-800 text-base rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-forest-500 block px-4 py-3 pb-8 outline-none transition-all shadow-sm resize-y"
                                             placeholder="Nhập mô tả chi tiết về sản phẩm, công dụng, cách bảo quản..."
-                                            oninput="updateAddProductCharCount(this)"></textarea>
+                                            oninput="updateAddProductCharCount(this)">{{ old('form_type') == 'add_product' ? old('description') : '' }}</textarea>
                                         <!-- Character Count -->
                                         <div class="absolute bottom-2 right-4 text-xs font-medium text-gray-400 bg-white px-1">
                                             <span id="add_product_char_count">0</span>/2000
@@ -246,3 +247,52 @@
 
     </div>
 </div>
+
+@if(old('form_type') == 'add_product' && $errors->any())
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tự động mở lại modal Thêm sản phẩm khi có lỗi validation
+        const modal = document.getElementById('addProductModal');
+        const content = document.getElementById('addProductContent');
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            content.classList.remove('scale-95');
+        }, 10);
+
+        // Khôi phục giá trị cũ cho các trường không dùng value attribute
+        const origin = "{{ old('origin') }}";
+        if (origin) document.getElementById('add_product_origin').value = origin;
+
+        // Khôi phục giá (format lại dấu chấm ngàn)
+        const price = "{{ old('price') }}";
+        if (price) {
+            const priceNum = parseInt(price) || 0;
+            document.getElementById('add_product_price').value = priceNum > 0 ? priceNum.toLocaleString('vi-VN') : '';
+        }
+        const discount = "{{ old('discount_price') }}";
+        if (discount) {
+            const discountNum = parseInt(discount) || 0;
+            document.getElementById('add_product_discount_price').value = discountNum > 0 ? discountNum.toLocaleString('vi-VN') : '';
+        }
+
+        // Khôi phục đơn vị tính
+        const unitSelect = "{{ old('unit_select') }}";
+        if (unitSelect) {
+            document.getElementById('add_product_unit_select').value = unitSelect;
+            if (unitSelect === 'custom') {
+                document.getElementById('add_product_unit_custom').classList.remove('hidden');
+                document.getElementById('add_product_unit_custom').value = "{{ old('unit_custom') }}";
+            }
+        }
+
+        // Khôi phục trạng thái radio
+        const isActive = "{{ old('is_active', '1') }}";
+        document.querySelector('#addProductForm input[name="is_active"][value="' + isActive + '"]').checked = true;
+
+        // Cập nhật đếm ký tự mô tả
+        const descEl = document.getElementById('add_product_description');
+        document.getElementById('add_product_char_count').innerText = descEl.value.length;
+    });
+</script>
+@endif
