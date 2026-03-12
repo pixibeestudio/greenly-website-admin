@@ -331,6 +331,12 @@
 <!-- Modal Sửa Sản Phẩm -->
 @include('admin.products.partials.edit-modal')
 
+<!-- Modal Xem Chi Tiết Sản Phẩm -->
+@include('admin.products.partials.show-modal')
+
+<!-- Modal Xóa Sản Phẩm -->
+@include('admin.products.partials.delete-modal')
+
 @endsection
 
 @push('scripts')
@@ -1010,5 +1016,144 @@
         btn.classList.add('opacity-70', 'cursor-not-allowed');
         setTimeout(() => { btn.disabled = true; }, 10);
     });
+
+    // ============================================
+    // MODAL XEM CHI TIẾT SẢN PHẨM
+    // ============================================
+
+    // Hàm format tiền tệ (dùng chung cho Show)
+    function formatCurrency(value) {
+        const num = parseInt(value) || 0;
+        return num.toLocaleString('vi-VN') + ' ₫';
+    }
+
+    // Mở Modal Xem Chi Tiết
+    function openShowProductModal(button) {
+        const product = JSON.parse(button.getAttribute('data-product'));
+
+        // Thông tin cơ bản
+        document.getElementById('show_product_id').innerText = '#' + product.id;
+        document.getElementById('show_product_name').innerText = product.name;
+        document.getElementById('show_product_slug').innerText = product.slug;
+        document.getElementById('show_product_category').innerText = product.category_name;
+        document.getElementById('show_product_origin').querySelector('span').innerText = product.origin;
+
+        // Giá cả & Tồn kho
+        document.getElementById('show_product_price').innerText = formatCurrency(product.price);
+        const discountPrice = parseInt(product.discount_price) || 0;
+        document.getElementById('show_product_discount_price').innerText = discountPrice > 0 ? formatCurrency(discountPrice) : 'Không có';
+        document.getElementById('show_product_unit').innerText = product.unit;
+
+        // Tồn kho
+        const stock = product.stock || 0;
+        const stockEl = document.getElementById('show_product_stock');
+        if (stock > 0) {
+            stockEl.innerHTML = '<i class="fa-solid fa-box text-forest-500 mr-1.5"></i> ' + stock.toLocaleString('vi-VN') + ' ' + product.unit;
+            stockEl.className = 'text-sm font-bold text-forest-700';
+        } else {
+            stockEl.innerHTML = '<i class="fa-solid fa-box-open text-red-400 mr-1.5"></i> Hết hàng (0)';
+            stockEl.className = 'text-sm font-bold text-red-500';
+        }
+
+        // Trạng thái (Badge)
+        const statusEl = document.getElementById('show_product_status_badge');
+        if (stock <= 0) {
+            statusEl.innerHTML = '<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-red-100 text-red-700"><i class="fa-solid fa-circle-xmark"></i> Hết hàng</span>';
+        } else if (product.is_active == 0) {
+            statusEl.innerHTML = '<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-gray-100 text-gray-600"><i class="fa-solid fa-ban"></i> Ngừng bán</span>';
+        } else {
+            statusEl.innerHTML = '<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-green-100 text-green-700"><i class="fa-solid fa-circle-check"></i> Đang bán</span>';
+        }
+
+        // Thời gian
+        document.getElementById('show_product_created_at').innerText = product.created_at;
+        document.getElementById('show_product_updated_at').innerText = product.updated_at;
+
+        // Mô tả
+        document.getElementById('show_product_description').innerText = product.description;
+
+        // Ảnh đại diện
+        const mainImg = document.getElementById('show_product_image');
+        if (product.image) {
+            mainImg.src = product.image;
+            mainImg.alt = product.name;
+        } else {
+            mainImg.src = 'https://placehold.co/400x300/f3f4f6/9ca3af?text=No+Image';
+            mainImg.alt = 'Không có ảnh';
+        }
+
+        // Gallery ảnh chi tiết
+        const galleryGrid = document.getElementById('show_product_gallery_grid');
+        const noGallery = document.getElementById('show_product_no_gallery');
+        const galleryCount = document.getElementById('show_product_gallery_count');
+        galleryGrid.innerHTML = '';
+
+        if (product.images && product.images.length > 0) {
+            noGallery.classList.add('hidden');
+            galleryCount.innerText = product.images.length + ' ảnh';
+            product.images.forEach((imgUrl, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'aspect-square rounded-xl border border-gray-200 overflow-hidden bg-white shadow-sm';
+                const img = document.createElement('img');
+                img.className = 'w-full h-full object-cover';
+                img.src = imgUrl;
+                img.alt = 'Gallery ' + (index + 1);
+                wrapper.appendChild(img);
+                galleryGrid.appendChild(wrapper);
+            });
+        } else {
+            noGallery.classList.remove('hidden');
+            galleryCount.innerText = '0 ảnh';
+        }
+
+        // Hiện Modal
+        const modal = document.getElementById('showProductModal');
+        const content = document.getElementById('showProductContent');
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            content.classList.remove('scale-95');
+        }, 10);
+    }
+
+    // Đóng Modal Xem Chi Tiết
+    function closeShowProductModal() {
+        const modal = document.getElementById('showProductModal');
+        const content = document.getElementById('showProductContent');
+        modal.classList.add('opacity-0');
+        content.classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    }
+
+    // ============================================
+    // MODAL XÓA SẢN PHẨM
+    // ============================================
+
+    // Mở Modal Xác nhận Xóa
+    function openDeleteProductModal(id, name) {
+        document.getElementById('delete_product_name').innerText = name;
+        document.getElementById('deleteProductForm').action = '/admin/products/' + id;
+
+        const modal = document.getElementById('deleteProductModal');
+        const content = document.getElementById('deleteProductContent');
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            content.classList.remove('scale-95');
+        }, 10);
+    }
+
+    // Đóng Modal Xác nhận Xóa
+    function closeDeleteProductModal() {
+        const modal = document.getElementById('deleteProductModal');
+        const content = document.getElementById('deleteProductContent');
+        modal.classList.add('opacity-0');
+        content.classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    }
 </script>
 @endpush

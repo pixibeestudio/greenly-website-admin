@@ -16,7 +16,8 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         // 1. Truy vấn danh sách sản phẩm, sử dụng Eager Loading
-        $query = Product::with(['category', 'images']);
+        $query = Product::with(['category', 'images'])
+            ->withSum('batches', 'current_quantity');
 
         // 2. Tìm kiếm theo tên sản phẩm
         if ($request->filled('search')) {
@@ -183,7 +184,27 @@ class ProductController extends Controller
             }
         }
 
-        // 8. Redirect về trang danh sách với thông báo thành công
+        // 9. Redirect về trang danh sách với thông báo thành công
         return redirect()->route('admin.products.index')->with('success', 'Cập nhật sản phẩm thành công!');
+    }
+
+    public function destroy(string $id)
+    {
+        $product = Product::with('images')->findOrFail($id);
+
+        // 1. Xóa ảnh đại diện chính
+        if ($product->image) {
+            Storage::disk('public')->delete($product->image);
+        }
+
+        // 2. Xóa tất cả ảnh gallery (file vật lý + record DB)
+        foreach ($product->images as $img) {
+            Storage::disk('public')->delete($img->image_path);
+        }
+
+        // 3. Xóa sản phẩm (cascade sẽ xóa product_images và batches)
+        $product->delete();
+
+        return redirect()->route('admin.products.index')->with('success', 'Đã xóa sản phẩm thành công!');
     }
 }
