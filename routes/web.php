@@ -23,9 +23,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     })->name('reviews.index');
 
     // Nhóm Kho hàng & Nguồn gốc
-    Route::get('/suppliers', function () {
-        return view('admin.dashboard', ['pageTitle' => 'Nhà Cung cấp']);
-    })->name('suppliers.index');
+    Route::resource('suppliers', \App\Http\Controllers\Admin\SupplierController::class)->names('suppliers');
 
     Route::get('/batches', function () {
         return view('admin.dashboard', ['pageTitle' => 'Quản lý Lô hàng (Kho)']);
