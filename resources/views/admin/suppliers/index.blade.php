@@ -106,7 +106,9 @@
                         <th class="px-6 py-4">Khu vực (Địa chỉ)</th>
                         <th class="px-6 py-4">Chứng chỉ</th>
                         <th class="px-6 py-4 text-center">Trạng thái</th>
-                        <th class="px-6 py-4 text-center sticky right-0 bg-cream-100/50 shadow-[-4px_0_10px_rgba(0,0,0,0.02)] z-10">Hành động</th>
+                        <th class="px-6 py-4 text-center">Ngày tạo</th>
+                        <th class="px-6 py-4 text-center">Cập nhật</th>
+                        <th class="px-6 py-4 text-center sticky right-0 bg-cream-100/50 shadow-[-4px_0_10px_rgba(0,0,0,0.02)] z-[5]">Hành động</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
@@ -171,14 +173,28 @@
                                 </span>
                             @endif
                         </td>
-                        <!-- Cột 7: Hành động (sticky) -->
-                        <td class="px-6 py-4 sticky right-0 bg-white shadow-[-4px_0_10px_rgba(0,0,0,0.02)] z-10">
+                        <!-- Cột 7: Ngày tạo -->
+                        <td class="px-6 py-4 text-center">
+                            <div class="text-xs text-gray-600 font-medium">{{ $supplier->created_at->format('d/m/Y') }}</div>
+                            <div class="text-[11px] text-gray-400">{{ $supplier->created_at->format('H:i') }}</div>
+                        </td>
+                        <!-- Cột 8: Cập nhật -->
+                        <td class="px-6 py-4 text-center">
+                            @if($supplier->updated_at->eq($supplier->created_at))
+                                <span class="text-xs text-gray-400 italic">Chưa cập nhật</span>
+                            @else
+                                <div class="text-xs text-gray-600 font-medium">{{ $supplier->updated_at->format('d/m/Y') }}</div>
+                                <div class="text-[11px] text-gray-400">{{ $supplier->updated_at->format('H:i') }}</div>
+                            @endif
+                        </td>
+                        <!-- Cột 9: Hành động (sticky) -->
+                        <td class="px-6 py-4 sticky right-0 bg-white shadow-[-4px_0_10px_rgba(0,0,0,0.02)] z-[5]">
                             @include('admin.suppliers.partials.action-buttons', ['supplier' => $supplier])
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="px-6 py-10 text-center text-gray-500">
+                        <td colspan="9" class="px-6 py-10 text-center text-gray-500">
                             <div class="flex flex-col items-center justify-center">
                                 <i class="fa-solid fa-inbox text-4xl text-gray-300 mb-3"></i>
                                 <p>Chưa có nhà cung cấp nào.</p>
@@ -201,19 +217,104 @@
     </div>
 </div>
 
-<!-- Modal Thêm Nhà Cung Cấp -->
-@include('admin.suppliers.partials.add-modal')
-
-<!-- Modal Sửa Nhà Cung Cấp -->
-@include('admin.suppliers.partials.edit-modal')
-
-<!-- Modal Xóa Nhà Cung Cấp -->
-@include('admin.suppliers.partials.delete-modal')
-
 @endsection
+
+@push('modals')
+    <!-- Modal Xem Chi Tiết Nhà Cung Cấp -->
+    @include('admin.suppliers.partials.show-modal')
+
+    <!-- Modal Thêm Nhà Cung Cấp -->
+    @include('admin.suppliers.partials.add-modal')
+
+    <!-- Modal Sửa Nhà Cung Cấp -->
+    @include('admin.suppliers.partials.edit-modal')
+
+    <!-- Modal Xóa Nhà Cung Cấp -->
+    @include('admin.suppliers.partials.delete-modal')
+@endpush
 
 @push('scripts')
 <script>
+    // ============================================
+    // MODAL XEM CHI TIẾT NHÀ CUNG CẤP
+    // ============================================
+    function openShowSupplierModal(button) {
+        let supplier = JSON.parse(button.getAttribute('data-supplier'));
+
+        // Điền thông tin cơ bản
+        document.getElementById('show_supplier_id').textContent = '#S' + String(supplier.id).padStart(2, '0');
+        document.getElementById('show_supplier_name').textContent = supplier.name;
+
+        // Thông tin liên hệ
+        const contactEl = document.getElementById('show_supplier_contact_name');
+        contactEl.querySelector('span').textContent = supplier.contact_name || 'Chưa cập nhật';
+
+        const phoneEl = document.getElementById('show_supplier_phone');
+        phoneEl.querySelector('span').textContent = supplier.phone || 'Chưa cập nhật';
+
+        const addressEl = document.getElementById('show_supplier_address');
+        addressEl.querySelector('span').textContent = supplier.address || 'Chưa cập nhật';
+
+        // Chứng chỉ (render badges)
+        const certContainer = document.getElementById('show_supplier_certificates');
+        const noCertEl = document.getElementById('show_supplier_no_cert');
+        certContainer.innerHTML = '';
+
+        if (supplier.certificate && supplier.certificate.trim()) {
+            noCertEl.classList.add('hidden');
+            supplier.certificate.split(',').forEach(cert => {
+                cert = cert.trim();
+                if (cert) {
+                    const badge = document.createElement('span');
+                    badge.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-600 border border-blue-100';
+                    badge.textContent = cert;
+                    certContainer.appendChild(badge);
+                }
+            });
+        } else {
+            noCertEl.classList.remove('hidden');
+        }
+
+        // Trạng thái
+        const statusBadge = document.getElementById('show_supplier_status_badge');
+        if (supplier.is_active) {
+            statusBadge.className = 'inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-bold bg-green-50 text-green-700 border border-green-200';
+            statusBadge.innerHTML = '<span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span> Đang hợp tác';
+        } else {
+            statusBadge.className = 'inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-bold bg-gray-200 text-gray-600 border border-gray-300';
+            statusBadge.innerHTML = '<i class="fa-solid fa-ban mr-2 text-xs"></i> Ngừng hợp tác';
+        }
+
+        // Thời gian
+        function formatDate(dateStr) {
+            if (!dateStr) return 'N/A';
+            const d = new Date(dateStr);
+            const pad = n => String(n).padStart(2, '0');
+            return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + '/' + d.getFullYear() + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+        }
+        document.getElementById('show_supplier_created_at').textContent = formatDate(supplier.created_at);
+        document.getElementById('show_supplier_updated_at').textContent = (supplier.created_at === supplier.updated_at) ? 'Chưa cập nhật' : formatDate(supplier.updated_at);
+
+        // Mở modal
+        const modal = document.getElementById('showSupplierModal');
+        const content = document.getElementById('showSupplierContent');
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            content.classList.remove('scale-95');
+        }, 10);
+    }
+
+    function closeShowSupplierModal() {
+        const modal = document.getElementById('showSupplierModal');
+        const content = document.getElementById('showSupplierContent');
+        modal.classList.add('opacity-0');
+        content.classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    }
+
     // ============================================
     // MODAL THÊM NHÀ CUNG CẤP
     // ============================================

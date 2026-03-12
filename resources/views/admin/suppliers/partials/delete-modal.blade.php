@@ -1,5 +1,5 @@
 <!-- Modal Xác nhận Xóa Nhà Cung Cấp -->
-<div id="deleteSupplierModal" class="fixed inset-0 bg-black/50 z-60 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+<div id="deleteSupplierModal" class="fixed inset-0 bg-black/50 z-[70] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
     <!-- Modal Content -->
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center transform scale-95 transition-all duration-300 mx-4" id="deleteSupplierContent">
         

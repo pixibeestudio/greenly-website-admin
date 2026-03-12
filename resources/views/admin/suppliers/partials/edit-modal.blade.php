@@ -1,6 +1,6 @@
 <!-- Modal Background Overlay -->
 <div id="editSupplierModal"
-    class="fixed inset-0 bg-black/50 z-60 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+    class="fixed inset-0 bg-black/50 z-[70] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
 
     <!-- Modal Content -->
     <div id="editSupplierContent"
