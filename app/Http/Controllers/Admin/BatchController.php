@@ -77,6 +77,9 @@ class BatchController extends Controller
 
     public function store(Request $request)
     {
+        // 0. Loại bỏ dấu chấm format tiền tệ trước khi validate
+        $request->merge(['import_price' => str_replace('.', '', $request->input('import_price'))]);
+
         // 1. Validate dữ liệu đầu vào
         $request->validate([
             'product_id' => 'required|exists:products,id',
@@ -118,6 +121,9 @@ class BatchController extends Controller
     {
         // 1. Tìm lô hàng theo ID
         $batch = Batch::findOrFail($id);
+
+        // 0. Loại bỏ dấu chấm format tiền tệ trước khi validate
+        $request->merge(['import_price' => str_replace('.', '', $request->input('import_price'))]);
 
         // 2. Validate dữ liệu đầu vào
         $request->validate([
