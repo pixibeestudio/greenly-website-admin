@@ -158,6 +158,16 @@
                             </div>
                         </div>
 
+                        <!-- Nhóm 6: Lô hàng hiện tại -->
+                        <div>
+                            <h3 class="text-sm font-bold text-forest-700 uppercase tracking-wider mb-4 flex items-center gap-2">
+                                <i class="fa-solid fa-boxes-packing text-amber-500"></i> Lô hàng hiện tại
+                            </h3>
+                            <div id="show_product_batches_container">
+                                <!-- JS sẽ render bảng hoặc text trống vào đây -->
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>

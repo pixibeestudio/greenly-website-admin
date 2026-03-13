@@ -12,8 +12,14 @@
                 'origin' => $product->origin ?? 'Chưa cập nhật',
                 'is_active' => $product->is_active,
                 'category_name' => $product->category->name ?? 'Không có',
-                'stock' => (int) ($product->batches_sum_current_quantity ?? 0),
+                'stock' => (int) $product->total_stock,
                 'images' => $product->images->map(fn($img) => asset('storage/' . $img->image_path))->toArray(),
+                'batches' => $product->batches->map(fn($b) => [
+                    'batch_code' => $b->batch_code,
+                    'supplier_name' => $b->supplier->name ?? 'N/A',
+                    'import_price' => $b->import_price,
+                    'current_quantity' => $b->current_quantity,
+                ])->toArray(),
                 'created_at' => $product->created_at->format('d/m/Y H:i'),
                 'updated_at' => $product->updated_at->eq($product->created_at) ? 'Chưa được cập nhật' : $product->updated_at->format('d/m/Y H:i'),
             ]) }}"

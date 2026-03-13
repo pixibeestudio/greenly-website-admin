@@ -73,7 +73,7 @@
             <div class="relative z-10 flex items-center justify-between">
                 <div>
                     <p class="text-emerald-100 text-[11px] font-bold uppercase tracking-wider mb-1">Đang mở bán</p>
-                    <h3 class="text-3xl font-bold text-white drop-shadow-md">{{ $discountedProducts ?? 0 }}</h3>
+                    <h3 class="text-3xl font-bold text-white drop-shadow-md">{{ $activeSellingProducts ?? 0 }}</h3>
                 </div>
                 <div class="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center text-white text-xl shadow-inner">
                     <i class="fa-solid fa-store"></i>
@@ -127,10 +127,11 @@
             </select>
 
             <!-- Lọc theo Trạng thái -->
-            <select name="is_active" onchange="document.getElementById('filterForm').submit();" class="bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-600 outline-none focus:border-forest-500 transition-all shadow-sm">
+            <select name="status" onchange="document.getElementById('filterForm').submit();" class="bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-600 outline-none focus:border-forest-500 transition-all shadow-sm">
                 <option value="">Tất cả trạng thái</option>
-                <option value="1" {{ request('is_active') === '1' ? 'selected' : '' }}>Đang bán</option>
-                <option value="0" {{ request('is_active') === '0' ? 'selected' : '' }}>Ngừng bán</option>
+                <option value="dang_ban" {{ request('status') === 'dang_ban' ? 'selected' : '' }}>Đang bán</option>
+                <option value="het_hang" {{ request('status') === 'het_hang' ? 'selected' : '' }}>Hết hàng</option>
+                <option value="ngung_ban" {{ request('status') === 'ngung_ban' ? 'selected' : '' }}>Ngừng bán</option>
             </select>
         </div>
 
@@ -150,17 +151,13 @@
                             <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Sắp xếp Giá</h4>
                             <div class="space-y-2">
                                 <label class="flex items-center p-2 rounded-lg hover:bg-forest-50 cursor-pointer group transition-colors">
-                                    <input type="radio" name="sort_price" class="peer hidden" value="expensive" {{ request('sort_price') === 'expensive' ? 'checked' : '' }}>
-                                    <div class="w-4 h-4 rounded-full border-2 border-gray-300 peer-checked:border-forest-600 peer-checked:bg-forest-600 flex items-center justify-center mr-3 transition-colors">
-                                        <div class="w-1.5 h-1.5 bg-white rounded-full opacity-0 peer-checked:opacity-100"></div>
-                                    </div>
+                                    <input type="radio" name="sort_price" value="expensive" {{ request('sort_price') === 'expensive' ? 'checked' : '' }}
+                                        class="w-4 h-4 rounded-full border-2 border-gray-300 appearance-none checked:border-forest-800 checked:bg-forest-800 checked:ring-2 checked:ring-white checked:ring-inset mr-3 transition-colors cursor-pointer">
                                     <span class="text-sm font-medium text-gray-700 group-hover:text-forest-700">Giá cao nhất</span>
                                 </label>
                                 <label class="flex items-center p-2 rounded-lg hover:bg-forest-50 cursor-pointer group transition-colors">
-                                    <input type="radio" name="sort_price" class="peer hidden" value="cheap" {{ request('sort_price') === 'cheap' ? 'checked' : '' }}>
-                                    <div class="w-4 h-4 rounded-full border-2 border-gray-300 peer-checked:border-forest-600 peer-checked:bg-forest-600 flex items-center justify-center mr-3 transition-colors">
-                                        <div class="w-1.5 h-1.5 bg-white rounded-full opacity-0 peer-checked:opacity-100"></div>
-                                    </div>
+                                    <input type="radio" name="sort_price" value="cheap" {{ request('sort_price') === 'cheap' ? 'checked' : '' }}
+                                        class="w-4 h-4 rounded-full border-2 border-gray-300 appearance-none checked:border-forest-800 checked:bg-forest-800 checked:ring-2 checked:ring-white checked:ring-inset mr-3 transition-colors cursor-pointer">
                                     <span class="text-sm font-medium text-gray-700 group-hover:text-forest-700">Giá rẻ nhất</span>
                                 </label>
                             </div>
@@ -256,24 +253,23 @@
                         </td>
                         <!-- Cột 5: Tồn kho -->
                         <td class="px-6 py-4 text-center">
-                            <span class="font-bold text-gray-700">0</span>
-                            <span class="text-xs text-gray-400 block">Sản phẩm</span>
+                            <span class="font-bold {{ $product->total_stock > 0 ? 'text-forest-700' : 'text-red-500' }}">{{ $product->total_stock }}</span>
+                            <span class="text-xs text-gray-400 block">{{ $product->unit }}</span>
                         </td>
                         <!-- Cột 6: Trạng thái & Thời gian -->
                         <td class="px-6 py-4 text-center">
                             <div class="flex flex-col items-center">
-                                @php $stock = 0; @endphp
-                                @if($stock <= 0)
+                                @if($product->total_stock <= 0)
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-red-100 text-red-700 border border-red-200 mb-1">
                                         <i class="fa-solid fa-circle-xmark mr-1.5 text-[10px]"></i> Hết hàng
                                     </span>
-                                @elseif($product->is_active)
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-green-50 text-green-700 border border-green-100 mb-1">
-                                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span> Đang bán
-                                    </span>
-                                @else
+                                @elseif(!$product->is_active)
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-gray-200 text-gray-600 border border-gray-300 mb-1">
                                         <i class="fa-solid fa-ban mr-1.5 text-[10px]"></i> Ngừng bán
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-green-50 text-green-700 border border-green-100 mb-1">
+                                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span> Đang bán
                                     </span>
                                 @endif
                                 <div class="text-[11px] text-gray-400">Tạo: {{ $product->created_at->format('d/m/Y') }}</div>
@@ -1053,6 +1049,32 @@
 
         // Mô tả
         document.getElementById('show_product_description').innerText = product.description;
+
+        // Lô hàng hiện tại
+        const batchesContainer = document.getElementById('show_product_batches_container');
+        if (product.batches && product.batches.length > 0) {
+            let tableHtml = '<div class="bg-gray-50 rounded-xl border border-gray-100 overflow-hidden">';
+            tableHtml += '<table class="w-full text-sm text-left">';
+            tableHtml += '<thead class="bg-gray-100/80 text-gray-500 uppercase text-[10px] font-bold tracking-wider">';
+            tableHtml += '<tr><th class="px-4 py-2.5">Mã lô</th><th class="px-4 py-2.5">Nhà cung cấp</th><th class="px-4 py-2.5 text-right">Giá nhập</th><th class="px-4 py-2.5 text-center">Tồn kho</th></tr>';
+            tableHtml += '</thead><tbody class="divide-y divide-gray-100">';
+            product.batches.forEach(function(b) {
+                const qty = b.current_quantity;
+                let qtyClass = 'text-forest-700';
+                if (qty <= 0) qtyClass = 'text-red-500';
+                else if (qty <= 10) qtyClass = 'text-orange-500';
+                tableHtml += '<tr class="hover:bg-white/60 transition-colors">';
+                tableHtml += '<td class="px-4 py-2.5 font-mono text-xs font-bold text-gray-700">' + b.batch_code + '</td>';
+                tableHtml += '<td class="px-4 py-2.5 text-xs text-gray-600">' + b.supplier_name + '</td>';
+                tableHtml += '<td class="px-4 py-2.5 text-xs font-bold text-forest-700 text-right">' + parseInt(b.import_price).toLocaleString('vi-VN') + 'đ</td>';
+                tableHtml += '<td class="px-4 py-2.5 text-xs font-bold ' + qtyClass + ' text-center">' + qty + '</td>';
+                tableHtml += '</tr>';
+            });
+            tableHtml += '</tbody></table></div>';
+            batchesContainer.innerHTML = tableHtml;
+        } else {
+            batchesContainer.innerHTML = '<p class="text-sm text-gray-400 italic">Chưa có lô hàng nào cho sản phẩm này.</p>';
+        }
 
         // Ảnh đại diện
         const mainImg = document.getElementById('show_product_image');

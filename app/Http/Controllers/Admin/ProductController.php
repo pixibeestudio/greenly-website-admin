@@ -16,7 +16,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         // 1. Truy vấn danh sách sản phẩm, sử dụng Eager Loading
-        $query = Product::with(['category', 'images'])
+        $query = Product::with(['category', 'images', 'batches.supplier'])
             ->withSum('batches', 'current_quantity');
 
         // 2. Tìm kiếm theo tên sản phẩm
@@ -29,9 +29,24 @@ class ProductController extends Controller
             $query->where('category_id', $request->category_id);
         }
 
-        // 4. Lọc theo trạng thái (is_active)
-        if ($request->filled('is_active')) {
-            $query->where('is_active', $request->is_active);
+        // 4. Lọc theo trạng thái (status)
+        if ($request->filled('status')) {
+            if ($request->status === 'dang_ban') {
+                // Đang bán: is_active = 1 VÀ có ít nhất 1 batch có current_quantity > 0
+                $query->where('is_active', 1)
+                    ->whereHas('batches', function ($q) {
+                        $q->where('current_quantity', '>', 0);
+                    });
+            } elseif ($request->status === 'het_hang') {
+                // Hết hàng: is_active = 1 NHƯNG không có batch nào có current_quantity > 0
+                $query->where('is_active', 1)
+                    ->whereDoesntHave('batches', function ($q) {
+                        $q->where('current_quantity', '>', 0);
+                    });
+            } elseif ($request->status === 'ngung_ban') {
+                // Ngừng bán: is_active = 0
+                $query->where('is_active', 0);
+            }
         }
 
         // 5. Lọc theo khuyến mãi
@@ -60,8 +75,14 @@ class ProductController extends Controller
         $totalProducts = Product::count();
 
         // 5. Thống kê cho các Card
-        $outOfStockProducts = 0; // Tạm thời để 0, chờ module Batches
-        $discountedProducts = Product::where('discount_price', '>', 0)->count();
+        $outOfStockProducts = Product::where('is_active', 1)
+            ->whereDoesntHave('batches', function ($q) {
+                $q->where('current_quantity', '>', 0);
+            })->count();
+        $activeSellingProducts = Product::where('is_active', 1)
+            ->whereHas('batches', function ($q) {
+                $q->where('current_quantity', '>', 0);
+            })->count();
         $inactiveProducts = Product::where('is_active', 0)->count();
 
         // 6. Lấy danh sách Category
@@ -70,7 +91,7 @@ class ProductController extends Controller
         // 7. Trả về view
         return view('admin.products.index', compact(
             'products', 'totalProducts', 'categories',
-            'outOfStockProducts', 'discountedProducts', 'inactiveProducts'
+            'outOfStockProducts', 'activeSellingProducts', 'inactiveProducts'
         ));
     }
 

@@ -36,4 +36,10 @@ class Product extends Model
     {
         return $this->hasMany(Batch::class);
     }
+
+    // Accessor: Tổng số lượng tồn kho từ tất cả lô hàng
+    public function getTotalStockAttribute()
+    {
+        return $this->batches->sum('current_quantity');
+    }
 }
