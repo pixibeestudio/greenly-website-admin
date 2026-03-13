@@ -16,12 +16,15 @@ class Batch extends Model
         'import_price',
         'quantity',
         'current_quantity',
-        'manufacturing_date',
-        'expiry_date',
     ];
 
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
     }
 }

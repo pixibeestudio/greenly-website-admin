@@ -25,9 +25,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Nhóm Kho hàng & Nguồn gốc
     Route::resource('suppliers', \App\Http\Controllers\Admin\SupplierController::class)->names('suppliers');
 
-    Route::get('/batches', function () {
-        return view('admin.dashboard', ['pageTitle' => 'Quản lý Lô hàng (Kho)']);
-    })->name('batches.index');
+    Route::resource('batches', \App\Http\Controllers\Admin\BatchController::class)->names('batches');
 
     // Nhóm Kinh doanh & Vận chuyển
     Route::get('/orders', function () {
