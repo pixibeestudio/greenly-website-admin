@@ -58,18 +58,22 @@ class UserController extends Controller
         $request->validate([
             'fullname' => 'required|string|max:100',
             'email' => 'required|email|max:255|unique:users,email',
-            'phone' => 'nullable|string|max:20',
+            'phone' => ['nullable', 'string', 'regex:/^0\d{9}$/'],
             'address' => 'nullable|string|max:500',
             'role' => 'required|in:admin,customer,shipper',
-            'password' => 'required|string|min:6',
+            'password' => ['required', 'string', 'min:8', 'max:30', 'regex:/[a-z]/', 'regex:/[A-Z]/', 'regex:/[0-9]/', 'regex:/[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]/'],
             'avatar' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ], [
             'fullname.required' => 'Vui lòng nhập họ và tên.',
             'email.required' => 'Vui lòng nhập email.',
             'email.unique' => 'Email này đã tồn tại trong hệ thống.',
             'password.required' => 'Vui lòng nhập mật khẩu.',
-            'password.min' => 'Mật khẩu phải có ít nhất 6 ký tự.',
+            'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
+            'password.max' => 'Mật khẩu không được quá 30 ký tự.',
+            'password.regex' => 'Mật khẩu phải chứa chữ hoa, chữ thường, số và ký tự đặc biệt.',
+            'phone.regex' => 'Số điện thoại phải gồm đúng 10 chữ số và bắt đầu bằng số 0.',
             'avatar.image' => 'File phải là hình ảnh.',
+            'avatar.mimes' => 'Chỉ chấp nhận ảnh định dạng JPG, PNG hoặc WEBP.',
             'avatar.max' => 'Ảnh đại diện không được quá 2MB.',
         ]);
 
@@ -93,17 +97,21 @@ class UserController extends Controller
         $request->validate([
             'fullname' => 'required|string|max:100',
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
-            'phone' => 'nullable|string|max:20',
+            'phone' => ['nullable', 'string', 'regex:/^0\d{9}$/'],
             'address' => 'nullable|string|max:500',
             'role' => 'required|in:admin,customer,shipper',
-            'password' => 'nullable|string|min:6',
+            'password' => ['nullable', 'string', 'min:8', 'max:30', 'regex:/[a-z]/', 'regex:/[A-Z]/', 'regex:/[0-9]/', 'regex:/[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]/'],
             'avatar' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ], [
             'fullname.required' => 'Vui lòng nhập họ và tên.',
             'email.required' => 'Vui lòng nhập email.',
             'email.unique' => 'Email này đã tồn tại trong hệ thống.',
-            'password.min' => 'Mật khẩu phải có ít nhất 6 ký tự.',
+            'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
+            'password.max' => 'Mật khẩu không được quá 30 ký tự.',
+            'password.regex' => 'Mật khẩu phải chứa chữ hoa, chữ thường, số và ký tự đặc biệt.',
+            'phone.regex' => 'Số điện thoại phải gồm đúng 10 chữ số và bắt đầu bằng số 0.',
             'avatar.image' => 'File phải là hình ảnh.',
+            'avatar.mimes' => 'Chỉ chấp nhận ảnh định dạng JPG, PNG hoặc WEBP.',
             'avatar.max' => 'Ảnh đại diện không được quá 2MB.',
         ]);
 

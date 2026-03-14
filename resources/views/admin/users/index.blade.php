@@ -237,6 +237,217 @@
 @push('scripts')
 <script>
     // ============================================
+    // HÀM TIỆN ÍCH CHUNG
+    // ============================================
+    // Kiểm tra số điện thoại hợp lệ (10 số, bắt đầu bằng 0)
+    function isValidPhone(phone) {
+        if (!phone || phone.trim() === '') return true; // Cho phép trống
+        return /^0\d{9}$/.test(phone.trim());
+    }
+
+    // Kiểm tra điều kiện mật khẩu
+    function checkPasswordRules(password) {
+        const sequences = ['abc','bcd','cde','def','efg','fgh','ghi','hij','ijk','jkl','klm','lmn','mno','nop','opq','pqr','qrs','rst','stu','tuv','uvw','vwx','wxy','xyz','012','123','234','345','456','567','678','789','qwerty','asdf','zxcv','1111','2222','3333','4444','5555','6666','7777','8888','9999','0000'];
+        const lower = password.toLowerCase();
+        const hasSeq = sequences.some(s => lower.includes(s));
+        return {
+            length: password.length >= 8 && password.length <= 30,
+            upperLower: /[a-z]/.test(password) && /[A-Z]/.test(password),
+            number: /\d/.test(password),
+            special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password),
+            noSeq: !hasSeq
+        };
+    }
+
+    // Cập nhật giao diện popup mật khẩu theo kết quả kiểm tra
+    function updatePwdUI(prefix, rules) {
+        const items = {
+            [`${prefix}_pwd_length`]: rules.length,
+            [`${prefix}_pwd_upper_lower`]: rules.upperLower,
+            [`${prefix}_pwd_number`]: rules.number,
+            [`${prefix}_pwd_special`]: rules.special,
+            [`${prefix}_pwd_no_seq`]: rules.noSeq,
+        };
+        Object.entries(items).forEach(([id, passed]) => {
+            const li = document.getElementById(id);
+            if (!li) return;
+            const icon = li.querySelector('i');
+            if (passed) {
+                icon.className = 'fa-solid fa-circle-check text-green-400 text-xs';
+                li.classList.remove('text-gray-300'); li.classList.add('text-green-400');
+            } else {
+                icon.className = 'fa-solid fa-circle-xmark text-red-400 text-xs';
+                li.classList.remove('text-green-400'); li.classList.add('text-gray-300');
+            }
+        });
+    }
+
+    // Kiểm tra mật khẩu có hợp lệ hoàn toàn không
+    function isPasswordValid(password) {
+        if (!password || password === '') return false;
+        const r = checkPasswordRules(password);
+        return r.length && r.upperLower && r.number && r.special && r.noSeq;
+    }
+
+    // Validate avatar: kiểu file + kích thước
+    function validateAvatarFile(file, errorElId) {
+        const errorEl = document.getElementById(errorElId);
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/webp'];
+        const allowedExts = ['.png', '.jpg', '.jpeg', '.webp'];
+        const maxSize = 2 * 1024 * 1024; // 2MB
+
+        if (!file) { errorEl.classList.add('hidden'); return true; }
+
+        const ext = '.' + file.name.split('.').pop().toLowerCase();
+        if (!allowedTypes.includes(file.type) && !allowedExts.includes(ext)) {
+            errorEl.textContent = 'Chỉ chấp nhận ảnh định dạng PNG, JPG hoặc WEBP.';
+            errorEl.classList.remove('hidden');
+            return false;
+        }
+        if (file.size > maxSize) {
+            errorEl.textContent = 'Kích thước ảnh không được vượt quá 2MB. (Hiện tại: ' + (file.size / 1024 / 1024).toFixed(2) + 'MB)';
+            errorEl.classList.remove('hidden');
+            return false;
+        }
+
+        errorEl.classList.add('hidden');
+        return true;
+    }
+
+    // ============================================
+    // AVATAR PREVIEW + VALIDATION
+    // ============================================
+    function setupAvatarPreview(inputId, previewWrapId, previewImgId, errorElId) {
+        const input = document.getElementById(inputId);
+        input.addEventListener('change', function() {
+            const file = this.files[0];
+            const wrap = document.getElementById(previewWrapId);
+            const img = document.getElementById(previewImgId);
+
+            if (!file) { wrap.classList.add('hidden'); return; }
+
+            if (!validateAvatarFile(file, errorElId)) {
+                this.value = '';
+                wrap.classList.add('hidden');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                img.src = e.target.result;
+                wrap.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function removeAddAvatar() {
+        document.getElementById('add_user_avatar').value = '';
+        document.getElementById('add_avatar_preview_wrap').classList.add('hidden');
+        document.getElementById('add_avatar_error').classList.add('hidden');
+    }
+    function removeEditAvatar() {
+        document.getElementById('edit_user_avatar').value = '';
+        document.getElementById('edit_avatar_preview_wrap').classList.add('hidden');
+        document.getElementById('edit_avatar_error').classList.add('hidden');
+    }
+
+    // Khởi tạo preview cho cả 2 form
+    setupAvatarPreview('add_user_avatar', 'add_avatar_preview_wrap', 'add_avatar_preview', 'add_avatar_error');
+    setupAvatarPreview('edit_user_avatar', 'edit_avatar_preview_wrap', 'edit_avatar_preview', 'edit_avatar_error');
+
+    // ============================================
+    // PHONE VALIDATION REAL-TIME
+    // ============================================
+    function setupPhoneValidation(inputId, errorId) {
+        const input = document.getElementById(inputId);
+        const error = document.getElementById(errorId);
+        input.addEventListener('input', function() {
+            // Chỉ cho phép nhập số
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.trim() === '') { error.classList.add('hidden'); return; }
+            if (!isValidPhone(this.value)) {
+                error.classList.remove('hidden');
+            } else {
+                error.classList.add('hidden');
+            }
+        });
+    }
+    setupPhoneValidation('add_user_phone', 'add_phone_error');
+    setupPhoneValidation('edit_user_phone', 'edit_phone_error');
+
+    // ============================================
+    // PASSWORD POPUP REAL-TIME
+    // ============================================
+    function setupPasswordPopup(inputId, popupId, prefix) {
+        const input = document.getElementById(inputId);
+        const popup = document.getElementById(popupId);
+
+        input.addEventListener('focus', function() { popup.classList.remove('hidden'); });
+        input.addEventListener('blur', function() {
+            // Ẩn popup khi blur nếu ô trống
+            setTimeout(() => {
+                if (!this.value) popup.classList.add('hidden');
+            }, 200);
+        });
+        input.addEventListener('input', function() {
+            popup.classList.remove('hidden');
+            const rules = checkPasswordRules(this.value);
+            updatePwdUI(prefix, rules);
+            // Tự động ẩn popup khi tất cả điều kiện đạt
+            if (rules.length && rules.upperLower && rules.number && rules.special && rules.noSeq) {
+                setTimeout(() => { popup.classList.add('hidden'); }, 600);
+            }
+        });
+    }
+    setupPasswordPopup('add_user_password', 'add_pwd_popup', 'add');
+    setupPasswordPopup('edit_user_password', 'edit_pwd_popup', 'edit');
+
+    // ============================================
+    // CLIENT-SIDE FORM VALIDATION (không cho submit nếu sai)
+    // ============================================
+    function validateForm(prefix, isEdit) {
+        let valid = true;
+
+        // Kiểm tra Họ tên (required)
+        const fullname = document.getElementById(prefix + '_user_fullname').value.trim();
+        if (!fullname) { valid = false; }
+
+        // Kiểm tra Email (required)
+        const email = document.getElementById(prefix + '_user_email').value.trim();
+        if (!email) { valid = false; }
+
+        // Kiểm tra SĐT (nếu có nhập)
+        const phone = document.getElementById(prefix + '_user_phone').value.trim();
+        if (phone && !isValidPhone(phone)) {
+            document.getElementById(prefix + '_phone_error').classList.remove('hidden');
+            valid = false;
+        }
+
+        // Kiểm tra mật khẩu
+        const password = document.getElementById(prefix + '_user_password').value;
+        if (!isEdit && !password) {
+            // Form Thêm: mật khẩu bắt buộc
+            valid = false;
+        }
+        if (password && !isPasswordValid(password)) {
+            // Nếu có nhập mật khẩu thì phải đúng điều kiện
+            document.getElementById(prefix + '_pwd_popup').classList.remove('hidden');
+            valid = false;
+        }
+
+        // Kiểm tra Avatar (nếu có chọn file)
+        const avatarInput = document.getElementById(prefix + '_user_avatar');
+        if (avatarInput.files.length > 0) {
+            if (!validateAvatarFile(avatarInput.files[0], prefix + '_avatar_error')) {
+                valid = false;
+            }
+        }
+
+        return valid;
+    }
+
+    // ============================================
     // MODAL THÊM TÀI KHOẢN
     // ============================================
     function openAddUserModal() {
@@ -249,7 +460,19 @@
         const modal = document.getElementById('addUserModal');
         const content = document.getElementById('addUserContent');
         modal.classList.add('opacity-0'); content.classList.add('scale-95');
-        setTimeout(() => { modal.classList.add('hidden'); document.getElementById('addUserForm').reset(); }, 300);
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            document.getElementById('addUserForm').reset();
+            document.getElementById('add_avatar_preview_wrap').classList.add('hidden');
+            document.getElementById('add_pwd_popup').classList.add('hidden');
+            document.getElementById('add_phone_error').classList.add('hidden');
+            document.getElementById('add_avatar_error').classList.add('hidden');
+            // Reset icon mật khẩu về mặc định
+            ['add_pwd_length','add_pwd_upper_lower','add_pwd_number','add_pwd_special','add_pwd_no_seq'].forEach(id => {
+                const li = document.getElementById(id);
+                if (li) { li.querySelector('i').className = 'fa-solid fa-circle-xmark text-red-400 text-xs'; li.classList.remove('text-green-400'); li.classList.add('text-gray-300'); }
+            });
+        }, 300);
     }
 
     // ============================================
@@ -264,6 +487,17 @@
         document.getElementById('edit_user_address').value = user.address || '';
         document.getElementById('edit_user_role').value = user.role;
         document.getElementById('edit_user_password').value = '';
+
+        // Reset trạng thái edit form
+        document.getElementById('edit_avatar_preview_wrap').classList.add('hidden');
+        document.getElementById('edit_pwd_popup').classList.add('hidden');
+        document.getElementById('edit_phone_error').classList.add('hidden');
+        document.getElementById('edit_avatar_error').classList.add('hidden');
+        document.getElementById('edit_user_avatar').value = '';
+        ['edit_pwd_length','edit_pwd_upper_lower','edit_pwd_number','edit_pwd_special','edit_pwd_no_seq'].forEach(id => {
+            const li = document.getElementById(id);
+            if (li) { li.querySelector('i').className = 'fa-solid fa-circle-xmark text-red-400 text-xs'; li.classList.remove('text-green-400'); li.classList.add('text-gray-300'); }
+        });
 
         const modal = document.getElementById('editUserModal');
         const content = document.getElementById('editUserContent');
@@ -342,26 +576,33 @@
         setTimeout(() => { modal.classList.add('hidden'); }, 300);
     }
 
-    // Auto-open modal nếu có lỗi validation
+    // Auto-open modal nếu có lỗi validation từ server
     @if($errors->any() && old('form_type') === 'add_user')
         openAddUserModal();
     @endif
     @if($errors->any() && old('form_type') === 'edit_user')
-        // Reopen edit modal - cần data-user từ hidden input
         const editBtn = document.querySelector('[data-user-id-edit="{{ old('user_id') }}"]');
         if (editBtn) openEditUserModal(editBtn);
     @endif
 
-    // Submit loading cho Add form
-    document.getElementById('addUserForm').addEventListener('submit', function() {
+    // Submit với client-side validation cho Add form
+    document.getElementById('addUserForm').addEventListener('submit', function(e) {
+        if (!validateForm('add', false)) {
+            e.preventDefault();
+            return;
+        }
         const btn = document.getElementById('addUserSubmitBtn');
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý...';
         btn.classList.add('opacity-70', 'cursor-not-allowed');
         setTimeout(() => { btn.disabled = true; }, 10);
     });
 
-    // Submit loading cho Edit form
-    document.getElementById('editUserForm').addEventListener('submit', function() {
+    // Submit với client-side validation cho Edit form
+    document.getElementById('editUserForm').addEventListener('submit', function(e) {
+        if (!validateForm('edit', true)) {
+            e.preventDefault();
+            return;
+        }
         const btn = document.getElementById('editUserSubmitBtn');
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý...';
         btn.classList.add('opacity-70', 'cursor-not-allowed');

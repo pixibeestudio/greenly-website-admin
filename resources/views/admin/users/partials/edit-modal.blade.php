@@ -9,7 +9,7 @@
         <div class="sticky top-0 z-20 bg-white border-b border-gray-100 px-8 py-5 rounded-t-2xl flex justify-between items-center">
             <div>
                 <h2 class="text-xl font-bold text-forest-800 flex items-center gap-2">
-                    <i class="fa-solid fa-user-pen text-blue-600"></i> Sửa Tài Khoản
+                    <i class="fa-solid fa-user-pen text-forest-600"></i> Sửa Tài Khoản
                 </h2>
                 <p class="text-gray-500 text-sm mt-0.5">Cập nhật thông tin người dùng trong hệ thống.</p>
             </div>
@@ -20,7 +20,7 @@
         </div>
 
         <!-- Form -->
-        <form id="editUserForm" action="" method="POST" enctype="multipart/form-data">
+        <form id="editUserForm" action="" method="POST" enctype="multipart/form-data" novalidate>
             @csrf
             @method('PUT')
             <input type="hidden" name="form_type" value="edit_user">
@@ -58,10 +58,11 @@
                                 <label for="edit_user_phone" class="block text-sm font-bold text-gray-700 mb-2">Số điện thoại</label>
                                 <div class="relative">
                                     <i class="fa-solid fa-phone absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
-                                    <input type="text" id="edit_user_phone" name="phone"
+                                    <input type="text" id="edit_user_phone" name="phone" maxlength="10"
                                         class="w-full bg-white border border-gray-300 text-gray-800 text-base rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-forest-500 block pl-10 pr-4 py-3 outline-none transition-all shadow-sm"
-                                        placeholder="0912.345.678">
+                                        placeholder="0912345678">
                                 </div>
+                                <p id="edit_phone_error" class="text-red-500 text-xs mt-1.5 hidden">Số điện thoại phải gồm đúng 10 chữ số và bắt đầu bằng số 0.</p>
                             </div>
                         </div>
 
@@ -69,7 +70,7 @@
                         <div>
                             <label for="edit_user_address" class="block text-sm font-bold text-gray-700 mb-2">Địa chỉ</label>
                             <div class="relative">
-                                <i class="fa-solid fa-location-dot absolute left-4 top-3.5 text-gray-400 text-sm"></i>
+                                <i class="fa-solid fa-location-dot absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
                                 <input type="text" id="edit_user_address" name="address"
                                     class="w-full bg-white border border-gray-300 text-gray-800 text-base rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-forest-500 block pl-10 pr-4 py-3 outline-none transition-all shadow-sm"
                                     placeholder="Số nhà, Đường, Quận/Huyện, Tỉnh/TP...">
@@ -87,7 +88,7 @@
                                     <option value="admin">Admin</option>
                                 </select>
                             </div>
-                            <div>
+                            <div class="relative">
                                 <label for="edit_user_password" class="block text-sm font-bold text-gray-700 mb-2">Mật khẩu mới</label>
                                 <div class="relative">
                                     <i class="fa-solid fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
@@ -98,15 +99,36 @@
                                 @if(old('form_type') == 'edit_user' && $errors->has('password'))
                                     <p class="text-red-500 text-xs mt-1.5">{{ $errors->first('password') }}</p>
                                 @endif
+                                <!-- Popup kiểm tra điều kiện mật khẩu -->
+                                <div id="edit_pwd_popup" class="hidden absolute left-0 top-full mt-2 z-50 bg-gray-900 text-white border border-gray-700 rounded-xl shadow-2xl p-4 text-sm w-full">
+                                    <p class="font-bold text-gray-100 mb-2">Mật khẩu phải đảm bảo:</p>
+                                    <ul class="space-y-1.5">
+                                        <li id="edit_pwd_length" class="flex items-center gap-2 text-gray-300"><i class="fa-solid fa-circle-xmark text-red-400 text-xs"></i> Từ 8 đến 30 ký tự</li>
+                                        <li id="edit_pwd_upper_lower" class="flex items-center gap-2 text-gray-300"><i class="fa-solid fa-circle-xmark text-red-400 text-xs"></i> Chứa cả chữ hoa và chữ thường</li>
+                                        <li id="edit_pwd_number" class="flex items-center gap-2 text-gray-300"><i class="fa-solid fa-circle-xmark text-red-400 text-xs"></i> Chứa ít nhất 1 chữ số</li>
+                                        <li id="edit_pwd_special" class="flex items-center gap-2 text-gray-300"><i class="fa-solid fa-circle-xmark text-red-400 text-xs"></i> Chứa ít nhất 1 ký tự đặc biệt (!@#$%^&*)</li>
+                                        <li id="edit_pwd_no_seq" class="flex items-center gap-2 text-gray-300"><i class="fa-solid fa-circle-xmark text-red-400 text-xs"></i> Không chứa chuỗi liên tục (abc, 123, qwerty)</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Avatar -->
                         <div>
                             <label for="edit_user_avatar" class="block text-sm font-bold text-gray-700 mb-2">Ảnh đại diện mới</label>
-                            <input type="file" id="edit_user_avatar" name="avatar" accept="image/*"
+                            <!-- Khung preview avatar -->
+                            <div id="edit_avatar_preview_wrap" class="hidden mb-3">
+                                <div class="relative inline-block">
+                                    <img id="edit_avatar_preview" src="" alt="Preview" class="w-20 h-20 rounded-full object-cover border-4 border-forest-100 shadow-md">
+                                    <button type="button" onclick="removeEditAvatar()" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-[10px] hover:bg-red-600 transition-colors border-2 border-white shadow-sm">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <input type="file" id="edit_user_avatar" name="avatar" accept=".png,.jpg,.jpeg,.webp"
                                 class="w-full bg-white border border-gray-300 text-gray-800 text-sm rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-forest-500 block px-4 py-2.5 outline-none transition-all shadow-sm file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-forest-50 file:text-forest-700 hover:file:bg-forest-100">
-                            <p class="text-xs text-gray-400 mt-1">Để trống nếu không muốn thay đổi avatar.</p>
+                            <p class="text-xs text-gray-400 mt-1">Chấp nhận: PNG, JPG, WEBP — Tối đa 2MB. Để trống nếu không muốn thay đổi.</p>
+                            <p id="edit_avatar_error" class="text-red-500 text-xs mt-1 hidden"></p>
                         </div>
 
                     </div>
@@ -120,7 +142,7 @@
                     Hủy
                 </button>
                 <button type="submit" id="editUserSubmitBtn"
-                    class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 transition-all flex items-center gap-2">
+                    class="px-6 py-2.5 bg-forest-700 hover:bg-forest-800 text-white font-bold rounded-xl shadow-lg shadow-forest-500/20 transition-all flex items-center gap-2">
                     <i class="fa-solid fa-check-circle"></i> Cập nhật
                 </button>
             </div>
