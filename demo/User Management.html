@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greenly User Management Content V2</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Quicksand', 'sans-serif'],
+                    },
+                    colors: {
+                        forest: {
+                            50: '#e8f5e9',
+                            100: '#c8e6c9',
+                            500: '#4caf50',
+                            600: '#43a047',
+                            700: '#2e7d32', 
+                            800: '#1b5e20',
+                            900: '#0d3b10',
+                        },
+                        organic: {
+                            100: '#fff9c4',
+                            400: '#fbc02d',
+                            500: '#f9a825', 
+                        },
+                        cream: {
+                            50: '#fffde7', 
+                            100: '#f5f5f5',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* CSS Ẩn thanh cuộn cho Tabs */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-white font-sans antialiased text-gray-800 p-6 md:p-10 min-h-screen relative overflow-x-hidden">
+
+    <!-- Giả lập Main Content Container -->
+    <div class="max-w-[1280px] mx-auto bg-cream-50 p-6 md:p-8 rounded-2xl border border-dashed border-gray-300 relative min-h-screen">
+        <div class="absolute -top-3 left-6 bg-white px-3 py-0.5 rounded-full text-xs text-gray-400 font-mono shadow-sm">Main Content Area: Users V2</div>
+
+        <!-- 1. STAT CARDS (4 Cards Thống kê) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8 mt-2">
+             
+             <!-- Card 1: Tổng số người dùng -->
+             <div class="bg-gradient-to-br from-forest-900 via-forest-800 to-forest-700 p-5 rounded-2xl shadow-lg text-white relative overflow-hidden group hover:shadow-xl transition-all border border-forest-800">
+                <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fa-solid fa-users text-8xl"></i>
+                </div>
+                <div class="relative z-10 flex flex-col justify-between h-full">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="text-forest-100 text-[11px] font-bold uppercase tracking-wider">Tổng người dùng</p>
+                        <div class="w-8 h-8 bg-white/10 backdrop-blur-sm rounded-lg flex items-center justify-center border border-white/20 text-organic-400"><i class="fa-solid fa-users text-sm"></i></div>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <h3 class="text-4xl font-bold text-white drop-shadow-md">856</h3>
+                        <span class="text-xs text-forest-100 font-medium">Tài khoản</span>
+                    </div>
+                </div>
+             </div>
+
+             <!-- Card 2: Khách hàng mới -->
+             <div class="bg-gradient-to-br from-teal-600 to-teal-500 p-5 rounded-2xl shadow-lg text-white relative overflow-hidden group hover:shadow-xl transition-all border border-teal-600">
+                <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fa-solid fa-user-plus text-8xl"></i>
+                </div>
+                <div class="relative z-10 flex flex-col justify-between h-full">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="text-teal-100 text-[11px] font-bold uppercase tracking-wider">Khách hàng mới</p>
+                        <div class="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center"><i class="fa-solid fa-seedling text-sm"></i></div>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <h3 class="text-4xl font-bold text-white drop-shadow-md">12</h3>
+                        <span class="text-[10px] text-teal-50 font-medium bg-black/10 px-2 py-0.5 rounded">Trong tháng này</span>
+                    </div>
+                </div>
+             </div>
+
+             <!-- Card 3: Tổng số Shipper -->
+             <div class="bg-gradient-to-br from-blue-700 to-blue-500 p-5 rounded-2xl shadow-lg text-white relative overflow-hidden group hover:shadow-xl transition-all border border-blue-600">
+                <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fa-solid fa-motorcycle text-8xl"></i>
+                </div>
+                <div class="relative z-10 flex flex-col justify-between h-full">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="text-blue-100 text-[11px] font-bold uppercase tracking-wider">Đội ngũ Shipper</p>
+                        <div class="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center"><i class="fa-solid fa-box-fast text-sm"></i></div>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <h3 class="text-4xl font-bold text-white drop-shadow-md">15</h3>
+                        <span class="text-xs text-blue-100 font-medium">Nhân sự</span>
+                    </div>
+                </div>
+             </div>
+
+             <!-- Card 4: Tài khoản bị khóa -->
+             <div class="bg-gradient-to-br from-red-600 to-rose-500 p-5 rounded-2xl shadow-lg text-white relative overflow-hidden group hover:shadow-xl transition-all border border-red-600">
+                <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fa-solid fa-user-lock text-8xl"></i>
+                </div>
+                <div class="relative z-10 flex flex-col justify-between h-full">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="text-red-100 text-[11px] font-bold uppercase tracking-wider">Khóa / Tạm dừng</p>
+                        <div class="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center"><i class="fa-solid fa-ban text-sm"></i></div>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <h3 class="text-4xl font-bold text-white drop-shadow-md">04</h3>
+                        <span class="text-xs text-red-100 font-medium">Cần kiểm tra</span>
+                    </div>
+                </div>
+             </div>
+        </div>
+
+        <!-- 2. TOOLBAR: LỌC THEO TABS & SEARCH -->
+        <div class="flex flex-col xl:flex-row justify-between items-center gap-4 mb-6">
+            
+            <!-- Tabs Navigation (Role Filter) -->
+            <div class="w-full xl:w-auto overflow-x-auto pb-2 xl:pb-0 hide-scrollbar">
+                <div class="inline-flex bg-white p-1.5 rounded-xl border border-gray-200 shadow-sm items-center min-w-max gap-1">
+                    <!-- Tab Active mặc định -->
+                    <button class="role-tab active px-5 py-2 rounded-lg text-sm font-bold bg-forest-100 text-forest-700 transition-all focus:outline-none">
+                        Tất cả
+                    </button>
+                    
+                    <button class="role-tab px-5 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-forest-700 transition-all focus:outline-none">
+                        Khách hàng
+                    </button>
+                    
+                    <button class="role-tab px-5 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-forest-700 transition-all focus:outline-none">
+                        Shipper
+                    </button>
+
+                    <button class="role-tab px-5 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-forest-700 transition-all focus:outline-none">
+                        Admin
+                    </button>
+                </div>
+            </div>
+
+            <!-- Nút Thêm mới & Ô Search -->
+            <div class="w-full xl:w-auto flex gap-3 shrink-0">
+                <!-- Search Box -->
+                <div class="relative group w-full xl:w-72">
+                    <div class="flex items-center bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-2.5 focus-within:border-forest-500 focus-within:ring-1 focus-within:ring-forest-500 transition-all">
+                        <i class="fa-solid fa-search text-gray-400 mr-3 group-focus-within:text-forest-500 transition-colors"></i>
+                        <input type="text" placeholder="Tìm tên, email, SĐT..." class="bg-transparent text-sm text-gray-700 outline-none w-full placeholder-gray-400">
+                    </div>
+                </div>
+
+                <!-- Thêm User -->
+                <button class="bg-forest-700 hover:bg-forest-800 text-white px-5 py-2.5 rounded-xl shadow-md shadow-forest-500/30 flex items-center justify-center gap-2 transition-all font-bold text-sm whitespace-nowrap">
+                    <i class="fa-solid fa-user-plus"></i> <span class="hidden sm:inline">Thêm tài khoản</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. BẢNG DỮ LIỆU NGƯỜI DÙNG (USERS TABLE) -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left whitespace-nowrap">
+                    <thead class="bg-cream-100/50 text-gray-500 uppercase text-[11px] font-bold border-b border-gray-100 tracking-wider">
+                        <tr>
+                            <th class="px-6 py-4 text-center w-12">ID</th>
+                            <th class="px-6 py-4 w-16 text-center">Avatar</th>
+                            <th class="px-6 py-4">Họ và Tên</th>
+                            <th class="px-6 py-4">Email</th>
+                            <th class="px-6 py-4">Số điện thoại</th>
+                            <th class="px-6 py-4 text-center">Vai trò (Role)</th>
+                            <th class="px-6 py-4">Ngày tạo</th>
+                            <th class="px-6 py-4 text-center">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        
+                        <!-- User 1: Admin -->
+                        <tr class="hover:bg-forest-50/30 transition-colors group">
+                            <td class="px-6 py-4 text-center font-mono text-gray-500 text-xs">#U01</td>
+                            <td class="px-6 py-4">
+                                <img src="https://ui-avatars.com/api/?name=Admin+Store&background=2e7d32&color=fff&rounded=true&bold=true" alt="Avatar" class="w-9 h-9 rounded-full object-cover border-2 border-white shadow-sm mx-auto">
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="font-bold text-gray-800 text-sm group-hover:text-forest-700 transition-colors">Nguyễn Quản Trị</span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600">admin@greenly.com</td>
+                            <td class="px-6 py-4 font-mono text-gray-700">0999.888.777</td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-md text-[10px] font-bold bg-red-50 text-red-600 border border-red-200">
+                                    <i class="fa-solid fa-shield-halved mr-1.5"></i> Admin
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-500 text-xs">01/01/2026</td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-all flex items-center justify-center" title="Xem / Sửa"><i class="fa-solid fa-pen text-xs"></i></button>
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-orange-50 hover:text-orange-500 transition-all flex items-center justify-center" title="Khóa tài khoản"><i class="fa-solid fa-lock text-xs"></i></button>
+                                    <button class="w-8 h-8 rounded-full text-gray-300 cursor-not-allowed flex items-center justify-center" title="Không thể xóa Admin"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- User 2: Shipper -->
+                        <tr class="hover:bg-forest-50/30 transition-colors group">
+                            <td class="px-6 py-4 text-center font-mono text-gray-500 text-xs">#U02</td>
+                            <td class="px-6 py-4">
+                                <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&w=100&q=80" alt="Avatar" class="w-9 h-9 rounded-full object-cover border-2 border-white shadow-sm mx-auto">
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="font-bold text-gray-800 text-sm group-hover:text-forest-700 transition-colors">Lê Văn Giao</span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600">giao.hang@greenly.com</td>
+                            <td class="px-6 py-4 font-mono text-gray-700">0933.123.456</td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-md text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-200">
+                                    <i class="fa-solid fa-motorcycle mr-1.5"></i> Shipper
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-500 text-xs">15/02/2026</td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-all flex items-center justify-center" title="Xem / Sửa"><i class="fa-solid fa-pen text-xs"></i></button>
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-orange-50 hover:text-orange-500 transition-all flex items-center justify-center" title="Khóa tài khoản"><i class="fa-solid fa-lock text-xs"></i></button>
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all flex items-center justify-center" title="Xóa"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- User 3: Customer (Bình thường) -->
+                        <tr class="hover:bg-forest-50/30 transition-colors group">
+                            <td class="px-6 py-4 text-center font-mono text-gray-500 text-xs">#U03</td>
+                            <td class="px-6 py-4">
+                                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80" alt="Avatar" class="w-9 h-9 rounded-full object-cover border-2 border-white shadow-sm mx-auto">
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="font-bold text-gray-800 text-sm group-hover:text-forest-700 transition-colors">Trần Thị Thu Hương</span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600">thuhuong.tran@gmail.com</td>
+                            <td class="px-6 py-4 font-mono text-gray-700">0902.555.666</td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-md text-[10px] font-bold bg-gray-100 text-gray-600 border border-gray-200">
+                                    <i class="fa-solid fa-user mr-1.5"></i> Customer
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-500 text-xs">10/03/2026</td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-all flex items-center justify-center" title="Xem / Sửa"><i class="fa-solid fa-pen text-xs"></i></button>
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-orange-50 hover:text-orange-500 transition-all flex items-center justify-center" title="Khóa tài khoản"><i class="fa-solid fa-lock text-xs"></i></button>
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all flex items-center justify-center" title="Xóa"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- User 4: Customer (Bị khóa) -->
+                        <tr class="bg-red-50/20 hover:bg-red-50/40 transition-colors group">
+                            <td class="px-6 py-4 text-center font-mono text-gray-500 text-xs">#U04</td>
+                            <td class="px-6 py-4">
+                                <div class="relative w-9 h-9 mx-auto">
+                                    <img src="https://ui-avatars.com/api/?name=Fake+User&background=random&rounded=true" alt="Avatar" class="w-9 h-9 rounded-full object-cover border-2 border-white shadow-sm grayscale opacity-60">
+                                    <div class="absolute -bottom-1 -right-1 bg-red-500 text-white w-4 h-4 rounded-full flex items-center justify-center text-[8px] border-2 border-white"><i class="fa-solid fa-ban"></i></div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="font-bold text-gray-500 text-sm line-through">Spammer 123</span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-500 line-through">fake.user99@yahoo.com</td>
+                            <td class="px-6 py-4 font-mono text-gray-500">0123.456.789</td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-md text-[10px] font-bold bg-gray-100 text-gray-500 border border-gray-200">
+                                    <i class="fa-solid fa-user mr-1.5"></i> Customer
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-500 text-xs">12/03/2026</td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-all flex items-center justify-center" title="Xem chi tiết"><i class="fa-solid fa-eye text-xs"></i></button>
+                                    <button class="w-8 h-8 rounded-full text-orange-500 bg-orange-50 hover:bg-orange-100 transition-all flex items-center justify-center" title="Mở khóa tài khoản"><i class="fa-solid fa-lock-open text-xs"></i></button>
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all flex items-center justify-center" title="Xóa vĩnh viễn"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- User 5: Shipper -->
+                        <tr class="hover:bg-forest-50/30 transition-colors group">
+                            <td class="px-6 py-4 text-center font-mono text-gray-500 text-xs">#U05</td>
+                            <td class="px-6 py-4">
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80" alt="Avatar" class="w-9 h-9 rounded-full object-cover border-2 border-white shadow-sm mx-auto">
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="font-bold text-gray-800 text-sm group-hover:text-forest-700 transition-colors">Phạm Hoàng Nam</span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600">nam.pham@greenly.com</td>
+                            <td class="px-6 py-4 font-mono text-gray-700">0911.222.333</td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-md text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-200">
+                                    <i class="fa-solid fa-motorcycle mr-1.5"></i> Shipper
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-500 text-xs">05/03/2026</td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-all flex items-center justify-center" title="Xem / Sửa"><i class="fa-solid fa-pen text-xs"></i></button>
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-orange-50 hover:text-orange-500 transition-all flex items-center justify-center" title="Khóa tài khoản"><i class="fa-solid fa-lock text-xs"></i></button>
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all flex items-center justify-center" title="Xóa"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- User 6: Customer (Mới) -->
+                        <tr class="hover:bg-forest-50/30 transition-colors group bg-green-50/10">
+                            <td class="px-6 py-4 text-center font-mono text-gray-500 text-xs">#U06</td>
+                            <td class="px-6 py-4">
+                                <img src="https://ui-avatars.com/api/?name=Bui+Tien+Dat&background=f9a825&color=fff&rounded=true" alt="Avatar" class="w-9 h-9 rounded-full object-cover border-2 border-white shadow-sm mx-auto">
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="font-bold text-gray-800 text-sm group-hover:text-forest-700 transition-colors">Bùi Tiến Đạt <span class="bg-organic-500 text-white text-[8px] px-1 rounded absolute ml-1 mt-0.5">NEW</span></span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600">tiendat.bui@gmail.com</td>
+                            <td class="px-6 py-4 font-mono text-gray-700">0987.654.321</td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-md text-[10px] font-bold bg-gray-100 text-gray-600 border border-gray-200">
+                                    <i class="fa-solid fa-user mr-1.5"></i> Customer
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-500 text-xs">14/03/2026</td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-all flex items-center justify-center" title="Xem / Sửa"><i class="fa-solid fa-pen text-xs"></i></button>
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-orange-50 hover:text-orange-500 transition-all flex items-center justify-center" title="Khóa tài khoản"><i class="fa-solid fa-lock text-xs"></i></button>
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all flex items-center justify-center" title="Xóa"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Phân trang tĩnh -->
+            <div class="px-6 py-4 border-t border-gray-100 flex justify-between items-center bg-white rounded-b-2xl">
+                <span class="text-sm text-gray-500 font-medium">Hiển thị 1 - 6 trên tổng số 856 tài khoản</span>
+                <div class="flex gap-1.5">
+                    <button class="w-8 h-8 rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 flex items-center justify-center disabled:opacity-50 transition-colors" disabled><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                    <button class="w-8 h-8 rounded-lg bg-forest-700 text-white flex items-center justify-center text-sm font-bold shadow-md shadow-forest-500/20">1</button>
+                    <button class="w-8 h-8 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-forest-700 flex items-center justify-center text-sm font-medium transition-colors">2</button>
+                    <button class="w-8 h-8 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-forest-700 flex items-center justify-center text-sm font-medium transition-colors">3</button>
+                    <span class="w-8 h-8 flex items-center justify-center text-gray-400 text-xs">...</span>
+                    <button class="w-8 h-8 rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 flex items-center justify-center transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script mô phỏng click Tab chuyển đổi Filter (Visual only) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabs = document.querySelectorAll('.role-tab');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Xóa class active ở tất cả các tab
+                    tabs.forEach(t => {
+                        t.classList.remove('active', 'bg-forest-100', 'text-forest-700', 'font-bold');
+                        t.classList.add('text-gray-600', 'font-medium');
+                    });
+                    
+                    // Thêm class active cho tab vừa click
+                    tab.classList.add('active', 'bg-forest-100', 'text-forest-700', 'font-bold');
+                    tab.classList.remove('text-gray-600', 'font-medium');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

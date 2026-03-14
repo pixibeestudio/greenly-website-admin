@@ -36,7 +36,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     })->name('shippers.index');
 
     // Nhóm Hệ thống
-    Route::get('/users', function () {
-        return view('admin.dashboard', ['pageTitle' => 'Người dùng hệ thống']);
-    })->name('users.index');
+    Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->names('users');
+    Route::patch('/users/{user}/toggle-lock', [\App\Http\Controllers\Admin\UserController::class, 'toggleLock'])->name('users.toggleLock');
 });
