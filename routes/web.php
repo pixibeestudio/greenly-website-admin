@@ -28,9 +28,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('batches', \App\Http\Controllers\Admin\BatchController::class)->names('batches');
 
     // Nhóm Kinh doanh & Vận chuyển
-    Route::get('/orders', function () {
-        return view('admin.dashboard', ['pageTitle' => 'Quản lý Đơn hàng']);
-    })->name('orders.index');
+    Route::get('/orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
+    Route::put('/orders/{id}/status', [\App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('orders.updateStatus');
 
     Route::get('/shippers', function () {
         return view('admin.dashboard', ['pageTitle' => 'Quản lý Shipper']);

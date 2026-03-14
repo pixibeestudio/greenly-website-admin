@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greenly Order Management Content V2 for Figma</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Quicksand', 'sans-serif'],
+                    },
+                    colors: {
+                        forest: {
+                            50: '#e8f5e9',
+                            100: '#c8e6c9',
+                            500: '#4caf50',
+                            600: '#43a047',
+                            700: '#2e7d32', 
+                            800: '#1b5e20',
+                            900: '#0d3b10',
+                        },
+                        organic: {
+                            100: '#fff9c4',
+                            400: '#fbc02d',
+                            500: '#f9a825', 
+                        },
+                        cream: {
+                            50: '#fffde7', 
+                            100: '#f5f5f5',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Tab transition styles */
+        .tab-btn { transition: all 0.3s ease; }
+        .tab-active { 
+            background-color: white; 
+            color: #2e7d32; /* forest-700 */
+            font-weight: 700;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-white font-sans antialiased text-gray-800 p-6 md:p-10 min-h-screen relative overflow-x-hidden">
+
+    <!-- Giả lập Main Content Container -->
+    <div class="max-w-[1280px] mx-auto bg-cream-50 p-6 md:p-8 rounded-2xl border border-dashed border-gray-300 relative min-h-screen">
+        <div class="absolute -top-3 left-6 bg-white px-3 py-0.5 rounded-full text-xs text-gray-400 font-mono shadow-sm">Main Content Area: Orders V2</div>
+
+        <!-- 1. 4 STAT CARDS (TODAY FOCUS) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8 mt-2">
+             
+             <!-- Card 1: Chờ xác nhận (Nhiệm vụ cần chốt ngay) -->
+             <div class="bg-gradient-to-br from-orange-500 to-yellow-500 p-5 rounded-2xl shadow-lg text-white relative overflow-hidden group hover:shadow-xl transition-all">
+                <div class="absolute -right-4 -bottom-6 opacity-20 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fa-solid fa-headset text-8xl"></i>
+                </div>
+                <div class="relative z-10 flex flex-col justify-between h-full">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="text-orange-50 text-[11px] font-bold uppercase tracking-wider">Cần xác nhận</p>
+                        <div class="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center"><i class="fa-solid fa-phone text-sm"></i></div>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <h3 class="text-4xl font-bold text-white drop-shadow-md">12</h3>
+                        <span class="text-xs text-yellow-100 font-medium">Đơn mới</span>
+                    </div>
+                </div>
+             </div>
+
+             <!-- Card 2: Đang giao hàng -->
+             <div class="bg-gradient-to-br from-blue-600 to-blue-400 p-5 rounded-2xl shadow-lg text-white relative overflow-hidden group hover:shadow-xl transition-all">
+                <div class="absolute -right-4 -bottom-6 opacity-20 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fa-solid fa-motorcycle text-8xl"></i>
+                </div>
+                <div class="relative z-10 flex flex-col justify-between h-full">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="text-blue-100 text-[11px] font-bold uppercase tracking-wider">Đang giao hàng</p>
+                        <div class="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center"><i class="fa-solid fa-truck-fast text-sm"></i></div>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <h3 class="text-4xl font-bold text-white drop-shadow-md">28</h3>
+                        <span class="text-xs text-blue-100 font-medium">Trên đường</span>
+                    </div>
+                </div>
+             </div>
+
+             <!-- Card 3: Thành công trong ngày & Doanh thu -->
+             <div class="bg-gradient-to-br from-emerald-700 to-emerald-500 p-5 rounded-2xl shadow-lg text-white relative overflow-hidden group hover:shadow-xl transition-all">
+                <div class="absolute -right-4 -bottom-6 opacity-20 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fa-solid fa-sack-dollar text-8xl"></i>
+                </div>
+                <div class="relative z-10 flex flex-col justify-between h-full">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="text-emerald-100 text-[11px] font-bold uppercase tracking-wider">Hôm nay (Đã giao)</p>
+                        <div class="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center"><i class="fa-solid fa-check-double text-sm"></i></div>
+                    </div>
+                    <div>
+                        <div class="flex items-baseline gap-2 mb-1">
+                            <h3 class="text-2xl font-bold text-white drop-shadow-md">15.4 Tr</h3>
+                            <span class="text-xs text-emerald-100 font-medium">VNĐ</span>
+                        </div>
+                        <div class="text-[11px] text-white/90 bg-black/10 inline-block px-2 py-0.5 rounded backdrop-blur-md">
+                            45 đơn hoàn tất
+                        </div>
+                    </div>
+                </div>
+             </div>
+
+             <!-- Card 4: Đơn bị hủy -->
+             <div class="bg-gradient-to-br from-slate-600 to-gray-500 p-5 rounded-2xl shadow-lg text-white relative overflow-hidden group hover:shadow-xl transition-all">
+                <div class="absolute -right-4 -bottom-6 opacity-20 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fa-solid fa-file-circle-xmark text-8xl"></i>
+                </div>
+                <div class="relative z-10 flex flex-col justify-between h-full">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="text-gray-200 text-[11px] font-bold uppercase tracking-wider">Đơn hủy (Rớt đơn)</p>
+                        <div class="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center"><i class="fa-solid fa-ban text-sm"></i></div>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <h3 class="text-4xl font-bold text-white drop-shadow-md">03</h3>
+                        <span class="text-xs text-gray-200 font-medium">Đơn</span>
+                    </div>
+                </div>
+             </div>
+        </div>
+
+        <!-- 2. TOOLBAR: TABS & SEARCH -->
+        <div class="flex flex-col xl:flex-row justify-between items-center gap-4 mb-6">
+            
+            <!-- Tabs Navigation -->
+            <div class="w-full xl:w-auto overflow-x-auto pb-2 xl:pb-0 hide-scrollbar">
+                <div class="inline-flex bg-gray-200/60 p-1.5 rounded-xl border border-gray-200 items-center min-w-max">
+                    <button class="tab-btn tab-active px-5 py-2 rounded-lg text-sm transition-all focus:outline-none">Tất cả</button>
+                    
+                    <button class="tab-btn px-5 py-2 rounded-lg text-sm text-gray-600 font-medium hover:text-forest-700 transition-all focus:outline-none flex items-center gap-1.5">
+                        Chờ xác nhận <span class="bg-orange-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">12</span>
+                    </button>
+                    
+                    <button class="tab-btn px-5 py-2 rounded-lg text-sm text-gray-600 font-medium hover:text-forest-700 transition-all focus:outline-none">
+                        Đang xử lý
+                    </button>
+                    
+                    <button class="tab-btn px-5 py-2 rounded-lg text-sm text-gray-600 font-medium hover:text-forest-700 transition-all focus:outline-none flex items-center gap-1.5">
+                        Đang giao <span class="bg-blue-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">28</span>
+                    </button>
+                    
+                    <button class="tab-btn px-5 py-2 rounded-lg text-sm text-gray-600 font-medium hover:text-forest-700 transition-all focus:outline-none">Đã giao</button>
+                    
+                    <button class="tab-btn px-5 py-2 rounded-lg text-sm text-gray-600 font-medium hover:text-forest-700 transition-all focus:outline-none">Đã hủy</button>
+                </div>
+            </div>
+
+            <!-- Search Box -->
+            <div class="w-full xl:w-80 relative group shrink-0">
+                <div class="flex items-center bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-2.5 focus-within:border-forest-500 focus-within:ring-1 focus-within:ring-forest-500 transition-all">
+                    <i class="fa-solid fa-search text-gray-400 mr-3 group-focus-within:text-forest-500 transition-colors"></i>
+                    <input type="text" placeholder="Tìm Mã đơn, SĐT khách hàng..." class="bg-transparent text-sm text-gray-700 outline-none w-full placeholder-gray-400">
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. BẢNG DỮ LIỆU ĐƠN HÀNG (2-LINE TECHNIQUE) -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left whitespace-nowrap">
+                    <thead class="bg-cream-100/50 text-gray-500 uppercase text-[11px] font-bold border-b border-gray-100 tracking-wider">
+                        <tr>
+                            <th class="px-6 py-4">Mã ĐH & Thời gian</th>
+                            <th class="px-6 py-4">Khách hàng</th>
+                            <th class="px-6 py-4">Thanh toán</th>
+                            <th class="px-6 py-4">Trạng thái TT</th>
+                            <th class="px-6 py-4">Trạng thái ĐH</th>
+                            <th class="px-6 py-4 text-center">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        
+                        <!-- Row 1: Chờ xác nhận / Chưa TT -->
+                        <tr class="hover:bg-forest-50/30 transition-colors group">
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-forest-700 text-sm">#ORD-260314-01</div>
+                                <div class="text-[11px] text-gray-500 mt-1"><i class="fa-regular fa-clock mr-1"></i>14/03/2026 10:30</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-gray-800">Trần Thị Bích Ngọc</div>
+                                <div class="text-[11px] text-gray-500 mt-1"><i class="fa-solid fa-phone text-[9px] mr-1"></i>0988.123.456</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-red-600 text-sm">850,000đ</div>
+                                <div class="text-[10px] font-bold text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded inline-block mt-1">COD</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2 py-1 rounded text-[10px] font-bold bg-gray-100 text-gray-600 border border-gray-200">
+                                    <span class="w-1.5 h-1.5 bg-gray-400 rounded-full mr-1.5"></span> Chưa thanh toán
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-orange-50 text-orange-600 border border-orange-200">
+                                    Chờ xác nhận
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button class="w-8 h-8 rounded-full bg-forest-50 text-forest-600 hover:bg-forest-600 hover:text-white transition-all shadow-sm flex items-center justify-center" title="Xem & Xử lý">
+                                        <i class="fa-solid fa-eye text-xs"></i>
+                                    </button>
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-gray-100 transition-all flex items-center justify-center" title="In hóa đơn">
+                                        <i class="fa-solid fa-print text-xs"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Row 2: Chờ xác nhận / Đã TT -->
+                        <tr class="hover:bg-forest-50/30 transition-colors group">
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-forest-700 text-sm">#ORD-260314-02</div>
+                                <div class="text-[11px] text-gray-500 mt-1"><i class="fa-regular fa-clock mr-1"></i>14/03/2026 09:15</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-gray-800">Nguyễn Hải Đăng</div>
+                                <div class="text-[11px] text-gray-500 mt-1"><i class="fa-solid fa-phone text-[9px] mr-1"></i>0902.999.888</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-green-600 text-sm">1,250,000đ</div>
+                                <div class="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100 inline-block mt-1">Chuyển khoản</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2 py-1 rounded text-[10px] font-bold bg-green-50 text-green-700 border border-green-200">
+                                    <i class="fa-solid fa-check mr-1 text-[9px]"></i> Đã thanh toán
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-orange-50 text-orange-600 border border-orange-200">
+                                    Chờ xác nhận
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button class="w-8 h-8 rounded-full bg-forest-50 text-forest-600 hover:bg-forest-600 hover:text-white transition-all shadow-sm flex items-center justify-center" title="Xem & Xử lý">
+                                        <i class="fa-solid fa-eye text-xs"></i>
+                                    </button>
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-gray-100 transition-all flex items-center justify-center" title="In hóa đơn">
+                                        <i class="fa-solid fa-print text-xs"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Row 3: Đang xử lý (Đóng gói) -->
+                        <tr class="hover:bg-forest-50/30 transition-colors group">
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-gray-700 text-sm">#ORD-260313-45</div>
+                                <div class="text-[11px] text-gray-500 mt-1"><i class="fa-regular fa-clock mr-1"></i>13/03/2026 21:00</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-gray-800">Lê Hoàng Long</div>
+                                <div class="text-[11px] text-gray-500 mt-1"><i class="fa-solid fa-phone text-[9px] mr-1"></i>0355.666.777</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-red-600 text-sm">340,000đ</div>
+                                <div class="text-[10px] font-bold text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded inline-block mt-1">COD</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2 py-1 rounded text-[10px] font-bold bg-gray-100 text-gray-600 border border-gray-200">
+                                    <span class="w-1.5 h-1.5 bg-gray-400 rounded-full mr-1.5"></span> Chưa thanh toán
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-purple-50 text-purple-600 border border-purple-200">
+                                    <i class="fa-solid fa-box-open mr-1.5 text-[10px]"></i> Đang xử lý
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-forest-50 hover:text-forest-600 transition-all flex items-center justify-center" title="Xem chi tiết"><i class="fa-solid fa-eye text-xs"></i></button>
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-gray-100 transition-all flex items-center justify-center" title="In hóa đơn"><i class="fa-solid fa-print text-xs"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Row 4: Đang giao hàng -->
+                        <tr class="hover:bg-forest-50/30 transition-colors group">
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-gray-700 text-sm">#ORD-260313-22</div>
+                                <div class="text-[11px] text-gray-500 mt-1"><i class="fa-regular fa-clock mr-1"></i>13/03/2026 14:20</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-gray-800">Phạm Thu Hương</div>
+                                <div class="text-[11px] text-gray-500 mt-1"><i class="fa-solid fa-phone text-[9px] mr-1"></i>0933.111.222</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-red-600 text-sm">85,000đ</div>
+                                <div class="text-[10px] font-bold text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded inline-block mt-1">COD</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2 py-1 rounded text-[10px] font-bold bg-gray-100 text-gray-600 border border-gray-200">
+                                    <span class="w-1.5 h-1.5 bg-gray-400 rounded-full mr-1.5"></span> Chưa thanh toán
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-blue-50 text-blue-600 border border-blue-200">
+                                    <i class="fa-solid fa-truck-fast mr-1.5 text-[10px]"></i> Đang giao
+                                </span>
+                                <div class="text-[9px] text-blue-500 mt-1 italic">Shipper: L.V.Hùng</div>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-forest-50 hover:text-forest-600 transition-all flex items-center justify-center" title="Xem chi tiết"><i class="fa-solid fa-eye text-xs"></i></button>
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-gray-100 transition-all flex items-center justify-center" title="In hóa đơn"><i class="fa-solid fa-print text-xs"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Row 5: Đang giao hàng / Đã TT -->
+                        <tr class="hover:bg-forest-50/30 transition-colors group">
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-gray-700 text-sm">#ORD-260313-18</div>
+                                <div class="text-[11px] text-gray-500 mt-1"><i class="fa-regular fa-clock mr-1"></i>13/03/2026 11:05</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-gray-800">Hoàng Kim Yến</div>
+                                <div class="text-[11px] text-gray-500 mt-1"><i class="fa-solid fa-phone text-[9px] mr-1"></i>0888.444.555</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-green-600 text-sm">2,100,000đ</div>
+                                <div class="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100 inline-block mt-1">VNPAY</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2 py-1 rounded text-[10px] font-bold bg-green-50 text-green-700 border border-green-200">
+                                    <i class="fa-solid fa-check mr-1 text-[9px]"></i> Đã thanh toán
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-blue-50 text-blue-600 border border-blue-200">
+                                    <i class="fa-solid fa-truck-fast mr-1.5 text-[10px]"></i> Đang giao
+                                </span>
+                                <div class="text-[9px] text-blue-500 mt-1 italic">Shipper: P.H.Nam</div>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-forest-50 hover:text-forest-600 transition-all flex items-center justify-center" title="Xem chi tiết"><i class="fa-solid fa-eye text-xs"></i></button>
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-gray-100 transition-all flex items-center justify-center" title="In hóa đơn"><i class="fa-solid fa-print text-xs"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Row 6: Đã giao (Thành công) -->
+                        <tr class="hover:bg-forest-50/30 transition-colors group">
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-gray-500 text-sm">#ORD-260312-88</div>
+                                <div class="text-[11px] text-gray-400 mt-1"><i class="fa-regular fa-clock mr-1"></i>12/03/2026 16:45</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-gray-700">Đinh Quang Dũng</div>
+                                <div class="text-[11px] text-gray-500 mt-1"><i class="fa-solid fa-phone text-[9px] mr-1"></i>0977.888.111</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-gray-600 text-sm">560,000đ</div>
+                                <div class="text-[10px] font-bold text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded inline-block mt-1">COD</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2 py-1 rounded text-[10px] font-bold bg-green-50 text-green-700 border border-green-200">
+                                    <i class="fa-solid fa-check mr-1 text-[9px]"></i> Đã thanh toán
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-green-50 text-green-700 border border-green-200">
+                                    <i class="fa-solid fa-check-double mr-1.5 text-[10px]"></i> Đã giao
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-forest-50 hover:text-forest-600 transition-all flex items-center justify-center" title="Xem chi tiết"><i class="fa-solid fa-eye text-xs"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <!-- Row 7: Đã giao -->
+                        <tr class="hover:bg-forest-50/30 transition-colors group">
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-gray-500 text-sm">#ORD-260312-50</div>
+                                <div class="text-[11px] text-gray-400 mt-1"><i class="fa-regular fa-clock mr-1"></i>12/03/2026 10:10</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-gray-700">Công ty ABC</div>
+                                <div class="text-[11px] text-gray-500 mt-1"><i class="fa-solid fa-phone text-[9px] mr-1"></i>0243.555.777</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-gray-600 text-sm">3,500,000đ</div>
+                                <div class="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100 inline-block mt-1">Chuyển khoản</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2 py-1 rounded text-[10px] font-bold bg-green-50 text-green-700 border border-green-200">
+                                    <i class="fa-solid fa-check mr-1 text-[9px]"></i> Đã thanh toán
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-green-50 text-green-700 border border-green-200">
+                                    <i class="fa-solid fa-check-double mr-1.5 text-[10px]"></i> Đã giao
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-forest-50 hover:text-forest-600 transition-all flex items-center justify-center" title="Xem chi tiết"><i class="fa-solid fa-eye text-xs"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Row 8: Đã hủy (Cancelled) -->
+                        <tr class="bg-gray-50/50 hover:bg-gray-100/50 transition-colors group">
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-gray-400 text-sm line-through">#ORD-260311-05</div>
+                                <div class="text-[11px] text-gray-400 mt-1"><i class="fa-regular fa-clock mr-1"></i>11/03/2026 07:45</div>
+                            </td>
+                            <td class="px-6 py-4 opacity-70">
+                                <div class="font-bold text-gray-600">Vũ Minh Cường</div>
+                                <div class="text-[11px] text-gray-500 mt-1"><i class="fa-solid fa-phone text-[9px] mr-1"></i>0922.333.444</div>
+                            </td>
+                            <td class="px-6 py-4 opacity-70">
+                                <div class="font-bold text-gray-500 text-sm">120,000đ</div>
+                                <div class="text-[10px] font-bold text-gray-400 bg-gray-200 px-1.5 py-0.5 rounded inline-block mt-1">COD</div>
+                            </td>
+                            <td class="px-6 py-4 opacity-70">
+                                <span class="inline-flex items-center px-2 py-1 rounded text-[10px] font-bold bg-gray-200 text-gray-500 border border-gray-300">
+                                    <i class="fa-solid fa-minus mr-1 text-[9px]"></i> Đã hoàn tiền / Hủy
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-gray-200 text-gray-600 border border-gray-300">
+                                    <i class="fa-solid fa-ban mr-1.5 text-[10px]"></i> Đã hủy
+                                </span>
+                                <div class="text-[9px] text-red-500 mt-1">Khách đổi ý</div>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-forest-50 hover:text-forest-600 transition-all flex items-center justify-center" title="Xem chi tiết"><i class="fa-solid fa-eye text-xs"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+
+                         <!-- Row 9: Đã hủy (Lý do Shipper) -->
+                         <tr class="bg-gray-50/50 hover:bg-gray-100/50 transition-colors group">
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-gray-400 text-sm line-through">#ORD-260310-99</div>
+                                <div class="text-[11px] text-gray-400 mt-1"><i class="fa-regular fa-clock mr-1"></i>10/03/2026 15:20</div>
+                            </td>
+                            <td class="px-6 py-4 opacity-70">
+                                <div class="font-bold text-gray-600">Bùi Tố Như</div>
+                                <div class="text-[11px] text-gray-500 mt-1"><i class="fa-solid fa-phone text-[9px] mr-1"></i>0987.654.321</div>
+                            </td>
+                            <td class="px-6 py-4 opacity-70">
+                                <div class="font-bold text-gray-500 text-sm">480,000đ</div>
+                                <div class="text-[10px] font-bold text-gray-400 bg-gray-200 px-1.5 py-0.5 rounded inline-block mt-1">COD</div>
+                            </td>
+                            <td class="px-6 py-4 opacity-70">
+                                <span class="inline-flex items-center px-2 py-1 rounded text-[10px] font-bold bg-gray-200 text-gray-500 border border-gray-300">
+                                    <i class="fa-solid fa-minus mr-1 text-[9px]"></i> Hủy
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-gray-200 text-gray-600 border border-gray-300">
+                                    <i class="fa-solid fa-ban mr-1.5 text-[10px]"></i> Đã hủy
+                                </span>
+                                <div class="text-[9px] text-red-500 mt-1">Không liên lạc được KH</div>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-forest-50 hover:text-forest-600 transition-all flex items-center justify-center" title="Xem chi tiết"><i class="fa-solid fa-eye text-xs"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+
+                         <!-- Row 10: Chờ xác nhận (Vừa mới đặt) -->
+                         <tr class="hover:bg-forest-50/30 transition-colors group bg-orange-50/10">
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-forest-700 text-sm">#ORD-260314-15 <span class="bg-red-500 text-white text-[8px] px-1 rounded animate-pulse absolute ml-1 mt-0.5">NEW</span></div>
+                                <div class="text-[11px] text-gray-500 mt-1"><i class="fa-regular fa-clock mr-1"></i>14/03/2026 10:50</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-gray-800">Cao Tiến Đạt</div>
+                                <div class="text-[11px] text-gray-500 mt-1"><i class="fa-solid fa-phone text-[9px] mr-1"></i>0919.191.919</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-red-600 text-sm">90,000đ</div>
+                                <div class="text-[10px] font-bold text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded inline-block mt-1">COD</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2 py-1 rounded text-[10px] font-bold bg-gray-100 text-gray-600 border border-gray-200">
+                                    <span class="w-1.5 h-1.5 bg-gray-400 rounded-full mr-1.5"></span> Chưa thanh toán
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-orange-50 text-orange-600 border border-orange-200">
+                                    Chờ xác nhận
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button class="w-8 h-8 rounded-full bg-forest-50 text-forest-600 hover:bg-forest-600 hover:text-white transition-all shadow-sm flex items-center justify-center" title="Xem & Xử lý">
+                                        <i class="fa-solid fa-eye text-xs"></i>
+                                    </button>
+                                    <button class="w-8 h-8 rounded-full text-gray-400 hover:bg-gray-100 transition-all flex items-center justify-center" title="In hóa đơn">
+                                        <i class="fa-solid fa-print text-xs"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Phân trang tĩnh -->
+            <div class="px-6 py-4 border-t border-gray-100 flex justify-between items-center bg-white rounded-b-2xl">
+                <span class="text-sm text-gray-500 font-medium">Hiển thị 1 - 10 trên tổng số 1,240 đơn hàng</span>
+                <div class="flex gap-1.5">
+                    <button class="w-8 h-8 rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 flex items-center justify-center disabled:opacity-50 transition-colors" disabled><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                    <button class="w-8 h-8 rounded-lg bg-forest-700 text-white flex items-center justify-center text-sm font-bold shadow-md shadow-forest-500/20">1</button>
+                    <button class="w-8 h-8 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-forest-700 flex items-center justify-center text-sm font-medium transition-colors">2</button>
+                    <button class="w-8 h-8 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-forest-700 flex items-center justify-center text-sm font-medium transition-colors">3</button>
+                    <span class="w-8 h-8 flex items-center justify-center text-gray-400 text-xs">...</span>
+                    <button class="w-8 h-8 rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 flex items-center justify-center transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script mô phỏng click Tab (Visual only) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabs = document.querySelectorAll('.tab-btn');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Reset all tabs
+                    tabs.forEach(t => {
+                        t.classList.remove('tab-active');
+                        t.classList.add('text-gray-600', 'hover:text-forest-700');
+                    });
+                    
+                    // Set active tab
+                    tab.classList.add('tab-active');
+                    tab.classList.remove('text-gray-600', 'hover:text-forest-700');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
