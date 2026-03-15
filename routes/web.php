@@ -18,9 +18,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::resource('products', \App\Http\Controllers\Admin\ProductController::class)->names('products');
 
-    Route::get('/reviews', function () {
-        return view('admin.dashboard', ['pageTitle' => 'Đánh giá Khách hàng']);
-    })->name('reviews.index');
+    Route::resource('reviews', \App\Http\Controllers\Admin\ReviewController::class)->only(['index', 'destroy'])->names('reviews');
+    Route::patch('/reviews/{review}/toggle-status', [\App\Http\Controllers\Admin\ReviewController::class, 'toggleStatus'])->name('reviews.toggleStatus');
+    Route::post('/reviews/{review}/reply', [\App\Http\Controllers\Admin\ReviewController::class, 'reply'])->name('reviews.reply');
 
     // Nhóm Kho hàng & Nguồn gốc
     Route::resource('suppliers', \App\Http\Controllers\Admin\SupplierController::class)->names('suppliers');
