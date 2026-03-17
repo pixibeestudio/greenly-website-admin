@@ -31,9 +31,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
     Route::put('/orders/{id}/status', [\App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('orders.updateStatus');
 
-    Route::get('/shippers', function () {
-        return view('admin.dashboard', ['pageTitle' => 'Quản lý Shipper']);
-    })->name('shippers.index');
+    Route::resource('shippers', \App\Http\Controllers\Admin\ShipperController::class)->only(['index', 'show'])->names('shippers');
+    Route::patch('/shippers/{shipper}/work-status', [\App\Http\Controllers\Admin\ShipperController::class, 'updateWorkStatus'])->name('shippers.updateWorkStatus');
 
     // Nhóm Hệ thống
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->names('users');

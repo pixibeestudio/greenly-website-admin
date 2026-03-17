@@ -20,6 +20,8 @@ class Order extends Model
         'shipping_phone',
         'note',
         'delivery_date',
+        'shipper_rating',
+        'shipper_review',
     ];
 
     protected $casts = [
