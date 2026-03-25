@@ -74,4 +74,66 @@ class ProductController extends Controller
             'data'    => $products,
         ], 200);
     }
+
+    // Lấy chi tiết sản phẩm theo ID, kèm ảnh phụ và tồn kho
+    public function show($id)
+    {
+        // Tìm sản phẩm kèm eager load ảnh phụ + tổng tồn kho
+        $product = Product::with(['images' => function ($query) {
+                $query->orderBy('sort_order', 'asc');
+            }])
+            ->withSum('batches', 'current_quantity')
+            ->find($id);
+
+        if (!$product) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy sản phẩm',
+            ], 404);
+        }
+
+        // Gắn tổng tồn kho
+        $product->stock_quantity = (int) ($product->batches_sum_current_quantity ?? 0);
+
+        // Hàm helper xử lý đường dẫn ảnh thành URL tuyệt đối
+        $resolveImageUrl = function ($path) {
+            if (!$path) return null;
+
+            // Xóa bỏ trường hợp lặp storage/storage/
+            $path = str_replace('storage/storage/', 'storage/', $path);
+
+            // Nếu chưa có prefix storage/ thì thêm vào
+            if (!str_starts_with($path, 'storage/') && !str_starts_with($path, 'http')) {
+                $path = 'storage/' . $path;
+            }
+
+            return asset($path);
+        };
+
+        // Transform ảnh chính
+        $product->image = $resolveImageUrl($product->image);
+
+        // Tạo mảng all_images: ảnh chính đứng đầu + các ảnh phụ từ product_images
+        $allImages = [];
+
+        // Ảnh chính đầu tiên
+        if ($product->image) {
+            $allImages[] = $product->image;
+        }
+
+        // Các ảnh phụ từ bảng product_images
+        foreach ($product->images as $img) {
+            $url = $resolveImageUrl($img->image_path);
+            if ($url) {
+                $allImages[] = $url;
+            }
+        }
+
+        $product->all_images = $allImages;
+
+        return response()->json([
+            'success' => true,
+            'data'    => $product,
+        ], 200);
+    }
 }

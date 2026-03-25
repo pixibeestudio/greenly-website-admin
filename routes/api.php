@@ -13,3 +13,4 @@ Route::get('/categories', [\App\Http\Controllers\Api\CategoryController::class, 
 // API Sản phẩm (public, không cần auth)
 Route::get('/products/discounted', [\App\Http\Controllers\Api\ProductController::class, 'getDiscountedProducts']);
 Route::get('/products', [\App\Http\Controllers\Api\ProductController::class, 'index']);
+Route::get('/products/{id}', [\App\Http\Controllers\Api\ProductController::class, 'show']);
