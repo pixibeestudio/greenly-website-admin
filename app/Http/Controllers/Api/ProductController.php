@@ -131,6 +131,14 @@ class ProductController extends Controller
 
         $product->all_images = $allImages;
 
+        // Lấy nhà cung cấp từ lô hàng mới nhất của sản phẩm
+        $latestBatch = $product->batches()->with('supplier')->latest('id')->first();
+        $product->supplier = $latestBatch && $latestBatch->supplier ? [
+            'name'        => $latestBatch->supplier->name,
+            'address'     => $latestBatch->supplier->address,
+            'certificate' => $latestBatch->supplier->certificate,
+        ] : null;
+
         return response()->json([
             'success' => true,
             'data'    => $product,
