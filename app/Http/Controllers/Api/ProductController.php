@@ -39,4 +39,39 @@ class ProductController extends Controller
             'data'    => $products,
         ], 200);
     }
+
+    // Lấy danh sách sản phẩm đang giảm giá, trả về JSON cho Mobile App
+    public function getDiscountedProducts()
+    {
+        // Chỉ lấy sản phẩm có giá giảm > 0, kèm tổng tồn kho từ bảng batches
+        $products = Product::where('discount_price', '>', 0)
+            ->withSum('batches', 'current_quantity')
+            ->get();
+
+        $products->transform(function ($product) {
+            // Gắn tổng tồn kho, mặc định 0 nếu chưa có lô hàng nào
+            $product->stock_quantity = (int) ($product->batches_sum_current_quantity ?? 0);
+
+            $imagePath = $product->image;
+
+            if ($imagePath) {
+                // Xóa bỏ trường hợp lặp storage/storage/ nếu có
+                $imagePath = str_replace('storage/storage/', 'storage/', $imagePath);
+
+                // Nếu trong DB chưa có chữ storage/ thì mới thêm vào
+                if (!str_starts_with($imagePath, 'storage/') && !str_starts_with($imagePath, 'http')) {
+                    $imagePath = 'storage/' . $imagePath;
+                }
+
+                $product->image = asset($imagePath);
+            }
+
+            return $product;
+        });
+
+        return response()->json([
+            'success' => true,
+            'data'    => $products,
+        ], 200);
+    }
 }
