@@ -17,3 +17,4 @@ Route::get('/products/{id}', [\App\Http\Controllers\Api\ProductController::class
 
 // API Xác thực (public, không cần auth)
 Route::post('/register', [\App\Http\Controllers\Api\AuthController::class, 'register']);
+Route::post('/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);

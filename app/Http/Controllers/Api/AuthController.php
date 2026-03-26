@@ -56,4 +56,52 @@ class AuthController extends Controller
             ],
         ], 201);
     }
+
+    // Đăng nhập tài khoản cho Mobile App
+    public function login(Request $request)
+    {
+        // Validate email trước
+        $validator = Validator::make($request->all(), [
+            'email'    => ['required', 'regex:/^[a-zA-Z0-9._%+-]+@gmail\.com$/', 'exists:users,email'],
+            'password' => 'required',
+        ], [
+            'email.regex'  => 'Email phải đúng theo dạng ..@gmail.com',
+            'email.exists' => 'Email chưa được đăng ký tài khoản',
+        ]);
+
+        // Trả lỗi validation nếu có
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors'  => $validator->errors(),
+            ], 422);
+        }
+
+        // Kiểm tra mật khẩu
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'success' => false,
+                'errors'  => [
+                    'password' => ['Mật khẩu chưa đúng, Vui lòng kiểm tra lại!'],
+                ],
+            ], 422);
+        }
+
+        // Tạo token Sanctum
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Đăng nhập thành công!',
+            'data'    => [
+                'id'       => $user->id,
+                'fullname' => $user->fullname,
+                'email'    => $user->email,
+                'role'     => $user->role,
+                'token'    => $token,
+            ],
+        ], 200);
+    }
 }
