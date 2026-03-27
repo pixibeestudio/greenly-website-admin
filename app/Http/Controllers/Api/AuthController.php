@@ -92,15 +92,21 @@ class AuthController extends Controller
         // Tạo token Sanctum
         $token = $user->createToken('auth_token')->plainTextToken;
 
+        // Xử lý đường dẫn tuyệt đối cho avatar (tránh lặp storage/storage)
+        if ($user->avatar) {
+            $avatarPath = $user->avatar;
+            $avatarPath = str_replace('storage/storage/', 'storage/', $avatarPath);
+            if (!str_starts_with($avatarPath, 'storage/') && !str_starts_with($avatarPath, 'http')) {
+                $avatarPath = 'storage/' . $avatarPath;
+            }
+            $user->avatar = asset($avatarPath);
+        }
+
         return response()->json([
             'success' => true,
-            'message' => 'Đăng nhập thành công!',
             'data'    => [
-                'id'       => $user->id,
-                'fullname' => $user->fullname,
-                'email'    => $user->email,
-                'role'     => $user->role,
-                'token'    => $token,
+                'user'  => $user,
+                'token' => $token,
             ],
         ], 200);
     }
