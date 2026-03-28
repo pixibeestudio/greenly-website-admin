@@ -19,11 +19,12 @@ Route::get('/products/{id}', [\App\Http\Controllers\Api\ProductController::class
 Route::post('/register', [\App\Http\Controllers\Api\AuthController::class, 'register']);
 Route::post('/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
 
-// API Giỏ hàng (cần xác thực Sanctum)
+// API yêu cầu đăng nhập (Sanctum)
 Route::middleware('auth:sanctum')->group(function () {
+    // Giỏ hàng
     Route::get('/carts', [\App\Http\Controllers\Api\CartController::class, 'index']);
     Route::post('/carts', [\App\Http\Controllers\Api\CartController::class, 'store']);
     Route::put('/carts/{id}', [\App\Http\Controllers\Api\CartController::class, 'update']);
-    Route::delete('/carts/{id}', [\App\Http\Controllers\Api\CartController::class, 'destroy']);
     Route::delete('/carts/clear', [\App\Http\Controllers\Api\CartController::class, 'clear']);
+    Route::delete('/carts/{id}', [\App\Http\Controllers\Api\CartController::class, 'destroy']);
 });
