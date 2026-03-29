@@ -35,4 +35,10 @@
             class="w-8 h-8 rounded-full text-gray-400 hover:bg-gray-100 transition-all flex items-center justify-center" title="In hóa đơn">
         <i class="fa-solid fa-print text-xs"></i>
     </button>
+    @if(in_array($order->order_status, ['pending', 'confirmed', 'processing']))
+        <button onclick="openAssignShipperModal({{ $order->id }})"
+                class="w-8 h-8 rounded-full bg-orange-50 text-orange-500 hover:bg-orange-500 hover:text-white transition-all shadow-sm flex items-center justify-center" title="Gán Shipper">
+            <i class="fa-solid fa-truck-fast text-xs"></i>
+        </button>
+    @endif
 </div>

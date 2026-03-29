@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\User;
 use Carbon\Carbon;
 
 class OrderController extends Controller
@@ -12,7 +13,7 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         // 1. Truy vấn danh sách đơn hàng, Eager Loading
-        $query = Order::with(['user', 'orderDetails.product']);
+        $query = Order::with(['user', 'orderDetails.product', 'shipper']);
 
         // 2. Lọc theo Tab trạng thái đơn hàng
         if ($request->filled('status')) {
@@ -62,9 +63,13 @@ class OrderController extends Controller
             'cancelled' => $cancelledCount,
         ];
 
+        // 9. Lấy danh sách shipper để gán đơn
+        $availableShippers = User::where('role', 'shipper')->get();
+
         return view('admin.orders.index', compact(
             'orders', 'pendingCount', 'shippingCount',
-            'completedTodayCount', 'completedTodayRevenue', 'cancelledCount', 'statusCounts'
+            'completedTodayCount', 'completedTodayRevenue', 'cancelledCount', 'statusCounts',
+            'availableShippers'
         ));
     }
 
@@ -90,5 +95,28 @@ class OrderController extends Controller
 
         return redirect()->route('admin.orders.index', $request->query())
             ->with('success', 'Cập nhật đơn hàng ' . $order->order_code . ' thành công!');
+    }
+
+    // Gán shipper cho đơn hàng
+    public function assignShipper(Request $request, $id)
+    {
+        $order = Order::findOrFail($id);
+
+        $request->validate([
+            'shipper_id' => 'required|exists:users,id',
+        ]);
+
+        $order->update([
+            'shipper_id'   => $request->shipper_id,
+            'order_status' => 'shipping',
+        ]);
+
+        // Cập nhật trạng thái shipper thành đang giao
+        User::where('id', $request->shipper_id)->update(['work_status' => 'on_delivery']);
+
+        $shipper = User::find($request->shipper_id);
+
+        return redirect()->back()
+            ->with('success', 'Đã gán đơn ' . $order->order_code . ' cho Shipper ' . $shipper->fullname . '!');
     }
 }

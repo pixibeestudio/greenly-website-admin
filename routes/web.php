@@ -30,6 +30,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Nhóm Kinh doanh & Vận chuyển
     Route::get('/orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
     Route::put('/orders/{id}/status', [\App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('orders.updateStatus');
+    Route::post('/orders/{order}/assign-shipper', [\App\Http\Controllers\Admin\OrderController::class, 'assignShipper'])->name('orders.assign-shipper');
 
     Route::resource('shippers', \App\Http\Controllers\Admin\ShipperController::class)->only(['index', 'show'])->names('shippers');
     Route::patch('/shippers/{shipper}/work-status', [\App\Http\Controllers\Admin\ShipperController::class, 'updateWorkStatus'])->name('shippers.updateWorkStatus');

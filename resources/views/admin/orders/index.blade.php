@@ -169,6 +169,7 @@
                         <th class="px-6 py-4">Thanh toán</th>
                         <th class="px-6 py-4">Trạng thái TT</th>
                         <th class="px-6 py-4">Trạng thái ĐH</th>
+                        <th class="px-6 py-4">Shipper</th>
                         <th class="px-6 py-4 text-center">Hành động</th>
                     </tr>
                 </thead>
@@ -248,14 +249,23 @@
                                         @break
                                 @endswitch
                             </td>
-                            <!-- Cột 6: Hành động -->
+                            <!-- Cột 6: Shipper -->
+                            <td class="px-6 py-4 {{ $order->order_status === 'cancelled' ? 'opacity-70' : '' }}">
+                                @if($order->shipper)
+                                    <div class="font-bold text-gray-800 text-sm">{{ $order->shipper->fullname }}</div>
+                                    <div class="text-[11px] text-gray-500 mt-1"><i class="fa-solid fa-phone text-[9px] mr-1"></i>{{ $order->shipper->phone }}</div>
+                                @else
+                                    <span class="text-xs text-gray-400 italic">Chưa gán</span>
+                                @endif
+                            </td>
+                            <!-- Cột 7: Hành động -->
                             <td class="px-6 py-4 text-center">
                                 @include('admin.orders.partials.action-buttons', ['order' => $order])
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center py-16">
+                            <td colspan="7" class="text-center py-16">
                                 <div class="flex flex-col items-center gap-3">
                                     <i class="fa-solid fa-inbox text-4xl text-gray-300"></i>
                                     <p class="text-gray-400 font-medium">Không tìm thấy đơn hàng nào.</p>
@@ -278,6 +288,72 @@
 
 <!-- Modal Xem & Xử lý -->
 @include('admin.orders.partials.show-modal')
+
+<!-- Modal Gán Shipper -->
+@foreach($orders as $order)
+<div id="assignShipperModal-{{ $order->id }}" class="fixed inset-0 z-50 hidden opacity-0 transition-opacity duration-300">
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeAssignShipperModal({{ $order->id }})"></div>
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div id="assignShipperContent-{{ $order->id }}" class="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col transform scale-95 transition-transform duration-300">
+            <!-- Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-forest-50 to-emerald-50 rounded-t-2xl">
+                <div>
+                    <h3 class="text-lg font-bold text-forest-800"><i class="fa-solid fa-truck-fast mr-2 text-forest-600"></i>Gán Shipper cho Đơn {{ $order->order_code }}</h3>
+                    <p class="text-xs text-gray-500 mt-0.5">Chọn shipper để giao đơn hàng này</p>
+                </div>
+                <button onclick="closeAssignShipperModal({{ $order->id }})" class="w-8 h-8 rounded-full bg-white hover:bg-red-50 text-gray-400 hover:text-red-500 flex items-center justify-center transition-all shadow-sm">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+            <!-- Body -->
+            <div class="overflow-y-auto flex-1 custom-scrollbar">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-gray-50 text-gray-500 uppercase text-[11px] font-bold tracking-wider sticky top-0">
+                        <tr>
+                            <th class="px-5 py-3">ID</th>
+                            <th class="px-5 py-3">Thông tin</th>
+                            <th class="px-5 py-3">Trạng thái</th>
+                            <th class="px-5 py-3 text-center">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        @foreach($availableShippers as $shipper)
+                        <tr class="hover:bg-forest-50/30 transition-colors">
+                            <td class="px-5 py-3 text-gray-500 font-mono text-xs">#{{ $shipper->id }}</td>
+                            <td class="px-5 py-3">
+                                <div class="font-bold text-gray-800">{{ $shipper->fullname }}</div>
+                                <div class="text-[11px] text-gray-500 mt-0.5"><i class="fa-solid fa-phone text-[9px] mr-1"></i>{{ $shipper->phone ?? 'N/A' }}</div>
+                            </td>
+                            <td class="px-5 py-3">
+                                @switch($shipper->work_status)
+                                    @case('available')
+                                        <span class="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-green-50 text-green-700 border border-green-200"><span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5 animate-pulse"></span>Sẵn sàng</span>
+                                        @break
+                                    @case('on_delivery')
+                                        <span class="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-orange-50 text-orange-600 border border-orange-200"><i class="fa-solid fa-motorcycle text-[9px] mr-1"></i>Đang giao</span>
+                                        @break
+                                    @default
+                                        <span class="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-gray-100 text-gray-500 border border-gray-200">Offline</span>
+                                @endswitch
+                            </td>
+                            <td class="px-5 py-3 text-center">
+                                <form action="{{ route('admin.orders.assign-shipper', $order->id) }}" method="POST" class="inline">
+                                    @csrf
+                                    <input type="hidden" name="shipper_id" value="{{ $shipper->id }}">
+                                    <button type="submit" class="px-3 py-1.5 bg-forest-500 hover:bg-forest-600 text-white text-xs font-bold rounded-lg transition-all shadow-sm hover:shadow-md {{ $shipper->work_status === 'offline' ? 'opacity-40 cursor-not-allowed' : '' }}" {{ $shipper->work_status === 'offline' ? 'disabled' : '' }}>
+                                        <i class="fa-solid fa-user-check mr-1 text-[10px]"></i>Gán
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@endforeach
 
 @endsection
 
@@ -394,5 +470,28 @@
         btn.classList.add('opacity-70', 'cursor-not-allowed');
         setTimeout(() => { btn.disabled = true; }, 10);
     });
+
+    // ============================================
+    // MODAL GÁN SHIPPER
+    // ============================================
+    function openAssignShipperModal(orderId) {
+        const modal = document.getElementById('assignShipperModal-' + orderId);
+        const content = document.getElementById('assignShipperContent-' + orderId);
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            content.classList.remove('scale-95');
+        }, 10);
+    }
+
+    function closeAssignShipperModal(orderId) {
+        const modal = document.getElementById('assignShipperModal-' + orderId);
+        const content = document.getElementById('assignShipperContent-' + orderId);
+        modal.classList.add('opacity-0');
+        content.classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    }
 </script>
 @endpush
