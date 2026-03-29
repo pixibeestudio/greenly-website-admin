@@ -27,4 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/carts/{id}', [\App\Http\Controllers\Api\CartController::class, 'update']);
     Route::delete('/carts/clear', [\App\Http\Controllers\Api\CartController::class, 'clear']);
     Route::delete('/carts/{id}', [\App\Http\Controllers\Api\CartController::class, 'destroy']);
+
+    // Đặt hàng (Checkout)
+    Route::post('/checkout', [\App\Http\Controllers\Api\CheckoutController::class, 'checkout']);
 });
