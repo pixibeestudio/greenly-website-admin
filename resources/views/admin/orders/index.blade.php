@@ -119,12 +119,12 @@
                     $currentStatus = request('status', '');
                     $tabs = [
                         '' => ['label' => 'Tất cả', 'badge' => null, 'color' => ''],
-                        'pending' => ['label' => 'Chờ xác nhận', 'badge' => $statusCounts['pending'] ?? 0, 'color' => 'bg-orange-500'],
-                        'processing' => ['label' => 'Đang xử lý', 'badge' => $statusCounts['processing'] ?? 0, 'color' => 'bg-purple-500'],
-                        'ready_for_pickup' => ['label' => 'Chờ lấy hàng', 'badge' => $statusCounts['ready_for_pickup'] ?? 0, 'color' => 'bg-cyan-500'],
+                        'pending' => ['label' => 'Chờ xác nhận', 'badge' => $statusCounts['pending'] ?? 0, 'color' => 'bg-yellow-500'],
+                        'processing' => ['label' => 'Đang xử lý', 'badge' => $statusCounts['processing'] ?? 0, 'color' => 'bg-cyan-500'],
+                        'ready_for_pickup' => ['label' => 'Chờ lấy hàng', 'badge' => $statusCounts['ready_for_pickup'] ?? 0, 'color' => 'bg-orange-500'],
                         'shipping' => ['label' => 'Đang giao', 'badge' => $statusCounts['shipping'] ?? 0, 'color' => 'bg-blue-500'],
                         'delivered' => ['label' => 'Đã giao', 'badge' => $statusCounts['delivered'] ?? 0, 'color' => 'bg-green-600'],
-                        'cancelled' => ['label' => 'Đã hủy', 'badge' => $statusCounts['cancelled'] ?? 0, 'color' => 'bg-gray-500'],
+                        'cancelled' => ['label' => 'Đã hủy', 'badge' => $statusCounts['cancelled'] ?? 0, 'color' => 'bg-red-500'],
                     ];
                 @endphp
                 @foreach($tabs as $statusKey => $tab)
@@ -227,13 +227,13 @@
                             <td class="px-6 py-4">
                                 @switch($order->order_status)
                                     @case('pending')
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-orange-50 text-orange-600 border border-orange-200">Chờ xác nhận</span>
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-yellow-50 text-yellow-600 border border-yellow-200"><i class="fa-solid fa-clock mr-1.5 text-[10px]"></i> Chờ xác nhận</span>
                                         @break
                                     @case('processing')
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-purple-50 text-purple-600 border border-purple-200"><i class="fa-solid fa-box-open mr-1.5 text-[10px]"></i> Đang xử lý</span>
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-cyan-50 text-cyan-600 border border-cyan-200"><i class="fa-solid fa-box-open mr-1.5 text-[10px]"></i> Đang xử lý</span>
                                         @break
                                     @case('ready_for_pickup')
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-cyan-50 text-cyan-600 border border-cyan-200"><i class="fa-solid fa-boxes-packing mr-1.5 text-[10px]"></i> Chờ lấy hàng</span>
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-orange-50 text-orange-600 border border-orange-200"><i class="fa-solid fa-boxes-packing mr-1.5 text-[10px]"></i> Chờ lấy hàng</span>
                                         @break
                                     @case('shipping')
                                         <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-blue-50 text-blue-600 border border-blue-200"><i class="fa-solid fa-truck-fast mr-1.5 text-[10px]"></i> Đang giao</span>
@@ -242,7 +242,7 @@
                                         <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-green-50 text-green-700 border border-green-200"><i class="fa-solid fa-check-double mr-1.5 text-[10px]"></i> Đã giao</span>
                                         @break
                                     @case('cancelled')
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-gray-200 text-gray-600 border border-gray-300"><i class="fa-solid fa-ban mr-1.5 text-[10px]"></i> Đã hủy</span>
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-red-50 text-red-600 border border-red-200"><i class="fa-solid fa-ban mr-1.5 text-[10px]"></i> Đã hủy</span>
                                         @if($order->note)
                                             <div class="text-[9px] text-red-500 mt-1">{{ Str::limit($order->note, 30) }}</div>
                                         @endif
@@ -402,12 +402,12 @@
         // Badge trạng thái ĐH
         const osBadge = document.getElementById('show_order_status_badge');
         const statusMap = {
-            'pending': '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-600">Chờ xác nhận</span>',
-            'processing': '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-600">Đang xử lý</span>',
-            'ready_for_pickup': '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-cyan-100 text-cyan-600">Chờ lấy hàng</span>',
-            'shipping': '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-600">Đang giao</span>',
-            'delivered': '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">Đã giao</span>',
-            'cancelled': '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-gray-200 text-gray-600">Đã hủy</span>',
+            'pending': '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-600"><i class="fa-solid fa-clock mr-1 text-[10px]"></i>Chờ xác nhận</span>',
+            'processing': '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-cyan-100 text-cyan-600"><i class="fa-solid fa-box-open mr-1 text-[10px]"></i>Đang xử lý</span>',
+            'ready_for_pickup': '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-600"><i class="fa-solid fa-boxes-packing mr-1 text-[10px]"></i>Chờ lấy hàng</span>',
+            'shipping': '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-600"><i class="fa-solid fa-truck-fast mr-1 text-[10px]"></i>Đang giao</span>',
+            'delivered': '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700"><i class="fa-solid fa-check-double mr-1 text-[10px]"></i>Đã giao</span>',
+            'cancelled': '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-600"><i class="fa-solid fa-ban mr-1 text-[10px]"></i>Đã hủy</span>',
         };
         osBadge.innerHTML = statusMap[order.order_status] || order.order_status;
 
