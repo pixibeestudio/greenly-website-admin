@@ -35,8 +35,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/shipper/stats', [\App\Http\Controllers\Api\ShipperApiController::class, 'getStats']);
     Route::post('/shipper/work-status', [\App\Http\Controllers\Api\ShipperApiController::class, 'updateWorkStatus']);
     Route::get('/shipper/orders/new', [\App\Http\Controllers\Api\ShipperApiController::class, 'getNewOrders']);
+    Route::get('/shipper/orders/pickup', [\App\Http\Controllers\Api\ShipperApiController::class, 'getPickupOrders']);
     Route::get('/shipper/orders/shipping', [\App\Http\Controllers\Api\ShipperApiController::class, 'getShippingOrders']);
     Route::post('/shipper/orders/{id}/accept', [\App\Http\Controllers\Api\ShipperApiController::class, 'acceptOrder']);
     Route::post('/shipper/orders/{id}/reject', [\App\Http\Controllers\Api\ShipperApiController::class, 'rejectOrder']);
+    Route::post('/shipper/orders/{id}/pickup', [\App\Http\Controllers\Api\ShipperApiController::class, 'pickupOrder']);
+    Route::post('/shipper/orders/{id}/complete', [\App\Http\Controllers\Api\ShipperApiController::class, 'completeOrder']);
     Route::post('/shipper/orders/{id}/fail', [\App\Http\Controllers\Api\ShipperApiController::class, 'failOrder']);
 });

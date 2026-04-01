@@ -93,7 +93,7 @@ class ShipperApiController extends Controller
     }
 
     /**
-     * Shipper nhận đơn hàng (chuyển trạng thái sang 'shipping')
+     * Shipper nhận đơn hàng (giữ nguyên trạng thái ready_for_pickup, cập nhật shipper sang on_delivery)
      */
     public function acceptOrder(Request $request, $id)
     {
@@ -111,13 +111,51 @@ class ShipperApiController extends Controller
             ], 404);
         }
 
-        $order->update([
-            'order_status' => 'shipping',
-        ]);
+        // Giữ nguyên order_status = ready_for_pickup, chỉ cập nhật trạng thái shipper
+        $request->user()->update(['work_status' => 'on_delivery']);
 
         return response()->json([
             'success' => true,
             'message' => 'Nhận đơn hàng ' . $order->order_code . ' thành công!',
+        ]);
+    }
+
+    /**
+     * Shipper xác nhận giao hàng thành công (chuyển đơn sang 'delivered', shipper rảnh lại)
+     */
+    public function completeOrder(Request $request, $id)
+    {
+        $shipperId = auth()->id();
+
+        $order = Order::where('id', $id)
+            ->where('shipper_id', $shipperId)
+            ->whereIn('order_status', ['ready_for_pickup', 'shipping'])
+            ->first();
+
+        if (!$order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy đơn hàng hoặc đơn không ở trạng thái đang giao!',
+            ], 404);
+        }
+
+        $order->update([
+            'order_status' => 'delivered',
+            'delivery_date' => now(),
+        ]);
+
+        // Cập nhật trạng thái shipper nếu không còn đơn nào đang giao
+        $remainingOrders = Order::where('shipper_id', $shipperId)
+            ->whereIn('order_status', ['ready_for_pickup', 'shipping'])
+            ->count();
+
+        if ($remainingOrders === 0) {
+            $request->user()->update(['work_status' => 'available']);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Giao hàng thành công đơn ' . $order->order_code,
         ]);
     }
 
@@ -157,6 +195,92 @@ class ShipperApiController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Đã từ chối đơn hàng ' . $order->order_code,
+        ]);
+    }
+
+    /**
+     * Lấy danh sách đơn hàng chờ lấy hàng (shipper đã nhận, cần tới cửa hàng lấy)
+     * Điều kiện: shipper_id = auth user, order_status = 'ready_for_pickup'
+     */
+    public function getPickupOrders()
+    {
+        $shipperId = auth()->id();
+
+        $orders = Order::where('shipper_id', $shipperId)
+            ->where('order_status', 'ready_for_pickup')
+            ->with(['orderDetails.product'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $data = $orders->map(function ($order) {
+            $firstDetail = $order->orderDetails->first();
+            $title = $firstDetail && $firstDetail->product
+                ? $firstDetail->product->name
+                : 'Đơn hàng';
+
+            $detailCount = $order->orderDetails->count();
+            if ($detailCount > 1) {
+                $title .= ' (+' . ($detailCount - 1) . ' sản phẩm khác)';
+            }
+
+            $imageUrl = null;
+            if ($firstDetail && $firstDetail->product && $firstDetail->product->image) {
+                $imagePath = $firstDetail->product->image;
+                $imagePath = str_replace('storage/storage/', 'storage/', $imagePath);
+                if (!str_starts_with($imagePath, 'storage/') && !str_starts_with($imagePath, 'http')) {
+                    $imagePath = 'storage/' . $imagePath;
+                }
+                $imageUrl = asset($imagePath);
+            }
+
+            return [
+                'id'             => $order->id,
+                'order_code'     => $order->order_code,
+                'title'          => $title,
+                'time_ago'       => $order->created_at->diffForHumans(),
+                'image_url'      => $imageUrl,
+                'address'        => $order->shipping_address,
+                'shipping_name'  => $order->shipping_name,
+                'shipping_phone' => $order->shipping_phone,
+                'total_price'    => $order->total_money + $order->shipping_fee,
+                'shipping_fee'   => $order->shipping_fee,
+                'status'         => $order->order_status,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data'    => $data,
+            'message' => 'Lấy danh sách chờ lấy hàng thành công',
+        ]);
+    }
+
+    /**
+     * Shipper xác nhận đã lấy hàng tại cửa hàng → chuyển đơn sang 'shipping'
+     */
+    public function pickupOrder(Request $request, $id)
+    {
+        $shipperId = auth()->id();
+
+        $order = Order::where('id', $id)
+            ->where('shipper_id', $shipperId)
+            ->where('order_status', 'ready_for_pickup')
+            ->first();
+
+        if (!$order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy đơn hàng hoặc đơn đã được xử lý!',
+            ], 404);
+        }
+
+        $order->update([
+            'order_status' => 'shipping',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Đã lấy hàng đơn ' . $order->order_code . ', bắt đầu giao!',
         ]);
     }
 
@@ -249,7 +373,7 @@ class ShipperApiController extends Controller
 
         $order = Order::where('id', $id)
             ->where('shipper_id', $shipperId)
-            ->where('order_status', 'shipping')
+            ->whereIn('order_status', ['ready_for_pickup', 'shipping'])
             ->first();
 
         if (!$order) {
@@ -269,7 +393,7 @@ class ShipperApiController extends Controller
             ->count();
 
         if ($remainingOrders === 0) {
-            User::where('id', $shipperId)->update(['work_status' => 'available']);
+            $request->user()->update(['work_status' => 'available']);
         }
 
         return response()->json([
@@ -288,7 +412,7 @@ class ShipperApiController extends Controller
 
         // Đơn hoàn thành trong ngày
         $todayCompletedOrders = Order::where('shipper_id', $shipper->id)
-            ->where('order_status', 'completed')
+            ->where('order_status', 'delivered')
             ->whereDate('updated_at', $today)
             ->get();
 
