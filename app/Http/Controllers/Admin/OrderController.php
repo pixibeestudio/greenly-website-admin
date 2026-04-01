@@ -45,9 +45,9 @@ class OrderController extends Controller
         // 7. Thống kê cho 4 Card
         $pendingCount = Order::where('order_status', 'pending')->count();
         $shippingCount = Order::where('order_status', 'shipping')->count();
-        $completedTodayCount = Order::where('order_status', 'completed')
+        $deliveredTodayCount = Order::where('order_status', 'delivered')
             ->whereDate('updated_at', Carbon::today())->count();
-        $completedTodayRevenue = Order::where('order_status', 'completed')
+        $deliveredTodayRevenue = Order::where('order_status', 'delivered')
             ->whereDate('updated_at', Carbon::today())
             ->selectRaw('SUM(total_money + shipping_fee) as total')
             ->value('total') ?? 0;
@@ -56,10 +56,10 @@ class OrderController extends Controller
         // 8. Đếm theo từng trạng thái cho badge trên Tabs
         $statusCounts = [
             'pending' => $pendingCount,
-            'confirmed' => Order::where('order_status', 'confirmed')->count(),
             'processing' => Order::where('order_status', 'processing')->count(),
+            'ready_for_pickup' => Order::where('order_status', 'ready_for_pickup')->count(),
             'shipping' => $shippingCount,
-            'completed' => Order::where('order_status', 'completed')->count(),
+            'delivered' => Order::where('order_status', 'delivered')->count(),
             'cancelled' => $cancelledCount,
         ];
 
@@ -68,7 +68,7 @@ class OrderController extends Controller
 
         return view('admin.orders.index', compact(
             'orders', 'pendingCount', 'shippingCount',
-            'completedTodayCount', 'completedTodayRevenue', 'cancelledCount', 'statusCounts',
+            'deliveredTodayCount', 'deliveredTodayRevenue', 'cancelledCount', 'statusCounts',
             'availableShippers'
         ));
     }
@@ -79,7 +79,7 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
 
         $request->validate([
-            'order_status' => 'required|in:pending,confirmed,processing,shipping,completed,cancelled',
+            'order_status' => 'required|in:pending,processing,ready_for_pickup,shipping,delivered,cancelled',
             'payment_status' => 'required|in:pending,completed,failed',
         ]);
 
@@ -88,8 +88,8 @@ class OrderController extends Controller
             'payment_status' => $request->payment_status,
         ]);
 
-        // Nếu chuyển sang completed, ghi nhận thời gian giao hàng
-        if ($request->order_status === 'completed' && !$order->delivery_date) {
+        // Nếu chuyển sang delivered, ghi nhận thời gian giao hàng
+        if ($request->order_status === 'delivered' && !$order->delivery_date) {
             $order->update(['delivery_date' => now()]);
         }
 
@@ -108,7 +108,7 @@ class OrderController extends Controller
 
         $order->update([
             'shipper_id'   => $request->shipper_id,
-            'order_status' => 'shipping',
+            'order_status' => 'ready_for_pickup',
         ]);
 
         // Cập nhật trạng thái shipper thành đang giao

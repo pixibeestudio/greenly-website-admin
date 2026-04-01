@@ -136,10 +136,10 @@
                                         <select id="select_order_status" name="order_status"
                                             class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 outline-none focus:border-forest-500 focus:ring-1 focus:ring-forest-500 transition-all">
                                             <option value="pending">Chờ xác nhận</option>
-                                            <option value="confirmed">Đã xác nhận</option>
                                             <option value="processing">Đang xử lý</option>
+                                            <option value="ready_for_pickup">Chờ lấy hàng</option>
                                             <option value="shipping">Đang giao hàng</option>
-                                            <option value="completed">Đã giao thành công</option>
+                                            <option value="delivered">Đã giao thành công</option>
                                             <option value="cancelled">Đã hủy</option>
                                         </select>
                                     </div>
