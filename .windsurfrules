@@ -15,3 +15,8 @@
 
 ## 4. Bảo mật cơ bản
 - Không bao giờ in trực tiếp mật khẩu hoặc thông tin nhạy cảm ra file log.
+
+## 5. Sửa lỗi và gỡ lỗi
+- Khi sửa lỗi, luôn giải thích nguyên nhân gốc rễ và giải pháp.
+- Khi gỡ lỗi, luôn sử dụng nhật ký để theo dõi vấn đề và ghi lại giải pháp trong memory.log để tham khảo trong tương lai.
+- Khi gỡ lỗi, luôn sử dụng trình gỡ lỗi để từng bước thực thi mã.
