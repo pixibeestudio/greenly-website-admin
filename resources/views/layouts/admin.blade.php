@@ -177,5 +177,15 @@
 
     @stack('modals')
     @stack('scripts')
+
+    <!-- Tự động làm mới trang mỗi 10 giây nếu không có Modal nào đang mở -->
+    <!-- <script>
+        setInterval(function() {
+            let openModals = document.querySelectorAll('[id$="Modal"]:not(.hidden), [data-modal-show="true"]');
+            if (openModals.length === 0) {
+                window.location.reload();
+            }
+        }, 10000);
+    </script> -->
 </body>
 </html>

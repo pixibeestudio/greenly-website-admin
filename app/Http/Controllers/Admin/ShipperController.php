@@ -42,9 +42,9 @@ class ShipperController extends Controller
         $offlineCount = User::where('role', 'shipper')->where('work_status', 'offline')->count();
 
         // Đơn đã giao thành công hôm nay (tất cả shipper)
-        $completedTodayCount = Order::where('order_status', 'completed')
+        $completedTodayCount = Order::where('order_status', 'delivered')
             ->whereNotNull('shipper_id')
-            ->whereDate('delivery_date', Carbon::today())
+            ->whereDate('updated_at', Carbon::today())
             ->count();
 
         // 7. Tính tỷ lệ thành công + đơn đang giữ cho từng shipper
@@ -69,9 +69,44 @@ class ShipperController extends Controller
 
         // Đếm đơn giao thành công (tháng này)
         $monthlyCompletedCounts = Order::whereIn('shipper_id', $shipperIds)
-            ->where('order_status', 'completed')
+            ->where('order_status', 'delivered')
             ->whereMonth('created_at', Carbon::now()->month)
             ->whereYear('created_at', Carbon::now()->year)
+            ->selectRaw('shipper_id, COUNT(*) as count')
+            ->groupBy('shipper_id')
+            ->pluck('count', 'shipper_id')
+            ->toArray();
+
+        // Đếm đơn đã giao hôm nay cho từng shipper
+        $deliveredTodayCounts = Order::whereIn('shipper_id', $shipperIds)
+            ->where('order_status', 'delivered')
+            ->whereDate('updated_at', Carbon::today())
+            ->selectRaw('shipper_id, COUNT(*) as count')
+            ->groupBy('shipper_id')
+            ->pluck('count', 'shipper_id')
+            ->toArray();
+
+        // Tiền COD đang giữ hôm nay (đơn delivered + COD + chưa hoàn tất thanh toán)
+        $codKeptAmounts = Order::whereIn('shipper_id', $shipperIds)
+            ->where('order_status', 'delivered')
+            ->where('payment_method', 'COD')
+            ->where('payment_status', '!=', 'completed')
+            ->whereDate('updated_at', Carbon::today())
+            ->selectRaw('shipper_id, SUM(total_money) as total')
+            ->groupBy('shipper_id')
+            ->pluck('total', 'shipper_id')
+            ->toArray();
+
+        // Tỷ lệ thành công toàn thời gian: delivered / (delivered + cancelled)
+        $allTimeDelivered = Order::whereIn('shipper_id', $shipperIds)
+            ->where('order_status', 'delivered')
+            ->selectRaw('shipper_id, COUNT(*) as count')
+            ->groupBy('shipper_id')
+            ->pluck('count', 'shipper_id')
+            ->toArray();
+
+        $allTimeCancelled = Order::whereIn('shipper_id', $shipperIds)
+            ->where('order_status', 'cancelled')
             ->selectRaw('shipper_id, COUNT(*) as count')
             ->groupBy('shipper_id')
             ->pluck('count', 'shipper_id')
@@ -87,7 +122,8 @@ class ShipperController extends Controller
         return view('admin.shippers.index', compact(
             'shippers', 'totalShippers', 'availableCount', 'onDeliveryCount', 'offlineCount',
             'completedTodayCount', 'deliveringCounts', 'monthlyTotalCounts',
-            'monthlyCompletedCounts', 'deliveringOrders'
+            'monthlyCompletedCounts', 'deliveringOrders',
+            'deliveredTodayCounts', 'codKeptAmounts', 'allTimeDelivered', 'allTimeCancelled'
         ));
     }
 
@@ -103,15 +139,15 @@ class ShipperController extends Controller
             ->get();
 
         // Thống kê mini
-        $completedToday = $todayOrders->where('order_status', 'completed')->count();
+        $completedToday = $todayOrders->where('order_status', 'delivered')->count();
         $cancelledToday = $todayOrders->where('order_status', 'cancelled')->count();
 
         // Tiền COD đang giữ (đơn COD đã giao thành công hôm nay, payment chưa hoàn tất)
         $codHolding = Order::where('shipper_id', $shipper->id)
             ->where('payment_method', 'COD')
-            ->where('order_status', 'completed')
+            ->where('order_status', 'delivered')
             ->where('payment_status', '!=', 'completed')
-            ->whereDate('delivery_date', $today)
+            ->whereDate('updated_at', $today)
             ->sum('total_money');
 
         // Đánh giá trung bình

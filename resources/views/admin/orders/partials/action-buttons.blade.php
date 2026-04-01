@@ -50,7 +50,7 @@
     {{-- Nút 3: Gán Shipper (Chỉ hiện khi processing) --}}
     @if($order->order_status === 'processing')
         <button onclick="openAssignShipperModal({{ $order->id }})"
-                class="w-8 h-8 rounded-full bg-orange-50 text-orange-500 hover:bg-orange-500 hover:text-white transition-all shadow-sm flex items-center justify-center" title="Gán Shipper">
+                class="w-8 h-8 rounded-full bg-green-50 text-green-500 hover:bg-green-600 hover:text-white transition-all shadow-sm flex items-center justify-center" title="Gán Shipper">
             <i class="fa-solid fa-truck-fast text-xs"></i>
         </button>
     @endif

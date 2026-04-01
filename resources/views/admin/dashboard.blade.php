@@ -52,20 +52,20 @@
     <!-- ============================================ -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
-        <!-- Card 1: Tổng Doanh Thu -->
+        <!-- Card 1: Doanh thu hôm nay -->
         <div class="kpi-card bg-gradient-to-br from-forest-900 via-forest-800 to-forest-700 p-5 rounded-2xl shadow-lg text-white relative overflow-hidden group hover:shadow-xl">
             <div class="absolute -right-4 -bottom-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
                 <i class="fa-solid fa-sack-dollar text-8xl"></i>
             </div>
             <div class="relative z-10 flex items-center justify-between">
                 <div>
-                    <p class="text-forest-100 text-[11px] font-bold uppercase tracking-wider mb-1">Tổng Doanh Thu</p>
+                    <p class="text-forest-100 text-[11px] font-bold uppercase tracking-wider mb-1">Doanh thu hôm nay</p>
                     <h3 class="text-3xl font-bold text-white drop-shadow-md">
-                        <span class="kpi-counter" data-target="25400000" data-suffix="đ" data-format="currency">0đ</span>
+                        <span class="kpi-counter" data-target="{{ (int) $todayRevenue }}" data-suffix="đ" data-format="currency">0đ</span>
                     </h3>
                     <p class="text-forest-200 text-xs mt-1.5 flex items-center gap-1">
-                        <i class="fa-solid fa-arrow-trend-up text-organic-400"></i>
-                        <span class="font-bold text-organic-400">+12.5%</span> so với kỳ trước
+                        <i class="fa-solid fa-calendar-day text-organic-400"></i>
+                        <span class="font-bold text-organic-400">{{ now()->format('d/m/Y') }}</span>
                     </p>
                 </div>
                 <div class="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center text-organic-400 text-xl shadow-inner">
@@ -74,42 +74,20 @@
             </div>
         </div>
 
-        <!-- Card 2: Tổng Lợi Nhuận -->
-        <div class="kpi-card bg-gradient-to-br from-emerald-700 via-emerald-600 to-emerald-500 p-5 rounded-2xl shadow-lg text-white relative overflow-hidden group hover:shadow-xl">
-            <div class="absolute -right-4 -bottom-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                <i class="fa-solid fa-chart-line text-8xl"></i>
-            </div>
-            <div class="relative z-10 flex items-center justify-between">
-                <div>
-                    <p class="text-emerald-100 text-[11px] font-bold uppercase tracking-wider mb-1">Tổng Lợi Nhuận</p>
-                    <h3 class="text-3xl font-bold text-white drop-shadow-md">
-                        <span class="kpi-counter" data-target="8200000" data-suffix="đ" data-format="currency">0đ</span>
-                    </h3>
-                    <p class="text-emerald-100 text-xs mt-1.5 flex items-center gap-1">
-                        <i class="fa-solid fa-arrow-trend-up text-yellow-300"></i>
-                        <span class="font-bold text-yellow-300">+8.3%</span> so với kỳ trước
-                    </p>
-                </div>
-                <div class="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center text-yellow-300 text-xl shadow-inner">
-                    <i class="fa-solid fa-chart-line"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- Card 3: Tổng Đơn Hàng -->
+        <!-- Card 2: Đơn hàng hôm nay -->
         <div class="kpi-card bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 p-5 rounded-2xl shadow-lg text-white relative overflow-hidden group hover:shadow-xl">
             <div class="absolute -right-4 -bottom-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
                 <i class="fa-solid fa-boxes-stacked text-8xl"></i>
             </div>
             <div class="relative z-10 flex items-center justify-between">
                 <div>
-                    <p class="text-blue-100 text-[11px] font-bold uppercase tracking-wider mb-1">Tổng Đơn Hàng</p>
+                    <p class="text-blue-100 text-[11px] font-bold uppercase tracking-wider mb-1">Đơn hàng hôm nay</p>
                     <h3 class="text-3xl font-bold text-white drop-shadow-md">
-                        <span class="kpi-counter" data-target="156" data-suffix=" đơn" data-format="number">0 đơn</span>
+                        <span class="kpi-counter" data-target="{{ $todayOrders }}" data-suffix=" đơn" data-format="number">0 đơn</span>
                     </h3>
                     <p class="text-blue-100 text-xs mt-1.5 flex items-center gap-1">
-                        <i class="fa-solid fa-arrow-trend-up text-sky-300"></i>
-                        <span class="font-bold text-sky-300">+5.2%</span> so với kỳ trước
+                        <i class="fa-solid fa-clock text-sky-300"></i>
+                        <span class="font-bold text-sky-300">Realtime</span>
                     </p>
                 </div>
                 <div class="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center text-sky-300 text-xl shadow-inner">
@@ -118,24 +96,46 @@
             </div>
         </div>
 
-        <!-- Card 4: Khách Hàng Mới -->
-        <div class="kpi-card bg-gradient-to-br from-violet-700 via-violet-600 to-violet-500 p-5 rounded-2xl shadow-lg text-white relative overflow-hidden group hover:shadow-xl">
+        <!-- Card 3: Tổng khách hàng -->
+        <div class="kpi-card bg-gradient-to-br from-emerald-700 via-emerald-600 to-emerald-500 p-5 rounded-2xl shadow-lg text-white relative overflow-hidden group hover:shadow-xl">
             <div class="absolute -right-4 -bottom-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                <i class="fa-solid fa-user-plus text-8xl"></i>
+                <i class="fa-solid fa-users text-8xl"></i>
             </div>
             <div class="relative z-10 flex items-center justify-between">
                 <div>
-                    <p class="text-violet-100 text-[11px] font-bold uppercase tracking-wider mb-1">Khách Hàng Mới</p>
+                    <p class="text-emerald-100 text-[11px] font-bold uppercase tracking-wider mb-1">Tổng khách hàng</p>
                     <h3 class="text-3xl font-bold text-white drop-shadow-md">
-                        <span class="kpi-counter" data-target="42" data-suffix=" người" data-format="number">0 người</span>
+                        <span class="kpi-counter" data-target="{{ $totalCustomers }}" data-suffix=" người" data-format="number">0 người</span>
+                    </h3>
+                    <p class="text-emerald-100 text-xs mt-1.5 flex items-center gap-1">
+                        <i class="fa-solid fa-user-check text-yellow-300"></i>
+                        <span class="font-bold text-yellow-300">Đã đăng ký</span>
+                    </p>
+                </div>
+                <div class="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center text-yellow-300 text-xl shadow-inner">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 4: Tổng sản phẩm -->
+        <div class="kpi-card bg-gradient-to-br from-violet-700 via-violet-600 to-violet-500 p-5 rounded-2xl shadow-lg text-white relative overflow-hidden group hover:shadow-xl">
+            <div class="absolute -right-4 -bottom-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
+                <i class="fa-solid fa-leaf text-8xl"></i>
+            </div>
+            <div class="relative z-10 flex items-center justify-between">
+                <div>
+                    <p class="text-violet-100 text-[11px] font-bold uppercase tracking-wider mb-1">Tổng sản phẩm</p>
+                    <h3 class="text-3xl font-bold text-white drop-shadow-md">
+                        <span class="kpi-counter" data-target="{{ $totalProducts }}" data-suffix=" SP" data-format="number">0 SP</span>
                     </h3>
                     <p class="text-violet-100 text-xs mt-1.5 flex items-center gap-1">
-                        <i class="fa-solid fa-arrow-trend-down text-red-300"></i>
-                        <span class="font-bold text-red-300">-2.1%</span> so với kỳ trước
+                        <i class="fa-solid fa-store text-violet-200"></i>
+                        <span class="font-bold text-violet-200">Đang kinh doanh</span>
                     </p>
                 </div>
                 <div class="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center text-violet-200 text-xl shadow-inner">
-                    <i class="fa-solid fa-user-plus"></i>
+                    <i class="fa-solid fa-leaf"></i>
                 </div>
             </div>
         </div>
@@ -171,19 +171,19 @@
                 <p class="text-xs text-gray-400 mt-0.5">Phân bổ theo trạng thái</p>
             </div>
             <div id="orderStatusChart" class="w-full flex justify-center" style="min-height: 280px;"></div>
-            <!-- Legend thủ công -->
+            <!-- Legend thật từ DB -->
             <div class="flex flex-col gap-2 mt-4 px-2">
                 <div class="flex items-center justify-between text-sm">
                     <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span><span class="text-gray-600 font-medium">Đã giao</span></span>
-                    <span class="font-bold text-gray-800">98 đơn</span>
+                    <span class="font-bold text-gray-800">{{ $orderStatusCounts['delivered'] }} đơn</span>
                 </div>
                 <div class="flex items-center justify-between text-sm">
                     <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span><span class="text-gray-600 font-medium">Đang xử lý</span></span>
-                    <span class="font-bold text-gray-800">38 đơn</span>
+                    <span class="font-bold text-gray-800">{{ $orderStatusCounts['pending'] + $orderStatusCounts['processing'] + $orderStatusCounts['shipping'] }} đơn</span>
                 </div>
                 <div class="flex items-center justify-between text-sm">
                     <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span><span class="text-gray-600 font-medium">Đã hủy</span></span>
-                    <span class="font-bold text-gray-800">20 đơn</span>
+                    <span class="font-bold text-gray-800">{{ $orderStatusCounts['cancelled'] }} đơn</span>
                 </div>
             </div>
         </div>
@@ -216,76 +216,37 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50">
-                        <tr class="hover:bg-forest-50/30 transition-colors">
-                            <td class="px-6 py-3.5"><span class="w-7 h-7 rounded-lg bg-organic-500 text-white text-xs font-bold flex items-center justify-center shadow-sm">1</span></td>
-                            <td class="px-6 py-3.5">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 bg-forest-50 rounded-lg flex items-center justify-center text-forest-600"><i class="fa-solid fa-leaf text-sm"></i></div>
-                                    <div>
-                                        <p class="font-bold text-gray-800">Cà chua Organic Đà Lạt</p>
-                                        <p class="text-xs text-gray-400">Rau củ quả</p>
+                        @forelse($topProducts as $index => $product)
+                            @php
+                                $imgUrl = $product->image
+                                    ? asset('storage/' . str_replace('storage/', '', $product->image))
+                                    : null;
+                                $totalSold = $product->order_details_count;
+                                $totalRevenue = \App\Models\OrderDetail::where('product_id', $product->id)->sum(\DB::raw('quantity * price'));
+                            @endphp
+                            <tr class="hover:bg-forest-50/30 transition-colors">
+                                <td class="px-6 py-3.5">
+                                    <span class="w-7 h-7 rounded-lg {{ $index === 0 ? 'bg-organic-500 text-white' : 'bg-gray-200 text-gray-600' }} text-xs font-bold flex items-center justify-center {{ $index === 0 ? 'shadow-sm' : '' }}">{{ $index + 1 }}</span>
+                                </td>
+                                <td class="px-6 py-3.5">
+                                    <div class="flex items-center gap-3">
+                                        @if($imgUrl)
+                                            <img src="{{ $imgUrl }}" alt="{{ $product->name }}" class="w-9 h-9 rounded-lg object-cover border border-gray-100">
+                                        @else
+                                            <div class="w-9 h-9 bg-forest-50 rounded-lg flex items-center justify-center text-forest-600"><i class="fa-solid fa-leaf text-sm"></i></div>
+                                        @endif
+                                        <div>
+                                            <p class="font-bold text-gray-800">{{ $product->name }}</p>
+                                            <p class="text-xs text-gray-400">{{ $product->category->name ?? 'Chưa phân loại' }}</p>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-3.5 text-center"><span class="font-bold text-gray-700">320</span></td>
-                            <td class="px-6 py-3.5 text-right font-mono font-bold text-forest-700">8.960.000₫</td>
-                        </tr>
-                        <tr class="hover:bg-forest-50/30 transition-colors">
-                            <td class="px-6 py-3.5"><span class="w-7 h-7 rounded-lg bg-gray-200 text-gray-600 text-xs font-bold flex items-center justify-center">2</span></td>
-                            <td class="px-6 py-3.5">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 bg-emerald-50 rounded-lg flex items-center justify-center text-emerald-600"><i class="fa-solid fa-seedling text-sm"></i></div>
-                                    <div>
-                                        <p class="font-bold text-gray-800">Rau cải xoăn Kale</p>
-                                        <p class="text-xs text-gray-400">Rau lá xanh</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-3.5 text-center"><span class="font-bold text-gray-700">275</span></td>
-                            <td class="px-6 py-3.5 text-right font-mono font-bold text-forest-700">6.875.000₫</td>
-                        </tr>
-                        <tr class="hover:bg-forest-50/30 transition-colors">
-                            <td class="px-6 py-3.5"><span class="w-7 h-7 rounded-lg bg-gray-200 text-gray-600 text-xs font-bold flex items-center justify-center">3</span></td>
-                            <td class="px-6 py-3.5">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 bg-orange-50 rounded-lg flex items-center justify-center text-orange-600"><i class="fa-solid fa-carrot text-sm"></i></div>
-                                    <div>
-                                        <p class="font-bold text-gray-800">Cà rốt hữu cơ</p>
-                                        <p class="text-xs text-gray-400">Rau củ quả</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-3.5 text-center"><span class="font-bold text-gray-700">210</span></td>
-                            <td class="px-6 py-3.5 text-right font-mono font-bold text-forest-700">4.200.000₫</td>
-                        </tr>
-                        <tr class="hover:bg-forest-50/30 transition-colors">
-                            <td class="px-6 py-3.5"><span class="w-7 h-7 rounded-lg bg-gray-200 text-gray-600 text-xs font-bold flex items-center justify-center">4</span></td>
-                            <td class="px-6 py-3.5">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 bg-yellow-50 rounded-lg flex items-center justify-center text-yellow-600"><i class="fa-solid fa-lemon text-sm"></i></div>
-                                    <div>
-                                        <p class="font-bold text-gray-800">Bưởi da xanh Bến Tre</p>
-                                        <p class="text-xs text-gray-400">Trái cây</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-3.5 text-center"><span class="font-bold text-gray-700">185</span></td>
-                            <td class="px-6 py-3.5 text-right font-mono font-bold text-forest-700">5.550.000₫</td>
-                        </tr>
-                        <tr class="hover:bg-forest-50/30 transition-colors">
-                            <td class="px-6 py-3.5"><span class="w-7 h-7 rounded-lg bg-gray-200 text-gray-600 text-xs font-bold flex items-center justify-center">5</span></td>
-                            <td class="px-6 py-3.5">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 bg-green-50 rounded-lg flex items-center justify-center text-green-600"><i class="fa-solid fa-pepper-hot text-sm"></i></div>
-                                    <div>
-                                        <p class="font-bold text-gray-800">Ớt chuông hữu cơ</p>
-                                        <p class="text-xs text-gray-400">Rau củ quả</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-3.5 text-center"><span class="font-bold text-gray-700">150</span></td>
-                            <td class="px-6 py-3.5 text-right font-mono font-bold text-forest-700">3.750.000₫</td>
-                        </tr>
+                                </td>
+                                <td class="px-6 py-3.5 text-center"><span class="font-bold text-gray-700">{{ $totalSold }}</span></td>
+                                <td class="px-6 py-3.5 text-right font-mono font-bold text-forest-700">{{ number_format($totalRevenue, 0, ',', '.') }}₫</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="4" class="px-6 py-8 text-center text-gray-400 italic">Chưa có dữ liệu bán hàng</td></tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
@@ -303,66 +264,42 @@
                 <a href="#" class="text-xs font-bold text-forest-600 hover:text-forest-800 transition-colors">Tất cả <i class="fa-solid fa-arrow-right ml-1"></i></a>
             </div>
             <div class="divide-y divide-gray-50 max-h-[400px] overflow-y-auto custom-scrollbar">
-                <!-- Đơn 1 -->
-                <div class="px-6 py-4 hover:bg-forest-50/30 transition-colors">
-                    <div class="flex justify-between items-start mb-1.5">
-                        <span class="font-mono font-bold text-sm text-gray-800">#ORD-001</span>
-                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700 border border-emerald-200">Đã giao</span>
+                @forelse($recentOrders as $order)
+                    @php
+                        $isCancelled = $order->order_status === 'cancelled';
+                        $statusBadge = match($order->order_status) {
+                            'delivered' => 'bg-emerald-100 text-emerald-700 border-emerald-200',
+                            'shipping' => 'bg-blue-100 text-blue-700 border-blue-200',
+                            'ready_for_pickup' => 'bg-orange-100 text-orange-700 border-orange-200',
+                            'processing' => 'bg-cyan-100 text-cyan-700 border-cyan-200',
+                            'pending' => 'bg-amber-100 text-amber-700 border-amber-200',
+                            'cancelled' => 'bg-red-100 text-red-700 border-red-200',
+                            default => 'bg-gray-100 text-gray-700 border-gray-200',
+                        };
+                        $statusLabel = match($order->order_status) {
+                            'delivered' => 'Đã giao',
+                            'shipping' => 'Đang giao',
+                            'ready_for_pickup' => 'Chờ lấy hàng',
+                            'processing' => 'Đang xử lý',
+                            'pending' => 'Chờ xác nhận',
+                            'cancelled' => 'Đã hủy',
+                            default => $order->order_status,
+                        };
+                    @endphp
+                    <div class="px-6 py-4 hover:bg-forest-50/30 transition-colors">
+                        <div class="flex justify-between items-start mb-1.5">
+                            <span class="font-mono font-bold text-sm text-gray-800">{{ $order->order_code }}</span>
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider {{ $statusBadge }} border">{{ $statusLabel }}</span>
+                        </div>
+                        <p class="text-sm text-gray-600 font-medium">{{ $order->user->fullname ?? ($order->shipping_name ?? 'Khách vãng lai') }}</p>
+                        <div class="flex justify-between items-center mt-1.5">
+                            <span class="text-xs text-gray-400">{{ $order->created_at->diffForHumans() }}</span>
+                            <span class="font-mono font-bold text-sm {{ $isCancelled ? 'text-gray-400 line-through' : 'text-forest-700' }}">{{ number_format($order->total_money + $order->shipping_fee, 0, ',', '.') }}₫</span>
+                        </div>
                     </div>
-                    <p class="text-sm text-gray-600 font-medium">Nguyễn Văn An</p>
-                    <div class="flex justify-between items-center mt-1.5">
-                        <span class="text-xs text-gray-400">2 phút trước</span>
-                        <span class="font-mono font-bold text-sm text-forest-700">450.000₫</span>
-                    </div>
-                </div>
-                <!-- Đơn 2 -->
-                <div class="px-6 py-4 hover:bg-forest-50/30 transition-colors">
-                    <div class="flex justify-between items-start mb-1.5">
-                        <span class="font-mono font-bold text-sm text-gray-800">#ORD-002</span>
-                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-700 border border-amber-200">Đang xử lý</span>
-                    </div>
-                    <p class="text-sm text-gray-600 font-medium">Trần Thị Bích</p>
-                    <div class="flex justify-between items-center mt-1.5">
-                        <span class="text-xs text-gray-400">15 phút trước</span>
-                        <span class="font-mono font-bold text-sm text-forest-700">1.230.000₫</span>
-                    </div>
-                </div>
-                <!-- Đơn 3 -->
-                <div class="px-6 py-4 hover:bg-forest-50/30 transition-colors">
-                    <div class="flex justify-between items-start mb-1.5">
-                        <span class="font-mono font-bold text-sm text-gray-800">#ORD-003</span>
-                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700 border border-emerald-200">Đã giao</span>
-                    </div>
-                    <p class="text-sm text-gray-600 font-medium">Lê Hoàng Minh</p>
-                    <div class="flex justify-between items-center mt-1.5">
-                        <span class="text-xs text-gray-400">1 giờ trước</span>
-                        <span class="font-mono font-bold text-sm text-forest-700">780.000₫</span>
-                    </div>
-                </div>
-                <!-- Đơn 4 -->
-                <div class="px-6 py-4 hover:bg-forest-50/30 transition-colors">
-                    <div class="flex justify-between items-start mb-1.5">
-                        <span class="font-mono font-bold text-sm text-gray-800">#ORD-004</span>
-                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-100 text-red-700 border border-red-200">Đã hủy</span>
-                    </div>
-                    <p class="text-sm text-gray-600 font-medium">Phạm Quốc Đạt</p>
-                    <div class="flex justify-between items-center mt-1.5">
-                        <span class="text-xs text-gray-400">2 giờ trước</span>
-                        <span class="font-mono font-bold text-sm text-gray-400 line-through">320.000₫</span>
-                    </div>
-                </div>
-                <!-- Đơn 5 -->
-                <div class="px-6 py-4 hover:bg-forest-50/30 transition-colors">
-                    <div class="flex justify-between items-start mb-1.5">
-                        <span class="font-mono font-bold text-sm text-gray-800">#ORD-005</span>
-                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-700 border border-amber-200">Đang xử lý</span>
-                    </div>
-                    <p class="text-sm text-gray-600 font-medium">Võ Thị Hương</p>
-                    <div class="flex justify-between items-center mt-1.5">
-                        <span class="text-xs text-gray-400">3 giờ trước</span>
-                        <span class="font-mono font-bold text-sm text-forest-700">2.100.000₫</span>
-                    </div>
-                </div>
+                @empty
+                    <div class="px-6 py-8 text-center text-gray-400 italic">Chưa có đơn hàng nào</div>
+                @endforelse
             </div>
         </div>
 
@@ -494,7 +431,7 @@
     // 3. BIỂU ĐỒ TRẠNG THÁI ĐƠN HÀNG (Donut Chart)
     // ============================================
     const orderStatusOptions = {
-        series: [98, 38, 20],
+        series: [{{ $orderStatusCounts['delivered'] }}, {{ $orderStatusCounts['pending'] + $orderStatusCounts['processing'] + $orderStatusCounts['shipping'] }}, {{ $orderStatusCounts['cancelled'] }}],
         chart: {
             type: 'donut',
             height: 260,

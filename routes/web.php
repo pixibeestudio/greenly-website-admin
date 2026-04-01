@@ -10,7 +10,42 @@ Route::get('/', function () {
 Route::prefix('admin')->name('admin.')->group(function () {
     // Dashboard
     Route::get('/', function () {
-        return view('admin.dashboard', ['pageTitle' => 'Dashboard']);
+        $today = \Carbon\Carbon::today();
+
+        // 4 KPI Cards
+        $todayOrders = \App\Models\Order::whereDate('created_at', $today)->count();
+        $todayRevenue = \App\Models\Order::where('order_status', 'delivered')
+            ->whereDate('updated_at', $today)
+            ->sum('total_money');
+        $totalCustomers = \App\Models\User::where('role', 'customer')->count();
+        $totalProducts = \App\Models\Product::count();
+
+        // 5 đơn hàng mới nhất
+        $recentOrders = \App\Models\Order::with('user')
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
+        // Thống kê trạng thái đơn hàng (cho biểu đồ Donut)
+        $orderStatusCounts = [
+            'delivered'  => \App\Models\Order::where('order_status', 'delivered')->count(),
+            'pending'    => \App\Models\Order::where('order_status', 'pending')->count(),
+            'processing' => \App\Models\Order::where('order_status', 'processing')->count(),
+            'shipping'   => \App\Models\Order::where('order_status', 'shipping')->count(),
+            'cancelled'  => \App\Models\Order::where('order_status', 'cancelled')->count(),
+        ];
+
+        // Top 5 sản phẩm bán chạy
+        $topProducts = \App\Models\Product::withSum('batches', 'current_quantity')
+            ->withCount('orderDetails')
+            ->orderByDesc('order_details_count')
+            ->take(5)
+            ->get();
+
+        return view('admin.dashboard', compact(
+            'todayOrders', 'todayRevenue', 'totalCustomers', 'totalProducts',
+            'recentOrders', 'orderStatusCounts', 'topProducts'
+        ));
     })->name('dashboard');
 
     // Nhóm Cửa hàng & Sản phẩm

@@ -156,7 +156,9 @@
                             $deliveringCount = $deliveringCounts[$shipper->id] ?? 0;
                             $monthlyTotal = $monthlyTotalCounts[$shipper->id] ?? 0;
                             $monthlyCompleted = $monthlyCompletedCounts[$shipper->id] ?? 0;
-                            $successRate = $monthlyTotal > 0 ? round(($monthlyCompleted / $monthlyTotal) * 100) : 0;
+                            $delivered = $allTimeDelivered[$shipper->id] ?? 0;
+                            $cancelled = $allTimeCancelled[$shipper->id] ?? 0;
+                            $successRate = ($delivered + $cancelled) > 0 ? round(($delivered / ($delivered + $cancelled)) * 100) : 0;
                             $shipperOrders = $deliveringOrders[$shipper->id] ?? collect();
                             $avatarUrl = $shipper->avatar ? asset('storage/' . $shipper->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode($shipper->fullname) . '&background=random&size=40';
 
@@ -372,9 +374,13 @@
                 const isCancelled = o.order_status === 'cancelled';
                 const statusBadge = isCancelled
                     ? '<span class="bg-gray-100 text-gray-600 text-[10px] px-2 py-1 rounded font-bold">Boom hàng</span>'
-                    : o.order_status === 'completed'
+                    : o.order_status === 'delivered'
                     ? '<span class="bg-green-100 text-green-600 text-[10px] px-2 py-1 rounded font-bold">Thành công</span>'
-                    : '<span class="bg-orange-100 text-orange-600 text-[10px] px-2 py-1 rounded font-bold">Đang giao</span>';
+                    : o.order_status === 'shipping'
+                    ? '<span class="bg-blue-100 text-blue-600 text-[10px] px-2 py-1 rounded font-bold">Đang giao</span>'
+                    : o.order_status === 'ready_for_pickup'
+                    ? '<span class="bg-orange-100 text-orange-600 text-[10px] px-2 py-1 rounded font-bold">Chờ lấy hàng</span>'
+                    : '<span class="bg-gray-100 text-gray-600 text-[10px] px-2 py-1 rounded font-bold">' + o.order_status + '</span>';
 
                 const codAmount = o.payment_method === 'COD' && !isCancelled
                     ? '<span class="text-red-600">' + Number(o.final_amount).toLocaleString('vi-VN') + 'đ</span>'

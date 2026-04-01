@@ -5,6 +5,8 @@
         <i class="fa-solid fa-eye text-xs"></i>
     </button>
 
+
+
     <!-- Nút Gán đơn -->
     @if($isOffline)
         <button class="bg-gray-100 text-gray-300 px-3 py-1.5 rounded-lg border border-gray-200 flex items-center justify-center gap-1.5 font-bold text-xs cursor-not-allowed" title="Không thể gán đơn" disabled>
@@ -19,7 +21,7 @@
             <i class="fa-solid fa-box-open"></i> Gán đơn
         </button>
     @else
-        <a href="{{ route('admin.orders.index', ['assign_shipper' => $shipper->id]) }}" class="bg-forest-600 hover:bg-forest-700 text-white px-3 py-1.5 rounded-lg shadow-md shadow-forest-500/20 transition-all flex items-center justify-center gap-1.5 font-bold text-xs">
+        <a href="{{ route('admin.orders.index', ['assign_shipper' => $shipper->id]) }}" class="hover:bg-forest-800 bg-forest-700 text-white px-3 py-1.5 rounded-lg shadow-md shadow-forest-500/20 transition-all flex items-center justify-center gap-1.5 font-bold text-xs">
             <i class="fa-solid fa-box-open"></i> Gán đơn
         </a>
     @endif

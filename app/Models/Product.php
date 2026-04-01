@@ -32,6 +32,12 @@ class Product extends Model
         return $this->hasMany(ProductImage::class);
     }
 
+    // Quan hệ: Sản phẩm có nhiều chi tiết đơn hàng
+    public function orderDetails()
+    {
+        return $this->hasMany(OrderDetail::class);
+    }
+
     public function batches()
     {
         return $this->hasMany(Batch::class);
