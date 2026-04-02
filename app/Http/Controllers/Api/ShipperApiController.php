@@ -477,80 +477,65 @@ class ShipperApiController extends Controller
         // 1. Tổng thu nhập (Tiền công ship) = tổng shipping_fee của đơn delivered
         $totalIncome = Order::where('shipper_id', $shipperId)
             ->where('order_status', 'delivered')
-            ->sum('shipping_fee');
+            ->sum('shipping_fee') ?? 0;
 
         // 2. COD đang giữ = tổng total_money của đơn delivered TRONG NGÀY HÔM NAY
-        $codHolding = Order::where('shipper_id', $shipperId)
+        $codBalance = Order::where('shipper_id', $shipperId)
             ->where('order_status', 'delivered')
             ->whereDate('updated_at', $today)
-            ->sum('total_money');
+            ->sum('total_money') ?? 0;
 
         // 3. Đơn hoàn thành = đếm đơn delivered
         $completedOrders = Order::where('shipper_id', $shipperId)
             ->where('order_status', 'delivered')
-            ->count();
+            ->count() ?? 0;
 
         // 4. Rating trung bình (mặc định 5.0 nếu chưa có đánh giá)
         $avgRating = Order::where('shipper_id', $shipperId)
             ->where('order_status', 'delivered')
             ->whereNotNull('shipper_rating')
             ->avg('shipper_rating');
-        $avgRating = $avgRating ? round($avgRating, 1) : 5.0;
+        $rating = $avgRating ? round($avgRating, 1) : 5.0;
 
-        // 5. Biểu đồ thu nhập 7 ngày gần nhất
+        // 5. Biểu đồ thu nhập 7 ngày gần nhất (CamelCase: date, income)
         $chartData = [];
         for ($i = 6; $i >= 0; $i--) {
             $date = Carbon::today()->subDays($i);
             $dayIncome = Order::where('shipper_id', $shipperId)
                 ->where('order_status', 'delivered')
                 ->whereDate('updated_at', $date)
-                ->sum('shipping_fee');
+                ->sum('shipping_fee') ?? 0;
 
             $chartData[] = [
                 'date' => $date->format('d/m'),
-                'income' => (int) $dayIncome,
+                'income' => (float) $dayIncome,
             ];
         }
 
-        // 6. Lịch sử giao dịch: 10 đơn delivered mới nhất
-        $transactions = Order::where('shipper_id', $shipperId)
+        // 6. Lịch sử giao dịch: 10 đơn delivered mới nhất (CamelCase)
+        $history = Order::where('shipper_id', $shipperId)
             ->where('order_status', 'delivered')
             ->orderBy('updated_at', 'desc')
             ->take(10)
             ->get()
             ->map(function ($order) {
                 return [
-                    'order_id' => $order->id,
-                    'order_code' => $order->order_code,
-                    'shipping_fee' => (int) $order->shipping_fee,
-                    'total_money' => (int) $order->total_money,
-                    'completed_at' => $order->updated_at->format('H:i d/m/Y'),
+                    'orderId' => (int) $order->id,
+                    'orderCode' => $order->order_code ?? '',
+                    'shippingFee' => (float) ($order->shipping_fee ?? 0),
+                    'totalMoney' => (float) ($order->total_money ?? 0),
+                    'completedAt' => $order->updated_at ? $order->updated_at->format('H:i d/m/Y') : '',
                 ];
-            });
+            })->toArray();
 
-        // 7. Thông tin cá nhân
-        $profile = [
-            'id' => $user->id,
-            'fullname' => $user->fullname,
-            'phone' => $user->phone,
-            'email' => $user->email,
-            'avatar' => $user->avatar ? asset('storage/' . $user->avatar) : null,
-            'work_status' => $user->work_status,
-        ];
-
+        // TRẢ VỀ TRỰC TIẾP JSON - CamelCase, không bọc 'data', giá trị mặc định
         return response()->json([
-            'success' => true,
-            'data' => [
-                'profile' => $profile,
-                'wallet' => [
-                    'total_income' => (int) $totalIncome,
-                    'cod_holding' => (int) $codHolding,
-                    'completed_orders' => $completedOrders,
-                    'avg_rating' => $avgRating,
-                ],
-                'chart' => $chartData,
-                'transactions' => $transactions,
-            ],
+            'totalIncome' => (float) $totalIncome,
+            'codBalance' => (float) $codBalance,
+            'completedOrders' => (int) $completedOrders,
+            'rating' => (float) $rating,
+            'chartData' => $chartData ?? [],
+            'history' => $history ?? [],
         ], 200);
     }
 }
