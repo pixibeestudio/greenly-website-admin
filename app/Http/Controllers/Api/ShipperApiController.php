@@ -512,8 +512,8 @@ class ShipperApiController extends Controller
             ];
         }
 
-        // 6. Lịch sử giao dịch: 10 đơn delivered mới nhất (CamelCase)
-        $history = Order::where('shipper_id', $shipperId)
+        // 6. Lịch sử giao dịch: 10 đơn delivered mới nhất (Format đơn giản cho App)
+        $history = \App\Models\Order::where('shipper_id', $shipperId)
             ->where('order_status', 'delivered')
             ->orderBy('updated_at', 'desc')
             ->take(10)
@@ -521,10 +521,8 @@ class ShipperApiController extends Controller
             ->map(function ($order) {
                 return [
                     'orderId' => (int) $order->id,
-                    'orderCode' => $order->order_code ?? '',
-                    'shippingFee' => (float) ($order->shipping_fee ?? 0),
-                    'totalMoney' => (float) ($order->total_money ?? 0),
-                    'completedAt' => $order->updated_at ? $order->updated_at->format('H:i d/m/Y') : '',
+                    'income' => (float) $order->shipping_fee,
+                    'time' => $order->updated_at->format('d/m/Y H:i'),
                 ];
             })->toArray();
 
