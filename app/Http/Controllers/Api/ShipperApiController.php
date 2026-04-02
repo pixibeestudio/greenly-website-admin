@@ -464,4 +464,93 @@ class ShipperApiController extends Controller
             'message' => 'Đã cập nhật trạng thái làm việc',
         ]);
     }
+
+    /**
+     * API gộp: Dữ liệu cho màn hình Ví (Wallet) và Cá nhân (Profile) của Shipper
+     */
+    public function getWalletAndProfile(Request $request)
+    {
+        $user = $request->user();
+        $shipperId = $user->id;
+        $today = Carbon::today();
+
+        // 1. Tổng thu nhập (Tiền công ship) = tổng shipping_fee của đơn delivered
+        $totalIncome = Order::where('shipper_id', $shipperId)
+            ->where('order_status', 'delivered')
+            ->sum('shipping_fee');
+
+        // 2. COD đang giữ = tổng total_money của đơn delivered TRONG NGÀY HÔM NAY
+        $codHolding = Order::where('shipper_id', $shipperId)
+            ->where('order_status', 'delivered')
+            ->whereDate('updated_at', $today)
+            ->sum('total_money');
+
+        // 3. Đơn hoàn thành = đếm đơn delivered
+        $completedOrders = Order::where('shipper_id', $shipperId)
+            ->where('order_status', 'delivered')
+            ->count();
+
+        // 4. Rating trung bình (mặc định 5.0 nếu chưa có đánh giá)
+        $avgRating = Order::where('shipper_id', $shipperId)
+            ->where('order_status', 'delivered')
+            ->whereNotNull('shipper_rating')
+            ->avg('shipper_rating');
+        $avgRating = $avgRating ? round($avgRating, 1) : 5.0;
+
+        // 5. Biểu đồ thu nhập 7 ngày gần nhất
+        $chartData = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = Carbon::today()->subDays($i);
+            $dayIncome = Order::where('shipper_id', $shipperId)
+                ->where('order_status', 'delivered')
+                ->whereDate('updated_at', $date)
+                ->sum('shipping_fee');
+
+            $chartData[] = [
+                'date' => $date->format('d/m'),
+                'income' => (int) $dayIncome,
+            ];
+        }
+
+        // 6. Lịch sử giao dịch: 10 đơn delivered mới nhất
+        $transactions = Order::where('shipper_id', $shipperId)
+            ->where('order_status', 'delivered')
+            ->orderBy('updated_at', 'desc')
+            ->take(10)
+            ->get()
+            ->map(function ($order) {
+                return [
+                    'order_id' => $order->id,
+                    'order_code' => $order->order_code,
+                    'shipping_fee' => (int) $order->shipping_fee,
+                    'total_money' => (int) $order->total_money,
+                    'completed_at' => $order->updated_at->format('H:i d/m/Y'),
+                ];
+            });
+
+        // 7. Thông tin cá nhân
+        $profile = [
+            'id' => $user->id,
+            'fullname' => $user->fullname,
+            'phone' => $user->phone,
+            'email' => $user->email,
+            'avatar' => $user->avatar ? asset('storage/' . $user->avatar) : null,
+            'work_status' => $user->work_status,
+        ];
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'profile' => $profile,
+                'wallet' => [
+                    'total_income' => (int) $totalIncome,
+                    'cod_holding' => (int) $codHolding,
+                    'completed_orders' => $completedOrders,
+                    'avg_rating' => $avgRating,
+                ],
+                'chart' => $chartData,
+                'transactions' => $transactions,
+            ],
+        ], 200);
+    }
 }

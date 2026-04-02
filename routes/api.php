@@ -42,4 +42,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/shipper/orders/{id}/pickup', [\App\Http\Controllers\Api\ShipperApiController::class, 'pickupOrder']);
     Route::post('/shipper/orders/{id}/complete', [\App\Http\Controllers\Api\ShipperApiController::class, 'completeOrder']);
     Route::post('/shipper/orders/{id}/fail', [\App\Http\Controllers\Api\ShipperApiController::class, 'failOrder']);
+    Route::get('/shipper/wallet-profile', [\App\Http\Controllers\Api\ShipperApiController::class, 'getWalletAndProfile']);
 });

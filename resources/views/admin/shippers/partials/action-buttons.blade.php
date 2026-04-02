@@ -5,8 +5,6 @@
         <i class="fa-solid fa-eye text-xs"></i>
     </button>
 
-
-
     <!-- Nút Gán đơn -->
     @if($isOffline)
         <button class="bg-gray-100 text-gray-300 px-3 py-1.5 rounded-lg border border-gray-200 flex items-center justify-center gap-1.5 font-bold text-xs cursor-not-allowed" title="Không thể gán đơn" disabled>
