@@ -31,6 +31,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Đặt hàng (Checkout)
     Route::post('/checkout', [\App\Http\Controllers\Api\CheckoutController::class, 'checkout']);
 
+    // Đơn hàng của khách hàng
+    Route::get('/my-orders', [\App\Http\Controllers\Api\OrderController::class, 'getUserOrders']);
+
     // --- SHIPPER API ---
     Route::get('/shipper/stats', [\App\Http\Controllers\Api\ShipperApiController::class, 'getStats']);
     Route::post('/shipper/work-status', [\App\Http\Controllers\Api\ShipperApiController::class, 'updateWorkStatus']);
