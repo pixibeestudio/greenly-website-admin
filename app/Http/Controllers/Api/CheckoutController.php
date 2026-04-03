@@ -68,13 +68,14 @@ class CheckoutController extends Controller
                 ];
             }
 
-            $grandTotal = $subTotal + $request->shipping_fee;
+            $shippingFee = (float) $request->shipping_fee;
+            $grandTotal = $subTotal + $shippingFee;
 
-            // Bước 5: Tạo đơn hàng
+            // Bước 5: Tạo đơn hàng (total_money = tiền hàng, shipping_fee riêng)
             $order = Order::create([
                 'user_id'          => $userId,
-                'total_money'      => $grandTotal,
-                'shipping_fee'     => $request->shipping_fee,
+                'total_money'      => $subTotal,
+                'shipping_fee'     => $shippingFee,
                 'payment_method'   => $request->payment_method,
                 'payment_status'   => 'pending',
                 'order_status'     => 'pending',
@@ -139,9 +140,9 @@ class CheckoutController extends Controller
                 'success' => true,
                 'message' => 'Đặt hàng thành công!',
                 'data'    => [
-                    'order_id'    => $order->id,
-                    'order_code'  => $order->order_code,
-                    'total_money' => $order->total_money,
+                    'order_id'     => $order->id,
+                    'order_code'   => $order->order_code,
+                    'total_money'  => (int) ($order->total_money + $order->shipping_fee),
                     'order_status' => $order->order_status,
                 ],
             ], 200);
@@ -155,5 +156,41 @@ class CheckoutController extends Controller
                 'message' => 'Đặt hàng thất bại: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * API xác nhận thanh toán (khi người dùng đã chuyển khoản)
+     */
+    public function confirmPayment(Request $request, $id)
+    {
+        $userId = auth()->id();
+
+        // Tìm đơn hàng theo ID và kiểm tra quyền sở hữu
+        $order = Order::where('id', $id)
+            ->where('user_id', $userId)
+            ->first();
+
+        if (!$order) {
+            return response()->json([
+                'status'  => 404,
+                'message' => 'Không tìm thấy đơn hàng',
+            ], 404);
+        }
+
+        // Kiểm tra nếu đơn hàng đã thanh toán rồi
+        if ($order->payment_status === 'completed') {
+            return response()->json([
+                'status'  => 400,
+                'message' => 'Đơn hàng đã được thanh toán trước đó',
+            ], 400);
+        }
+
+        // Cập nhật trạng thái thanh toán thành 'completed' (theo enum trong DB)
+        $order->update(['payment_status' => 'completed']);
+
+        return response()->json([
+            'status'  => 200,
+            'message' => 'Xác nhận thanh toán thành công',
+        ], 200);
     }
 }

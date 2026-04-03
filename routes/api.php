@@ -33,6 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Đơn hàng của khách hàng
     Route::get('/my-orders', [\App\Http\Controllers\Api\OrderController::class, 'getUserOrders']);
+    Route::post('/orders/{id}/confirm-payment', [\App\Http\Controllers\Api\CheckoutController::class, 'confirmPayment']);
 
     // --- SHIPPER API ---
     Route::get('/shipper/stats', [\App\Http\Controllers\Api\ShipperApiController::class, 'getStats']);
