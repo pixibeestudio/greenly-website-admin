@@ -19,7 +19,8 @@ class Product extends Model
         'unit', 
         'description', 
         'origin', 
-        'is_active'
+        'is_active',
+        'sold_count'
     ];
 
     public function category()

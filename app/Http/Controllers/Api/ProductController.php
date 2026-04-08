@@ -189,4 +189,53 @@ class ProductController extends Controller
             'data'    => $product,
         ], 200);
     }
+
+    /**
+     * API lấy dữ liệu cho trang Home: SP mới nhất + Top 10 bán chạy
+     */
+    public function getHomeData()
+    {
+        // Hàm helper format ảnh thành URL tuyệt đối
+        $resolveImage = function ($path) {
+            if (!$path) return null;
+            $path = str_replace('storage/storage/', 'storage/', $path);
+            if (!str_starts_with($path, 'storage/') && !str_starts_with($path, 'http')) {
+                $path = 'storage/' . $path;
+            }
+            return asset($path);
+        };
+
+        // Hàm transform chung cho sản phẩm
+        $transformProduct = function ($product) use ($resolveImage) {
+            $product->stock_quantity = (int) ($product->batches_sum_current_quantity ?? 0);
+            $product->image = $resolveImage($product->image);
+            return $product;
+        };
+
+        // 1. Sản phẩm mới nhất (4 SP mới nhất đang hoạt động)
+        $featuredProducts = Product::with(['images', 'category'])
+            ->where('is_active', true)
+            ->withSum('batches', 'current_quantity')
+            ->orderBy('created_at', 'desc')
+            ->take(4)
+            ->get()
+            ->transform($transformProduct);
+
+        // 2. Top 10 bán chạy (sắp xếp theo sold_count giảm dần)
+        $topSellingProducts = Product::with(['images', 'category'])
+            ->where('is_active', true)
+            ->withSum('batches', 'current_quantity')
+            ->orderBy('sold_count', 'desc')
+            ->take(10)
+            ->get()
+            ->transform($transformProduct);
+
+        return response()->json([
+            'success' => true,
+            'data'    => [
+                'featured'    => $featuredProducts,
+                'top_selling' => $topSellingProducts,
+            ],
+        ], 200);
+    }
 }
