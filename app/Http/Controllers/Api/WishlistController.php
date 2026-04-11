@@ -18,6 +18,21 @@ class WishlistController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        // Format image URL cho product (giống ProductController)
+        $wishlists->transform(function ($wishlist) {
+            if ($wishlist->product) {
+                $imagePath = $wishlist->product->image;
+                if ($imagePath) {
+                    $imagePath = str_replace('storage/storage/', 'storage/', $imagePath);
+                    if (!str_starts_with($imagePath, 'storage/') && !str_starts_with($imagePath, 'http')) {
+                        $imagePath = 'storage/' . $imagePath;
+                    }
+                    $wishlist->product->image = asset($imagePath);
+                }
+            }
+            return $wishlist;
+        });
+
         return response()->json([
             'success' => true,
             'data'    => $wishlists,

@@ -191,6 +191,38 @@ class ProductController extends Controller
     }
 
     /**
+     * API lấy danh sách sản phẩm theo danh mục
+     */
+    public function getProductsByCategory($categoryId)
+    {
+        $products = Product::where('category_id', $categoryId)
+            ->where('is_active', 1)
+            ->with('images')
+            ->withSum('batches', 'current_quantity')
+            ->get();
+
+        $products->transform(function ($product) {
+            $product->stock_quantity = (int) ($product->batches_sum_current_quantity ?? 0);
+
+            $imagePath = $product->image;
+            if ($imagePath) {
+                $imagePath = str_replace('storage/storage/', 'storage/', $imagePath);
+                if (!str_starts_with($imagePath, 'storage/') && !str_starts_with($imagePath, 'http')) {
+                    $imagePath = 'storage/' . $imagePath;
+                }
+                $product->image = asset($imagePath);
+            }
+
+            return $product;
+        });
+
+        return response()->json([
+            'success' => true,
+            'data'    => $products,
+        ], 200);
+    }
+
+    /**
      * API lấy dữ liệu cho trang Home: SP mới nhất + Top 10 bán chạy
      */
     public function getHomeData()
