@@ -34,6 +34,14 @@
                 </a>
             </li>
 
+            <!-- Quản lý Banner -->
+            <li>
+                <a href="{{ route('admin.banners.index') }}" class="nav-item flex items-center px-4 py-3 rounded-lg {{ request()->routeIs('admin.banners.*') ? 'bg-forest-700 text-white shadow-md' : 'hover:bg-forest-700 text-forest-100 hover:text-white' }} transition-colors">
+                    <i class="fa-solid fa-images w-6 text-center"></i>
+                    <span class="ml-3 font-medium">Quản lý Banner</span>
+                </a>
+            </li>
+
             <!-- Sản phẩm -->
             <li>
                 <a href="{{ route('admin.products.index') }}" class="nav-item flex items-center px-4 py-3 rounded-lg {{ request()->routeIs('admin.products.*') ? 'bg-forest-700 text-white shadow-md' : 'hover:bg-forest-700 text-forest-100 hover:text-white' }} transition-colors">

@@ -51,6 +51,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Nhóm Cửa hàng & Sản phẩm
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class)->names('categories');
 
+    Route::resource('banners', \App\Http\Controllers\Admin\BannerController::class)->names('banners');
+    Route::post('banners/{banner}/toggle-active', [\App\Http\Controllers\Admin\BannerController::class, 'toggleActive'])->name('banners.toggle-active');
+
     Route::resource('products', \App\Http\Controllers\Admin\ProductController::class)->names('products');
 
     Route::resource('reviews', \App\Http\Controllers\Admin\ReviewController::class)->only(['index', 'destroy'])->names('reviews');
