@@ -286,9 +286,10 @@ class ProductController extends Controller
             $query->where('category_id', $request->category_id);
         }
 
-        // Lọc sản phẩm đang giảm giá
+        // Lọc sản phẩm đang giảm giá (loại bỏ SP có discount_price = 0 hoặc NULL)
         if ($request->filled('is_discount') && $request->is_discount === 'true') {
             $query->whereNotNull('discount_price')
+                  ->where('discount_price', '>', 0)
                   ->whereColumn('discount_price', '<', 'price');
         }
 
