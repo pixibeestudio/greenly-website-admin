@@ -262,9 +262,20 @@ class ProductController extends Controller
             ->get()
             ->transform($transformProduct);
 
+        // 3. Banner đang hoạt động, sắp xếp theo thứ tự hiển thị
+        $banners = \App\Models\Banner::where('is_active', true)
+            ->orderBy('sort_order', 'asc')
+            ->get(['id', 'image_url', 'title']);
+
+        $banners->transform(function ($banner) {
+            $banner->image_url = asset('storage/' . $banner->image_url);
+            return $banner;
+        });
+
         return response()->json([
             'success' => true,
             'data'    => [
+                'banners'     => $banners,
                 'featured'    => $featuredProducts,
                 'top_selling' => $topSellingProducts,
             ],

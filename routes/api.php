@@ -7,6 +7,9 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+// API Banner quảng cáo (public, không cần auth)
+Route::get('/banners', [\App\Http\Controllers\Api\BannerApiController::class, 'index']);
+
 // API Danh mục sản phẩm (public, không cần auth)
 Route::get('/categories', [\App\Http\Controllers\Api\CategoryController::class, 'index']);
 
