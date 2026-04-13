@@ -270,4 +270,68 @@ class ProductController extends Controller
             ],
         ], 200);
     }
+
+    /**
+     * API lọc sản phẩm tổng hợp: category_id, is_discount, sort_by
+     */
+    public function filterProducts(Request $request)
+    {
+        // Khởi tạo query: chỉ lấy SP đang hoạt động, kèm images + category
+        $query = Product::with(['images', 'category'])
+            ->where('is_active', true)
+            ->withSum('batches', 'current_quantity');
+
+        // Lọc theo danh mục (bỏ qua nếu category_id = 0 hoặc không gửi)
+        if ($request->filled('category_id') && $request->category_id != 0) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        // Lọc sản phẩm đang giảm giá
+        if ($request->filled('is_discount') && $request->is_discount === 'true') {
+            $query->whereNotNull('discount_price')
+                  ->whereColumn('discount_price', '<', 'price');
+        }
+
+        // Sắp xếp theo tham số sort_by
+        switch ($request->query('sort_by')) {
+            case 'newest':
+                $query->orderBy('created_at', 'desc');
+                break;
+            case 'top_sales':
+                $query->orderBy('sold_count', 'desc');
+                break;
+            case 'price_asc':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+
+        $products = $query->get();
+
+        // Format ảnh + tồn kho
+        $products->transform(function ($product) {
+            $product->stock_quantity = (int) ($product->batches_sum_current_quantity ?? 0);
+
+            $imagePath = $product->image;
+            if ($imagePath) {
+                $imagePath = str_replace('storage/storage/', 'storage/', $imagePath);
+                if (!str_starts_with($imagePath, 'storage/') && !str_starts_with($imagePath, 'http')) {
+                    $imagePath = 'storage/' . $imagePath;
+                }
+                $product->image = asset($imagePath);
+            }
+
+            return $product;
+        });
+
+        return response()->json([
+            'success' => true,
+            'data'    => $products,
+        ], 200);
+    }
 }
