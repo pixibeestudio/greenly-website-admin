@@ -45,6 +45,13 @@ Route::middleware('auth:sanctum')->group(function () {
     // Kiểm tra trạng thái thanh toán (app polling)
     Route::get('/payment/status/{id}', [\App\Http\Controllers\Api\CheckoutController::class, 'checkPaymentStatus']);
 
+    // Sổ địa chỉ (Addresses)
+    Route::get('/addresses', [\App\Http\Controllers\Api\AddressController::class, 'index']);
+    Route::post('/addresses', [\App\Http\Controllers\Api\AddressController::class, 'store']);
+    Route::put('/addresses/{id}', [\App\Http\Controllers\Api\AddressController::class, 'update']);
+    Route::delete('/addresses/{id}', [\App\Http\Controllers\Api\AddressController::class, 'destroy']);
+    Route::post('/addresses/{id}/set-default', [\App\Http\Controllers\Api\AddressController::class, 'setDefault']);
+
     // Yêu thích sản phẩm (Wishlist)
     Route::get('/wishlist', [\App\Http\Controllers\Api\WishlistController::class, 'getWishlists']);
     Route::post('/wishlist/toggle', [\App\Http\Controllers\Api\WishlistController::class, 'toggleFavorite']);
