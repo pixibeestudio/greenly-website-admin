@@ -6,6 +6,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Trang xác nhận thanh toán giả lập (public, quét QR từ app mở trang này)
+Route::get('/payment/{orderId}/{token}', [\App\Http\Controllers\PaymentController::class, 'showPaymentPage'])->name('payment.show');
+Route::post('/payment/{orderId}/{token}/confirm', [\App\Http\Controllers\PaymentController::class, 'processPayment'])->name('payment.confirm');
+
 // --- Route nhóm Admin ---
 Route::prefix('admin')->name('admin.')->group(function () {
     // Dashboard

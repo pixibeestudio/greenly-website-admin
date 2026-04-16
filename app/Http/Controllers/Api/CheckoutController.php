@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\PaymentController;
 use App\Models\Batch;
 use App\Models\Cart;
 use App\Models\Order;
@@ -136,15 +137,22 @@ class CheckoutController extends Controller
             // Bước 8: Commit transaction
             DB::commit();
 
+            $responseData = [
+                'order_id'     => $order->id,
+                'order_code'   => $order->order_code,
+                'total_money'  => (int) ($order->total_money + $order->shipping_fee),
+                'order_status' => $order->order_status,
+            ];
+
+            // Nếu thanh toán bằng chuyển khoản, trả thêm payment_url cho app tạo QR
+            if ($request->payment_method === 'banking') {
+                $responseData['payment_url'] = PaymentController::generatePaymentUrl($order->id);
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Đặt hàng thành công!',
-                'data'    => [
-                    'order_id'     => $order->id,
-                    'order_code'   => $order->order_code,
-                    'total_money'  => (int) ($order->total_money + $order->shipping_fee),
-                    'order_status' => $order->order_status,
-                ],
+                'data'    => $responseData,
             ], 200);
 
         } catch (\Exception $e) {
@@ -191,6 +199,31 @@ class CheckoutController extends Controller
         return response()->json([
             'status'  => 200,
             'message' => 'Xác nhận thanh toán thành công',
+        ], 200);
+    }
+
+    /**
+     * API kiểm tra trạng thái thanh toán (app polling mỗi 3 giây)
+     * GET /api/payment/status/{id}
+     */
+    public function checkPaymentStatus($id)
+    {
+        $userId = auth()->id();
+
+        $order = Order::where('id', $id)
+            ->where('user_id', $userId)
+            ->first();
+
+        if (!$order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy đơn hàng',
+            ], 404);
+        }
+
+        return response()->json([
+            'success'        => true,
+            'payment_status' => $order->payment_status,
         ], 200);
     }
 }

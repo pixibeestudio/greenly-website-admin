@@ -42,6 +42,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/my-orders', [\App\Http\Controllers\Api\OrderController::class, 'getUserOrders']);
     Route::post('/orders/{id}/confirm-payment', [\App\Http\Controllers\Api\CheckoutController::class, 'confirmPayment']);
 
+    // Kiểm tra trạng thái thanh toán (app polling)
+    Route::get('/payment/status/{id}', [\App\Http\Controllers\Api\CheckoutController::class, 'checkPaymentStatus']);
+
     // Yêu thích sản phẩm (Wishlist)
     Route::get('/wishlist', [\App\Http\Controllers\Api\WishlistController::class, 'getWishlists']);
     Route::post('/wishlist/toggle', [\App\Http\Controllers\Api\WishlistController::class, 'toggleFavorite']);
