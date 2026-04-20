@@ -31,4 +31,10 @@ class OrderDetail extends Model
     {
         return $this->belongsTo(Batch::class);
     }
+
+    // Quan hệ: 1 order_detail tương ứng với 1 review (nếu đã đánh giá)
+    public function review()
+    {
+        return $this->hasOne(Review::class);
+    }
 }

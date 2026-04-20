@@ -22,6 +22,9 @@ Route::get('/products', [\App\Http\Controllers\Api\ProductController::class, 'in
 Route::get('/products/category/{categoryId}', [\App\Http\Controllers\Api\ProductController::class, 'getProductsByCategory']);
 Route::get('/products/{id}', [\App\Http\Controllers\Api\ProductController::class, 'show']);
 
+// API Đánh giá sản phẩm (public cho xem review của 1 sản phẩm)
+Route::get('/products/{id}/reviews', [\App\Http\Controllers\Api\ReviewController::class, 'productReviews']);
+
 // API Xác thực (public, không cần auth)
 Route::post('/register', [\App\Http\Controllers\Api\AuthController::class, 'register']);
 Route::post('/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
@@ -51,6 +54,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/addresses/{id}', [\App\Http\Controllers\Api\AddressController::class, 'update']);
     Route::delete('/addresses/{id}', [\App\Http\Controllers\Api\AddressController::class, 'destroy']);
     Route::post('/addresses/{id}/set-default', [\App\Http\Controllers\Api\AddressController::class, 'setDefault']);
+
+    // Đánh giá sản phẩm (Reviews)
+    Route::get('/reviews/stats', [\App\Http\Controllers\Api\ReviewController::class, 'stats']);
+    Route::get('/reviews/pending-count', [\App\Http\Controllers\Api\ReviewController::class, 'pendingCount']);
+    Route::get('/reviews/pending', [\App\Http\Controllers\Api\ReviewController::class, 'pending']);
+    Route::get('/reviews/my', [\App\Http\Controllers\Api\ReviewController::class, 'myReviews']);
+    Route::post('/reviews', [\App\Http\Controllers\Api\ReviewController::class, 'store']);
 
     // Yêu thích sản phẩm (Wishlist)
     Route::get('/wishlist', [\App\Http\Controllers\Api\WishlistController::class, 'getWishlists']);

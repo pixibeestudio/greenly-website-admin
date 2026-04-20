@@ -13,10 +13,16 @@ class Review extends Model
         'user_id',
         'product_id',
         'order_id',
+        'order_detail_id',
         'rating',
         'comment',
+        'images',
         'status',
         'admin_reply',
+    ];
+
+    protected $casts = [
+        'images' => 'array',
     ];
 
     public function user()
@@ -27,5 +33,15 @@ class Review extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
+    public function orderDetail()
+    {
+        return $this->belongsTo(OrderDetail::class);
     }
 }
