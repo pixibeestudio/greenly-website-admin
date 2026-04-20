@@ -16,12 +16,6 @@
     </div>
 
     <div class="flex items-center gap-4">
-        <!-- Ô tìm kiếm -->
-        <div class="hidden sm:flex items-center bg-cream-100 rounded-full px-4 py-2 border border-transparent focus-within:border-organic-400 focus-within:bg-white transition-all">
-            <i class="fa-solid fa-search text-gray-400"></i>
-            <input type="text" placeholder="Tìm kiếm..." class="bg-transparent border-none focus:ring-0 ml-2 text-sm w-48 outline-none text-gray-600">
-        </div>
-
         <!-- Chuông thông báo -->
         <button class="relative p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
             <i class="fa-regular fa-bell text-xl"></i>

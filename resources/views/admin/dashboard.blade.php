@@ -36,14 +36,18 @@
             <h2 class="text-2xl font-bold text-gray-800">Tổng quan hệ thống</h2>
             <p class="text-sm text-gray-500 mt-0.5">Xin chào! Dưới đây là tóm tắt hoạt động kinh doanh của bạn.</p>
         </div>
-        <div class="relative">
-            <select id="timeFilter" class="bg-white border border-gray-200 rounded-xl px-4 py-2.5 pr-10 text-sm font-bold text-gray-600 outline-none focus:border-forest-500 focus:ring-1 focus:ring-forest-500 transition-all shadow-sm appearance-none cursor-pointer">
-                <option value="today">Hôm nay</option>
-                <option value="week">Tuần này</option>
-                <option value="month" selected>Tháng này</option>
-                <option value="year">Năm nay</option>
-            </select>
-            <i class="fa-solid fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+        <div class="flex items-center gap-3">
+            <!-- Spinner loading khi AJAX chạy -->
+            <span id="filterLoading" class="hidden text-forest-600 text-sm font-bold"><i class="fa-solid fa-circle-notch fa-spin"></i> Đang tải...</span>
+            <div class="relative">
+                <select id="timeFilter" class="bg-white border border-gray-200 rounded-xl px-4 py-2.5 pr-10 text-sm font-bold text-gray-600 outline-none focus:border-forest-500 focus:ring-1 focus:ring-forest-500 transition-all shadow-sm appearance-none cursor-pointer">
+                    <option value="today"  {{ ($initialPeriod ?? 'month') === 'today' ? 'selected' : '' }}>Hôm nay</option>
+                    <option value="week"   {{ ($initialPeriod ?? 'month') === 'week'  ? 'selected' : '' }}>Tuần này</option>
+                    <option value="month"  {{ ($initialPeriod ?? 'month') === 'month' ? 'selected' : '' }}>Tháng này</option>
+                    <option value="year"   {{ ($initialPeriod ?? 'month') === 'year'  ? 'selected' : '' }}>Năm nay</option>
+                </select>
+                <i class="fa-solid fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+            </div>
         </div>
     </div>
 
@@ -52,16 +56,16 @@
     <!-- ============================================ -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
-        <!-- Card 1: Doanh thu hôm nay -->
+        <!-- Card 1: Doanh thu (theo filter) -->
         <div class="kpi-card bg-gradient-to-br from-forest-900 via-forest-800 to-forest-700 p-5 rounded-2xl shadow-lg text-white relative overflow-hidden group hover:shadow-xl">
             <div class="absolute -right-4 -bottom-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
                 <i class="fa-solid fa-sack-dollar text-8xl"></i>
             </div>
             <div class="relative z-10 flex items-center justify-between">
                 <div>
-                    <p class="text-forest-100 text-[11px] font-bold uppercase tracking-wider mb-1">Doanh thu hôm nay</p>
+                    <p class="text-forest-100 text-[11px] font-bold uppercase tracking-wider mb-1">Doanh thu <span class="kpi-period-label">{{ $stats['period_label'] }}</span></p>
                     <h3 class="text-3xl font-bold text-white drop-shadow-md">
-                        <span class="kpi-counter" data-target="{{ (int) $todayRevenue }}" data-suffix="đ" data-format="currency">0đ</span>
+                        <span class="kpi-counter" id="kpi-revenue" data-target="{{ (int) $stats['revenue'] }}" data-suffix="đ" data-format="currency">0đ</span>
                     </h3>
                     <p class="text-forest-200 text-xs mt-1.5 flex items-center gap-1">
                         <i class="fa-solid fa-calendar-day text-organic-400"></i>
@@ -74,16 +78,16 @@
             </div>
         </div>
 
-        <!-- Card 2: Đơn hàng hôm nay -->
+        <!-- Card 2: Đơn hàng (theo filter) -->
         <div class="kpi-card bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 p-5 rounded-2xl shadow-lg text-white relative overflow-hidden group hover:shadow-xl">
             <div class="absolute -right-4 -bottom-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
                 <i class="fa-solid fa-boxes-stacked text-8xl"></i>
             </div>
             <div class="relative z-10 flex items-center justify-between">
                 <div>
-                    <p class="text-blue-100 text-[11px] font-bold uppercase tracking-wider mb-1">Đơn hàng hôm nay</p>
+                    <p class="text-blue-100 text-[11px] font-bold uppercase tracking-wider mb-1">Đơn hàng <span class="kpi-period-label">{{ $stats['period_label'] }}</span></p>
                     <h3 class="text-3xl font-bold text-white drop-shadow-md">
-                        <span class="kpi-counter" data-target="{{ $todayOrders }}" data-suffix=" đơn" data-format="number">0 đơn</span>
+                        <span class="kpi-counter" id="kpi-orders" data-target="{{ $stats['order_count'] }}" data-suffix=" đơn" data-format="number">0 đơn</span>
                     </h3>
                     <p class="text-blue-100 text-xs mt-1.5 flex items-center gap-1">
                         <i class="fa-solid fa-clock text-sky-300"></i>
@@ -96,20 +100,20 @@
             </div>
         </div>
 
-        <!-- Card 3: Tổng khách hàng -->
+        <!-- Card 3: Khách hàng mới (theo filter) -->
         <div class="kpi-card bg-gradient-to-br from-emerald-700 via-emerald-600 to-emerald-500 p-5 rounded-2xl shadow-lg text-white relative overflow-hidden group hover:shadow-xl">
             <div class="absolute -right-4 -bottom-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
                 <i class="fa-solid fa-users text-8xl"></i>
             </div>
             <div class="relative z-10 flex items-center justify-between">
                 <div>
-                    <p class="text-emerald-100 text-[11px] font-bold uppercase tracking-wider mb-1">Tổng khách hàng</p>
+                    <p class="text-emerald-100 text-[11px] font-bold uppercase tracking-wider mb-1">Khách hàng mới <span class="kpi-period-label">{{ $stats['period_label'] }}</span></p>
                     <h3 class="text-3xl font-bold text-white drop-shadow-md">
-                        <span class="kpi-counter" data-target="{{ $totalCustomers }}" data-suffix=" người" data-format="number">0 người</span>
+                        <span class="kpi-counter" id="kpi-customers" data-target="{{ $stats['new_customers'] }}" data-suffix=" người" data-format="number">0 người</span>
                     </h3>
                     <p class="text-emerald-100 text-xs mt-1.5 flex items-center gap-1">
-                        <i class="fa-solid fa-user-check text-yellow-300"></i>
-                        <span class="font-bold text-yellow-300">Đã đăng ký</span>
+                        <i class="fa-solid fa-user-plus text-yellow-300"></i>
+                        <span class="font-bold text-yellow-300">Mới đăng ký</span>
                     </p>
                 </div>
                 <div class="w-12 h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center text-yellow-300 text-xl shadow-inner">
@@ -118,7 +122,7 @@
             </div>
         </div>
 
-        <!-- Card 4: Tổng sản phẩm -->
+        <!-- Card 4: Tổng sản phẩm (không phụ thuộc filter) -->
         <div class="kpi-card bg-gradient-to-br from-violet-700 via-violet-600 to-violet-500 p-5 rounded-2xl shadow-lg text-white relative overflow-hidden group hover:shadow-xl">
             <div class="absolute -right-4 -bottom-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
                 <i class="fa-solid fa-leaf text-8xl"></i>
@@ -127,7 +131,7 @@
                 <div>
                     <p class="text-violet-100 text-[11px] font-bold uppercase tracking-wider mb-1">Tổng sản phẩm</p>
                     <h3 class="text-3xl font-bold text-white drop-shadow-md">
-                        <span class="kpi-counter" data-target="{{ $totalProducts }}" data-suffix=" SP" data-format="number">0 SP</span>
+                        <span class="kpi-counter" id="kpi-products" data-target="{{ $totalProducts }}" data-suffix=" SP" data-format="number">0 SP</span>
                     </h3>
                     <p class="text-violet-100 text-xs mt-1.5 flex items-center gap-1">
                         <i class="fa-solid fa-store text-violet-200"></i>
@@ -171,19 +175,19 @@
                 <p class="text-xs text-gray-400 mt-0.5">Phân bổ theo trạng thái</p>
             </div>
             <div id="orderStatusChart" class="w-full flex justify-center" style="min-height: 280px;"></div>
-            <!-- Legend thật từ DB -->
+            <!-- Legend thật từ DB (dùng id để JS cập nhật theo filter) -->
             <div class="flex flex-col gap-2 mt-4 px-2">
                 <div class="flex items-center justify-between text-sm">
                     <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span><span class="text-gray-600 font-medium">Đã giao</span></span>
-                    <span class="font-bold text-gray-800">{{ $orderStatusCounts['delivered'] }} đơn</span>
+                    <span class="font-bold text-gray-800"><span id="status-delivered">{{ $stats['order_status']['delivered'] }}</span> đơn</span>
                 </div>
                 <div class="flex items-center justify-between text-sm">
                     <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span><span class="text-gray-600 font-medium">Đang xử lý</span></span>
-                    <span class="font-bold text-gray-800">{{ $orderStatusCounts['pending'] + $orderStatusCounts['processing'] + $orderStatusCounts['shipping'] }} đơn</span>
+                    <span class="font-bold text-gray-800"><span id="status-processing">{{ $stats['order_status']['pending'] + $stats['order_status']['processing'] + $stats['order_status']['shipping'] }}</span> đơn</span>
                 </div>
                 <div class="flex items-center justify-between text-sm">
                     <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span><span class="text-gray-600 font-medium">Đã hủy</span></span>
-                    <span class="font-bold text-gray-800">{{ $orderStatusCounts['cancelled'] }} đơn</span>
+                    <span class="font-bold text-gray-800"><span id="status-cancelled">{{ $stats['order_status']['cancelled'] }}</span> đơn</span>
                 </div>
             </div>
         </div>
@@ -314,87 +318,69 @@
 
 <script>
     // ============================================
-    // 1. HIỆU ỨNG NUMBER COUNTER CHO KPI CARDS
+    // DỮ LIỆU BAN ĐẦU (server-side, được render lần đầu)
     // ============================================
-    function animateCounters() {
-        const counters = document.querySelectorAll('.kpi-counter');
-        const duration = 1500;
+    const initialStats = @json($stats);
+    const statsUrl = "{{ route('admin.dashboard.stats') }}";
 
-        counters.forEach(counter => {
-            const target = parseInt(counter.getAttribute('data-target'));
-            const suffix = counter.getAttribute('data-suffix') || '';
-            const format = counter.getAttribute('data-format');
-            const startTime = performance.now();
+    // ============================================
+    // 1. COUNTER ANIMATION (chạy khi load lần đầu + khi filter thay đổi)
+    // ============================================
+    function animateCounter(counterEl, targetValue) {
+        const suffix   = counterEl.getAttribute('data-suffix') || '';
+        const duration = 900;
+        const startValue = parseInt((counterEl.textContent.replace(/[^\d]/g, '')) || '0');
+        const startTime  = performance.now();
 
-            function updateCounter(currentTime) {
-                const elapsed = currentTime - startTime;
-                const progress = Math.min(elapsed / duration, 1);
+        function update(currentTime) {
+            const elapsed  = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const ease     = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+            const value    = Math.floor(startValue + (targetValue - startValue) * ease);
+            counterEl.textContent = value.toLocaleString('vi-VN') + suffix;
 
-                // Easing: ease-out cubic
-                const easeOut = 1 - Math.pow(1 - progress, 3);
-                const current = Math.floor(easeOut * target);
-
-                if (format === 'currency') {
-                    counter.textContent = current.toLocaleString('vi-VN') + suffix;
-                } else {
-                    counter.textContent = current.toLocaleString('vi-VN') + suffix;
-                }
-
-                if (progress < 1) {
-                    requestAnimationFrame(updateCounter);
-                } else {
-                    counter.textContent = target.toLocaleString('vi-VN') + suffix;
-                }
+            if (progress < 1) {
+                requestAnimationFrame(update);
+            } else {
+                counterEl.textContent = targetValue.toLocaleString('vi-VN') + suffix;
+                counterEl.setAttribute('data-target', targetValue);
             }
+        }
+        requestAnimationFrame(update);
+    }
 
-            requestAnimationFrame(updateCounter);
+    function animateAllCounters() {
+        document.querySelectorAll('.kpi-counter').forEach(el => {
+            animateCounter(el, parseInt(el.getAttribute('data-target')) || 0);
         });
     }
 
-    // Chạy counter khi trang load xong
-    document.addEventListener('DOMContentLoaded', animateCounters);
+    document.addEventListener('DOMContentLoaded', animateAllCounters);
 
     // ============================================
-    // 2. BIỂU ĐỒ DOANH THU & LỢI NHUẬN (Area Chart)
+    // 2. BIỂU ĐỒ DOANH THU & LỢI NHUẬN (Area Chart) - dùng dữ liệu thật
     // ============================================
     const revenueOptions = {
         series: [
-            {
-                name: 'Doanh thu',
-                data: [3200000, 4100000, 3800000, 4500000, 3600000, 2900000, 3300000]
-            },
-            {
-                name: 'Lợi nhuận',
-                data: [1100000, 1500000, 1200000, 1800000, 1300000, 900000, 1400000]
-            }
+            { name: 'Doanh thu',  data: initialStats.chart.revenue },
+            { name: 'Lợi nhuận', data: initialStats.chart.profit  }
         ],
         chart: {
             type: 'area',
             height: 320,
             fontFamily: 'Quicksand, sans-serif',
             toolbar: { show: false },
-            animations: {
-                enabled: true,
-                easing: 'easeinout',
-                speed: 1000,
-                animateGradually: { enabled: true, delay: 150 },
-                dynamicAnimation: { enabled: true, speed: 350 }
-            }
+            animations: { enabled: true, easing: 'easeinout', speed: 800 }
         },
         colors: ['#2e7d32', '#f9a825'],
         fill: {
             type: 'gradient',
-            gradient: {
-                shadeIntensity: 1,
-                opacityFrom: 0.4,
-                opacityTo: 0.05,
-                stops: [0, 90, 100]
-            }
+            gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05, stops: [0, 90, 100] }
         },
         stroke: { curve: 'smooth', width: 3 },
         dataLabels: { enabled: false },
         xaxis: {
-            categories: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+            categories: initialStats.chart.categories,
             labels: { style: { fontWeight: 600, colors: '#9ca3af' } },
             axisBorder: { show: false },
             axisTicks: { show: false }
@@ -409,19 +395,12 @@
                 }
             }
         },
-        grid: {
-            borderColor: '#f1f5f9',
-            strokeDashArray: 4,
-            padding: { left: 10, right: 10 }
-        },
+        grid: { borderColor: '#f1f5f9', strokeDashArray: 4, padding: { left: 10, right: 10 } },
         tooltip: {
-            y: {
-                formatter: function(val) {
-                    return val.toLocaleString('vi-VN') + '₫';
-                }
-            }
+            y: { formatter: function(val) { return (val || 0).toLocaleString('vi-VN') + '₫'; } }
         },
-        legend: { show: false }
+        legend: { show: false },
+        noData: { text: 'Chưa có dữ liệu doanh thu trong khoảng thời gian này.' }
     };
 
     const revenueChart = new ApexCharts(document.querySelector('#revenueChart'), revenueOptions);
@@ -430,18 +409,21 @@
     // ============================================
     // 3. BIỂU ĐỒ TRẠNG THÁI ĐƠN HÀNG (Donut Chart)
     // ============================================
+    function computeDonutSeries(orderStatus) {
+        return [
+            orderStatus.delivered,
+            orderStatus.pending + orderStatus.processing + orderStatus.shipping,
+            orderStatus.cancelled,
+        ];
+    }
+
     const orderStatusOptions = {
-        series: [{{ $orderStatusCounts['delivered'] }}, {{ $orderStatusCounts['pending'] + $orderStatusCounts['processing'] + $orderStatusCounts['shipping'] }}, {{ $orderStatusCounts['cancelled'] }}],
+        series: computeDonutSeries(initialStats.order_status),
         chart: {
             type: 'donut',
             height: 260,
             fontFamily: 'Quicksand, sans-serif',
-            animations: {
-                enabled: true,
-                easing: 'easeinout',
-                speed: 1200,
-                animateGradually: { enabled: true, delay: 200 }
-            }
+            animations: { enabled: true, easing: 'easeinout', speed: 800 }
         },
         colors: ['#10b981', '#f59e0b', '#ef4444'],
         labels: ['Đã giao', 'Đang xử lý', 'Đã hủy'],
@@ -451,25 +433,13 @@
                     size: '70%',
                     labels: {
                         show: true,
-                        name: {
-                            show: true,
-                            fontSize: '14px',
-                            fontWeight: 700,
-                            color: '#374151'
-                        },
+                        name:  { show: true, fontSize: '14px', fontWeight: 700, color: '#374151' },
                         value: {
-                            show: true,
-                            fontSize: '24px',
-                            fontWeight: 700,
-                            color: '#1f2937',
+                            show: true, fontSize: '24px', fontWeight: 700, color: '#1f2937',
                             formatter: function(val) { return val + ' đơn'; }
                         },
                         total: {
-                            show: true,
-                            label: 'Tổng đơn',
-                            fontSize: '12px',
-                            fontWeight: 600,
-                            color: '#9ca3af',
+                            show: true, label: 'Tổng đơn', fontSize: '12px', fontWeight: 600, color: '#9ca3af',
                             formatter: function(w) {
                                 return w.globals.seriesTotals.reduce((a, b) => a + b, 0) + ' đơn';
                             }
@@ -481,14 +451,83 @@
         dataLabels: { enabled: false },
         stroke: { width: 2, colors: ['#fff'] },
         legend: { show: false },
-        tooltip: {
-            y: {
-                formatter: function(val) { return val + ' đơn'; }
-            }
-        }
+        tooltip: { y: { formatter: function(val) { return val + ' đơn'; } } },
+        noData: { text: 'Không có đơn hàng trong khoảng thời gian này.' }
     };
 
     const orderStatusChart = new ApexCharts(document.querySelector('#orderStatusChart'), orderStatusOptions);
     orderStatusChart.render();
+
+    // ============================================
+    // 4. BỘ LỌC THỜI GIAN - AJAX cập nhật toàn bộ Dashboard
+    // ============================================
+    const timeFilter    = document.getElementById('timeFilter');
+    const filterLoading = document.getElementById('filterLoading');
+
+    async function fetchStats(period) {
+        filterLoading.classList.remove('hidden');
+        timeFilter.disabled = true;
+
+        try {
+            const res = await fetch(`${statsUrl}?period=${period}`, {
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin',
+            });
+
+            if (!res.ok) throw new Error('Không tải được số liệu');
+            const json = await res.json();
+            if (!json.success) throw new Error('Phản hồi không hợp lệ');
+
+            applyStats(json.data);
+        } catch (err) {
+            if (typeof showErrorNotification === 'function') {
+                showErrorNotification('Không thể tải số liệu: ' + err.message);
+            } else {
+                alert('Không thể tải số liệu: ' + err.message);
+            }
+        } finally {
+            filterLoading.classList.add('hidden');
+            timeFilter.disabled = false;
+        }
+    }
+
+    function applyStats(data) {
+        // 1. Cập nhật nhãn "hôm nay / tuần này..."
+        document.querySelectorAll('.kpi-period-label').forEach(el => {
+            el.textContent = data.period_label;
+        });
+
+        // 2. Cập nhật KPI với animation
+        const revenueEl   = document.getElementById('kpi-revenue');
+        const ordersEl    = document.getElementById('kpi-orders');
+        const customersEl = document.getElementById('kpi-customers');
+        // Products là tổng tất cả, không đổi theo filter
+        if (revenueEl)   animateCounter(revenueEl,   data.revenue);
+        if (ordersEl)    animateCounter(ordersEl,    data.order_count);
+        if (customersEl) animateCounter(customersEl, data.new_customers);
+
+        // 3. Cập nhật legend donut
+        const delEl  = document.getElementById('status-delivered');
+        const procEl = document.getElementById('status-processing');
+        const canEl  = document.getElementById('status-cancelled');
+        if (delEl)  delEl.textContent  = data.order_status.delivered;
+        if (procEl) procEl.textContent = data.order_status.pending + data.order_status.processing + data.order_status.shipping;
+        if (canEl)  canEl.textContent  = data.order_status.cancelled;
+
+        // 4. Cập nhật biểu đồ doanh thu
+        revenueChart.updateOptions({ xaxis: { categories: data.chart.categories } }, false, true);
+        revenueChart.updateSeries([
+            { name: 'Doanh thu',  data: data.chart.revenue },
+            { name: 'Lợi nhuận', data: data.chart.profit  },
+        ], true);
+
+        // 5. Cập nhật donut chart
+        orderStatusChart.updateSeries(computeDonutSeries(data.order_status), true);
+    }
+
+    // Lắng nghe thay đổi bộ lọc
+    timeFilter.addEventListener('change', function () {
+        fetchStats(this.value);
+    });
 </script>
 @endpush

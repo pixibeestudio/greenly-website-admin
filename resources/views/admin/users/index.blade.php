@@ -173,10 +173,10 @@
                             <td class="px-6 py-4">
                                 <span class="font-bold text-sm {{ $user->status === 'locked' ? 'text-gray-500 line-through' : 'text-gray-800 group-hover:text-forest-700' }} transition-colors">{{ $user->fullname }}</span>
                             </td>
-                            <!-- Email -->
-                            <td class="px-6 py-4 {{ $user->status === 'locked' ? 'text-gray-500 line-through' : 'text-gray-600' }}">{{ $user->email }}</td>
-                            <!-- Số điện thoại -->
-                            <td class="px-6 py-4 font-mono {{ $user->status === 'locked' ? 'text-gray-500' : 'text-gray-700' }}">{{ $user->phone ?? '—' }}</td>
+                            <!-- Email (đã mask để bảo mật) -->
+                            <td class="px-6 py-4 {{ $user->status === 'locked' ? 'text-gray-500 line-through' : 'text-gray-600' }}" title="Bấm icon mắt để xem đầy đủ">{{ $user->masked_email }}</td>
+                            <!-- Số điện thoại (đã mask) -->
+                            <td class="px-6 py-4 font-mono {{ $user->status === 'locked' ? 'text-gray-500' : 'text-gray-700' }}" title="Bấm icon mắt để xem đầy đủ">{{ $user->masked_phone ?? '—' }}</td>
                             <!-- Vai trò -->
                             <td class="px-6 py-4 text-center">
                                 @switch($user->role)

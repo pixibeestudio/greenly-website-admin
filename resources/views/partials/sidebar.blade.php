@@ -4,7 +4,10 @@
     <!-- Logo Area -->
     <div class="h-20 flex items-center justify-center border-b border-forest-700 bg-forest-900">
         <div class="flex items-center gap-3">
-            <img src="{{ asset('images/logo.png') }}" alt="Greenly Logo" class="h-10 w-auto">
+            <!-- Logo bo tròn, viền nhẹ để nổi bật trên nền tối -->
+            <div class="w-11 h-11 rounded-full overflow-hidden bg-white ring-2 ring-organic-400/60 shadow-md flex items-center justify-center">
+                <img src="{{ asset('images/logo.png') }}" alt="Greenly Logo" class="w-full h-full object-cover">
+            </div>
             <div>
                 <h1 class="text-xl font-bold tracking-wide">GREENLY</h1>
                 <p class="text-xs text-forest-100 uppercase tracking-wider">Admin Premium</p>
@@ -110,13 +113,38 @@
     </nav>
 
     <!-- Thông tin người dùng (Cuối Sidebar) -->
+    @php
+        $currentUser = auth()->user();
+        // Nếu chưa login (ví dụ lỡ vào trang public), hiển thị placeholder an toàn
+        $displayName   = $currentUser->fullname ?? 'Quản trị viên';
+        $displayEmail  = $currentUser->masked_email ?? 'admin@greenly.com';
+        $avatarFallback= 'https://ui-avatars.com/api/?name=' . urlencode($displayName) . '&background=f9a825&color=fff&bold=true&rounded=true';
+        $avatarUrl     = $currentUser && $currentUser->avatar
+            ? asset('storage/' . $currentUser->avatar)
+            : $avatarFallback;
+    @endphp
     <div class="p-4 border-t border-forest-700 bg-forest-900">
         <div class="flex items-center gap-3">
-            <img src="https://ui-avatars.com/api/?name=Admin+User&background=f9a825&color=fff" alt="Admin" class="w-10 h-10 rounded-full border-2 border-white">
-            <div class="overflow-hidden">
-                <h4 class="text-sm font-semibold truncate">Quản trị viên</h4>
-                <p class="text-xs text-forest-100 truncate">admin@greenly.com</p>
+            <!-- Avatar bo tròn hoàn toàn -->
+            <img src="{{ $avatarUrl }}" alt="Avatar quản trị viên"
+                 class="w-10 h-10 rounded-full object-cover border-2 border-organic-400 shadow-md flex-shrink-0"
+                 onerror="this.src='{{ $avatarFallback }}'">
+            <div class="overflow-hidden flex-1 min-w-0">
+                <h4 class="text-sm font-bold truncate">{{ $displayName }}</h4>
+                <p class="text-xs text-forest-100 truncate" title="Đã ẩn để bảo mật">{{ $displayEmail }}</p>
             </div>
         </div>
+
+        <!-- Nút Đăng xuất -->
+        @auth
+        <form method="POST" action="{{ route('logout') }}" class="mt-3">
+            @csrf
+            <button type="submit"
+                class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-forest-700/60 hover:bg-red-600/90 text-forest-100 hover:text-white text-xs font-bold transition-all border border-forest-600 hover:border-red-500">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Đăng xuất</span>
+            </button>
+        </form>
+        @endauth
     </div>
 </aside>
