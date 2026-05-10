@@ -137,10 +137,35 @@ class MomoService
         $payUrl   = $body['payUrl']   ?? null;
         $deeplink = $body['deeplink'] ?? null;
 
-        // Với type=qr: dùng dịch vụ qrserver.com để encode payUrl thành ảnh QR
+        // ========================================================================
+        // Tạo QR code URL với thứ tự ưu tiên:
+        //   1. qrCodeUrl trực tiếp từ MoMo response (nếu MoMo trả về)
+        //   2. Generate QR từ deeplink momo://...
+        //      → Khi scan bằng MoMo App, MoMo nhận diện là payment intent
+        //        và mở form xác nhận trong app (giống luồng deeplink)
+        //   3. Fallback cuối: generate từ payUrl (https://test-payment.momo.vn/...)
+        //      → KHÔNG khuyến nghị: MoMo App sẽ mở WebView hiển thị trang web,
+        //        không có form xác nhận trong app như mong đợi.
+        //
+        // Lưu ý: deeplink chứa các thông tin cần thiết (orderId, amount, signature)
+        // mà MoMo App có thể parse và xử lý nội bộ giống như khi user bấm "Mở app MoMo"
+        // ngay trên thiết bị thanh toán.
+        // ========================================================================
         $qrCodeUrl = null;
-        if ($type === 'qr' && !empty($payUrl)) {
-            $qrCodeUrl = config('momo.qr_generator_url') . urlencode($payUrl);
+        if ($type === 'qr') {
+            if (!empty($body['qrCodeUrl'])) {
+                // Ưu tiên 1: dùng QR có sẵn từ MoMo (chuẩn nhất)
+                $qrCodeUrl = $body['qrCodeUrl'];
+            } elseif (!empty($deeplink)) {
+                // Ưu tiên 2: encode deeplink momo:// → MoMo App nhận diện ngay
+                $qrCodeUrl = config('momo.qr_generator_url') . urlencode($deeplink);
+            } elseif (!empty($payUrl)) {
+                // Fallback cuối: encode payUrl (mở WebView, không có form xác nhận)
+                Log::warning('MoMo: thiếu deeplink, fallback QR sang payUrl', [
+                    'momo_order_id' => $momoOrderId,
+                ]);
+                $qrCodeUrl = config('momo.qr_generator_url') . urlencode($payUrl);
+            }
         }
 
         return MomoTransaction::create([

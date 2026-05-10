@@ -19,6 +19,18 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Khi người dùng chưa đăng nhập, redirect về trang login
         $middleware->redirectGuestsTo(fn () => route('login'));
+
+        // Tin tuong proxy ngrok (chay dev/sandbox).
+        // Khi request den qua https://...ngrok-free.dev forward ve http://localhost:8000,
+        // can trust proxy de Laravel xac dinh dung scheme HTTPS, tranh sai URL trong asset()/route().
+        // '*' = trust tat ca proxy (chap nhan trong moi truong dev voi ngrok).
+        $middleware->trustProxies(at: '*', headers:
+            \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR |
+            \Illuminate\Http\Request::HEADER_X_FORWARDED_HOST |
+            \Illuminate\Http\Request::HEADER_X_FORWARDED_PORT |
+            \Illuminate\Http\Request::HEADER_X_FORWARDED_PROTO |
+            \Illuminate\Http\Request::HEADER_X_FORWARDED_AWS_ELB
+        );
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
