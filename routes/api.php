@@ -29,6 +29,10 @@ Route::get('/products/{id}/reviews', [\App\Http\Controllers\Api\ReviewController
 Route::post('/register', [\App\Http\Controllers\Api\AuthController::class, 'register']);
 Route::post('/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
 
+// MoMo IPN callback - PUBLIC endpoint (MoMo gọi từ server của họ, không có token user)
+// Endpoint này tự verify chữ ký HMAC để bảo mật
+Route::post('/momo/ipn', [\App\Http\Controllers\Api\MomoController::class, 'ipn']);
+
 // API yêu cầu đăng nhập (Sanctum)
 Route::middleware('auth:sanctum')->group(function () {
     // Giỏ hàng
@@ -45,8 +49,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/my-orders', [\App\Http\Controllers\Api\OrderController::class, 'getUserOrders']);
     Route::post('/orders/{id}/confirm-payment', [\App\Http\Controllers\Api\CheckoutController::class, 'confirmPayment']);
 
-    // Kiểm tra trạng thái thanh toán (app polling)
+    // Kiểm tra trạng thái thanh toán (app polling - generic, fallback)
     Route::get('/payment/status/{id}', [\App\Http\Controllers\Api\CheckoutController::class, 'checkPaymentStatus']);
+
+    // === MoMo Payment API ===
+    // Tạo giao dịch MoMo (app/qr) cho đơn hàng đã đặt
+    Route::post('/momo/create-payment', [\App\Http\Controllers\Api\MomoController::class, 'createPayment']);
+    // Polling trạng thái giao dịch MoMo theo order_id
+    Route::get('/momo/status/{orderId}', [\App\Http\Controllers\Api\MomoController::class, 'checkStatus']);
 
     // Sổ địa chỉ (Addresses)
     Route::get('/addresses', [\App\Http\Controllers\Api\AddressController::class, 'index']);

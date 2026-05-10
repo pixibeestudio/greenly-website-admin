@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\PaymentController;
 use App\Models\Batch;
 use App\Models\Cart;
 use App\Models\Order;
@@ -144,10 +143,10 @@ class CheckoutController extends Controller
                 'order_status' => $order->order_status,
             ];
 
-            // Nếu thanh toán bằng chuyển khoản, trả thêm payment_url cho app tạo QR
-            if ($request->payment_method === 'banking') {
-                $responseData['payment_url'] = PaymentController::generatePaymentUrl($order->id);
-            }
+            // Lưu ý: Với phương thức 'banking' (MoMo), app sẽ gọi tiếp
+            // POST /api/momo/create-payment để lấy payUrl/QR sau khi tạo order.
+            // Không cần trả payment_url ở response checkout nữa.
+            $responseData['payment_method'] = $order->payment_method;
 
             return response()->json([
                 'success' => true,

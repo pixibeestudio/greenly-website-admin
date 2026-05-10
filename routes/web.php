@@ -37,10 +37,6 @@ Route::post('/logout', [\App\Http\Controllers\Auth\AuthController::class, 'logou
     ->middleware('auth')
     ->name('logout');
 
-// Trang xác nhận thanh toán giả lập (public, quét QR từ app mở trang này)
-Route::get('/payment/{orderId}/{token}', [\App\Http\Controllers\PaymentController::class, 'showPaymentPage'])->name('payment.show');
-Route::post('/payment/{orderId}/{token}/confirm', [\App\Http\Controllers\PaymentController::class, 'processPayment'])->name('payment.confirm');
-
 // --- Route nhóm Admin (yêu cầu đăng nhập + role admin) ---
 Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     // Dashboard - trang chính
