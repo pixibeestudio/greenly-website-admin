@@ -10,6 +10,7 @@ use App\Models\OrderDetail;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Services\NotificationService;
 
 class CheckoutController extends Controller
 {
@@ -132,6 +133,9 @@ class CheckoutController extends Controller
 
             // Bước 7: Xóa toàn bộ giỏ hàng
             Cart::where('user_id', $userId)->delete();
+
+            // Bước 7.5: Tạo thông báo đặt hàng thành công cho khách
+            NotificationService::createOrderNotification($order, 'pending');
 
             // Bước 8: Commit transaction
             DB::commit();

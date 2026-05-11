@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Services\NotificationService;
 
 class ShipperApiController extends Controller
 {
@@ -144,6 +145,9 @@ class ShipperApiController extends Controller
             'delivery_date' => now(),
         ]);
 
+        // Tạo thông báo cho khách: giao hàng thành công
+        NotificationService::createOrderNotification($order, 'delivered');
+
         // Cập nhật trạng thái shipper nếu không còn đơn nào đang giao
         $remainingOrders = Order::where('shipper_id', $shipperId)
             ->whereIn('order_status', ['ready_for_pickup', 'shipping'])
@@ -278,6 +282,9 @@ class ShipperApiController extends Controller
             'order_status' => 'shipping',
         ]);
 
+        // Tạo thông báo cho khách: đơn đang được giao
+        NotificationService::createOrderNotification($order, 'shipping');
+
         return response()->json([
             'success' => true,
             'message' => 'Đã lấy hàng đơn ' . $order->order_code . ', bắt đầu giao!',
@@ -386,6 +393,9 @@ class ShipperApiController extends Controller
         $order->update([
             'order_status' => 'cancelled',
         ]);
+
+        // Tạo thông báo cho khách: đơn đã bị hủy
+        NotificationService::createOrderNotification($order, 'cancelled');
 
         // Cập nhật trạng thái shipper nếu không còn đơn nào đang giao
         $remainingOrders = Order::where('shipper_id', $shipperId)

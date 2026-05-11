@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\User;
 use Carbon\Carbon;
+use App\Services\NotificationService;
 
 class OrderController extends Controller
 {
@@ -93,6 +94,9 @@ class OrderController extends Controller
             $order->update(['delivery_date' => now()]);
         }
 
+        // Tạo thông báo cho khách hàng khi trạng thái đơn thay đổi
+        NotificationService::createOrderNotification($order, $request->order_status);
+
         return redirect()->route('admin.orders.index', $request->query())
             ->with('success', 'Cập nhật đơn hàng ' . $order->order_code . ' thành công!');
     }
@@ -110,6 +114,9 @@ class OrderController extends Controller
             'shipper_id'   => $request->shipper_id,
             'order_status' => 'ready_for_pickup',
         ]);
+
+        // Tạo thông báo cho khách hàng khi đơn sẵn sàng giao
+        NotificationService::createOrderNotification($order, 'ready_for_pickup');
 
         // Cập nhật trạng thái shipper thành đang giao
         User::where('id', $request->shipper_id)->update(['work_status' => 'on_delivery']);

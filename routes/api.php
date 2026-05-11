@@ -72,6 +72,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reviews/my', [\App\Http\Controllers\Api\ReviewController::class, 'myReviews']);
     Route::post('/reviews', [\App\Http\Controllers\Api\ReviewController::class, 'store']);
 
+    // Thông báo (Notifications)
+    Route::get('/notifications', [\App\Http\Controllers\Api\NotificationController::class, 'index']);
+    Route::get('/notifications/unread-count', [\App\Http\Controllers\Api\NotificationController::class, 'unreadCount']);
+    Route::post('/notifications/{id}/read', [\App\Http\Controllers\Api\NotificationController::class, 'markAsRead']);
+    Route::post('/notifications/read-all', [\App\Http\Controllers\Api\NotificationController::class, 'markAllAsRead']);
+
     // Yêu thích sản phẩm (Wishlist)
     Route::get('/wishlist', [\App\Http\Controllers\Api\WishlistController::class, 'getWishlists']);
     Route::post('/wishlist/toggle', [\App\Http\Controllers\Api\WishlistController::class, 'toggleFavorite']);
