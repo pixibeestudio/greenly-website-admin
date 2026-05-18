@@ -81,6 +81,15 @@ class WishlistController extends Controller
     }
 
     /**
+     * Đếm số lượng sản phẩm yêu thích (cho badge count)
+     */
+    public function count(Request $request)
+    {
+        $count = Wishlist::where('user_id', $request->user()->id)->count();
+        return response()->json(['count' => $count], 200);
+    }
+
+    /**
      * API xóa toàn bộ danh sách yêu thích của User hiện tại
      */
     public function clearWishlists(Request $request)

@@ -489,9 +489,11 @@ class ShipperApiController extends Controller
             ->where('order_status', 'delivered')
             ->sum('shipping_fee') ?? 0;
 
-        // 2. COD đang giữ = tổng total_money của đơn delivered TRONG NGÀY HÔM NAY
+        // 2. COD đang giữ = tổng total_money đơn COD delivered hôm nay, chưa nộp tiền
         $codBalance = Order::where('shipper_id', $shipperId)
             ->where('order_status', 'delivered')
+            ->where('payment_method', 'COD')
+            ->where('payment_status', '!=', 'completed')
             ->whereDate('updated_at', $today)
             ->sum('total_money') ?? 0;
 

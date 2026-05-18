@@ -137,6 +137,13 @@ class CartController extends Controller
         ], 200);
     }
 
+    // Đếm số lượng sản phẩm trong giỏ hàng (cho badge count)
+    public function count()
+    {
+        $count = Cart::where('user_id', auth()->id())->count();
+        return response()->json(['count' => $count], 200);
+    }
+
     // Xóa toàn bộ giỏ hàng của user
     public function clear()
     {

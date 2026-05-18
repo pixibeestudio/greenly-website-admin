@@ -36,6 +36,7 @@ Route::post('/momo/ipn', [\App\Http\Controllers\Api\MomoController::class, 'ipn'
 // API yêu cầu đăng nhập (Sanctum)
 Route::middleware('auth:sanctum')->group(function () {
     // Giỏ hàng
+    Route::get('/carts/count', [\App\Http\Controllers\Api\CartController::class, 'count']);
     Route::get('/carts', [\App\Http\Controllers\Api\CartController::class, 'index']);
     Route::post('/carts', [\App\Http\Controllers\Api\CartController::class, 'store']);
     Route::put('/carts/{id}', [\App\Http\Controllers\Api\CartController::class, 'update']);
@@ -79,6 +80,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/notifications/read-all', [\App\Http\Controllers\Api\NotificationController::class, 'markAllAsRead']);
 
     // Yêu thích sản phẩm (Wishlist)
+    Route::get('/wishlist/count', [\App\Http\Controllers\Api\WishlistController::class, 'count']);
     Route::get('/wishlist', [\App\Http\Controllers\Api\WishlistController::class, 'getWishlists']);
     Route::post('/wishlist/toggle', [\App\Http\Controllers\Api\WishlistController::class, 'toggleFavorite']);
     Route::delete('/wishlist/clear', [\App\Http\Controllers\Api\WishlistController::class, 'clearWishlists']);
